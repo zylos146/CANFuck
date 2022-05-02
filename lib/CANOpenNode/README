@@ -1,0 +1,4 @@
+Created from https://github.com/nathanRamaNoodles/CANopen-ESP32-nodes using
+Alexander Miller's implementation
+
+Based on CANOpenNode @ https://github.com/CANopenNode/CANopenNode/tree/a1f36cbe156c5a87eb0d57e845dd46c9eaf5a959
