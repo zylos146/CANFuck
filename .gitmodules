@@ -1,0 +1,4 @@
+[submodule "lib/StrokeEngine"]
+	path = lib/StrokeEngine
+	url = https://github.com/theelims/StrokeEngine.git
+	branch = main
