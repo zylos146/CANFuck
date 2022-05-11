@@ -44,12 +44,10 @@
 #include "soc/soc.h"
 
 #include "CANopen.h"
-#include "CO_OD.h"
 #include "CO_config.h"
-#include "modul_config.h"
+#include "CO_OD.h"
 #include "CO_driver.h"
 #include "CO_Emergency.h"
-#include "CO_config.h"
 
 #include "driver/twai.h"
 #include "driver/gpio.h"
@@ -57,10 +55,11 @@
 CO_CANmodule_t *CANmodulePointer = NULL;
 
 //CAN Timing configuration
-static twai_timing_config_t timingConfig = TWAI_TIMING_CONFIG_1MBITS();     //Set Baudrate to 1Mbit
+static twai_timing_config_t timingConfig = TWAI_TIMING_CONFIG_500KBITS();     //Set Baudrate to 1Mbit
                                                                           //CAN Filter configuration
 static twai_filter_config_t filterConfig = TWAI_FILTER_CONFIG_ACCEPT_ALL(); //Disable Message Filter
                                                                           //CAN General configuration
+                                                                          
 static twai_general_config_t generalConfig = {.mode = TWAI_MODE_NORMAL,
                                              .tx_io = CAN_TX_IO,                  /*TX IO Pin (CO_config.h)*/
                                              .rx_io = CAN_RX_IO,                  /*RX IO Pin (CO_config.h)*/
@@ -68,7 +67,7 @@ static twai_general_config_t generalConfig = {.mode = TWAI_MODE_NORMAL,
                                              .bus_off_io = TWAI_IO_UNUSED,         /*No busoff pin*/
                                              .tx_queue_len = CAN_TX_QUEUE_LENGTH, /*ESP TX Buffer Size (CO_config.h)*/
                                              .rx_queue_len = CAN_RX_QUEUE_LENGTH, /*ESP RX Buffer Size (CO_config.h)*/
-                                             .alerts_enabled = TWAI_ALERT_NONE,    /*Disable CAN Alarms TODO: Enable for CO_CANverifyErrors*/
+                                             .alerts_enabled = TWAI_ALERT_ALL | TWAI_ALERT_AND_LOG,    /*Disable CAN Alarms TODO: Enable for CO_CANverifyErrors*/
                                              .clkout_divider = 0};                /*No Clockout*/
 
 //Timer Interrupt Configuration
@@ -89,11 +88,15 @@ void CO_CANsetConfigurationMode(void *CANdriverState)
 /******************************************************************************/
 void CO_CANsetNormalMode(CO_CANmodule_t *CANmodule)
 {
+    
+      ESP_LOGI("CANOpen.init", "install");
     /*Install CAN driver*/
     ESP_ERROR_CHECK(twai_driver_install(&generalConfig, &timingConfig, &filterConfig));
     /*Start CAN Controller*/
+      ESP_LOGI("CANOpen.init", "start");
     ESP_ERROR_CHECK(twai_start());
 
+      ESP_LOGI("CANOpen.init", "add handler");
     /*WORKAROUND: INTERRUPT ALLOCATION FÜR CAN NICHT MÖGLICH DA BEREITS IM IDF TREIBER VERWENDET*/
     /* Configure Timer interrupt function for execution every CO_CAN_PSEUDO_INTERRUPT_INTERVAL */
     ESP_ERROR_CHECK(esp_timer_create(&CO_CANinterruptArgs, &CO_CANinterruptPeriodicTimer));
@@ -394,15 +397,17 @@ CO_ReturnError_t CO_CANsend(CO_CANmodule_t *CANmodule, CO_CANtx_t *buffer)
         {
             temp_can_message.data[i] = buffer->data[i]; /* copy data from buffer in esp can message */
         }
+
         /* Transmit esp can message.  */
-        if (twai_transmit(&temp_can_message, pdMS_TO_TICKS(CAN_TICKS_TO_WAIT)) == ESP_OK)
+        esp_err_t send_err = twai_transmit(&temp_can_message, pdMS_TO_TICKS(CAN_MS_TO_WAIT));
+        if (send_err == ESP_OK)
         {
             ESP_LOGI("CANsend", "ID: %d , Data %d,%d,%d,%d,%d,%d", temp_can_message.identifier, temp_can_message.data[0], temp_can_message.data[1], temp_can_message.data[2], temp_can_message.data[3], temp_can_message.data[4], temp_can_message.data[5]);
         }
         else
         {
             err = CO_ERROR_TIMEOUT;
-            ESP_LOGE("CO_CANsend", "Failed to queue message for transmission");
+            ESP_LOGE("CO_CANsend", "Failed to queue message for transmission - %u", send_err);
         }
     }
     /* if no buffer is free, message will be sent by interrupt */
@@ -549,7 +554,7 @@ void CO_CANinterrupt(void *args)
     if (esp_can_hw_status.msgs_to_rx != 0)
     {
         twai_message_t temp_can_message; //ESP data type can message
-        ESP_ERROR_CHECK(twai_receive(&temp_can_message, pdMS_TO_TICKS(CAN_TICKS_TO_WAIT)));
+        ESP_ERROR_CHECK(twai_receive(&temp_can_message, pdMS_TO_TICKS(CAN_MS_TO_WAIT)));
 
         CO_CANrxMsg_t rcvMsg;      /* pointer to received message in CAN module */
         uint16_t index;            /* index of received message */
