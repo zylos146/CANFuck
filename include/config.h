@@ -11,9 +11,6 @@
 //----------------------------------
 
 //#### CANOPEN CONFIG ####
-#define CAN_BITRATE 500    /* kbit */
-#define NODE_ID_SELF 0x42
-#define NODE_ID_LINMOT 0x3F
 //----------------------------------
 
 #define UART_PORT UART_NUM_0
