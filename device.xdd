@@ -15,7 +15,7 @@
         <ProfileTechnology>CANopen</ProfileTechnology>
       </ISO15745Reference>
     </ProfileHeader>
-    <ProfileBody xmlns:q1="http://www.canopen.org/xml/1.1" xsi:type="q1:ProfileBody_Device_CANopen" formatName="CANopen" formatVersion="1.0" fileName="device.xdd" fileCreator="Zylos" fileCreationDate="2020-11-28" fileCreationTime="07:37:54.0000000-04:00" fileModifiedBy="Zylos" fileModificationDate="2022-05-14" fileModificationTime="00:48:55.6204701-04:00" fileVersion="1" supportedLanguages="en" xmlns="">
+    <ProfileBody xmlns:q1="http://www.canopen.org/xml/1.1" xsi:type="q1:ProfileBody_Device_CANopen" formatName="CANopen" formatVersion="1.0" fileName="device.xdd" fileCreator="Zylos" fileCreationDate="2020-11-28" fileCreationTime="07:37:54.0000000-04:00" fileModifiedBy="Zylos" fileModificationDate="2022-05-14" fileModificationTime="00:53:25.5330815-04:00" fileVersion="1" supportedLanguages="en" xmlns="">
       <q1:DeviceIdentity>
         <q1:vendorName>Central Nexus</q1:vendorName>
         <q1:vendorID></q1:vendorID>
@@ -151,28 +151,6 @@
               <USINT />
             </q1:varDeclaration>
           </q1:struct>
-          <q1:struct name="RPDO communication parameter" uniqueID="UID_REC_1402">
-            <q1:varDeclaration name="max sub-index" uniqueID="UID_RECSUB_140200">
-              <USINT />
-            </q1:varDeclaration>
-            <q1:varDeclaration name="COB-ID used by RPDO" uniqueID="UID_RECSUB_140201">
-              <UDINT />
-            </q1:varDeclaration>
-            <q1:varDeclaration name="transmission type" uniqueID="UID_RECSUB_140202">
-              <USINT />
-            </q1:varDeclaration>
-          </q1:struct>
-          <q1:struct name="RPDO communication parameter" uniqueID="UID_REC_1403">
-            <q1:varDeclaration name="max sub-index" uniqueID="UID_RECSUB_140300">
-              <USINT />
-            </q1:varDeclaration>
-            <q1:varDeclaration name="COB-ID used by RPDO" uniqueID="UID_RECSUB_140301">
-              <UDINT />
-            </q1:varDeclaration>
-            <q1:varDeclaration name="transmission type" uniqueID="UID_RECSUB_140302">
-              <USINT />
-            </q1:varDeclaration>
-          </q1:struct>
           <q1:struct name="RPDO mapping parameter" uniqueID="UID_REC_1600">
             <q1:varDeclaration name="Number of mapped objects" uniqueID="UID_RECSUB_160000">
               <USINT />
@@ -205,16 +183,6 @@
             </q1:varDeclaration>
             <q1:varDeclaration name="Mapped object 4" uniqueID="UID_RECSUB_160104">
               <UDINT />
-            </q1:varDeclaration>
-          </q1:struct>
-          <q1:struct name="RPDO mapping parameter" uniqueID="UID_REC_1602">
-            <q1:varDeclaration name="Number of mapped objects" uniqueID="UID_RECSUB_160200">
-              <USINT />
-            </q1:varDeclaration>
-          </q1:struct>
-          <q1:struct name="RPDO mapping parameter" uniqueID="UID_REC_1603">
-            <q1:varDeclaration name="Number of mapped objects" uniqueID="UID_RECSUB_160300">
-              <USINT />
             </q1:varDeclaration>
           </q1:struct>
           <q1:struct name="TPDO communication parameter" uniqueID="UID_REC_1800">
@@ -286,29 +254,6 @@
               <USINT />
             </q1:varDeclaration>
           </q1:struct>
-          <q1:struct name="TPDO communication parameter" uniqueID="UID_REC_1803">
-            <q1:varDeclaration name="max sub-index" uniqueID="UID_RECSUB_180300">
-              <USINT />
-            </q1:varDeclaration>
-            <q1:varDeclaration name="COB-ID used by TPDO" uniqueID="UID_RECSUB_180301">
-              <UDINT />
-            </q1:varDeclaration>
-            <q1:varDeclaration name="transmission type" uniqueID="UID_RECSUB_180302">
-              <USINT />
-            </q1:varDeclaration>
-            <q1:varDeclaration name="inhibit time" uniqueID="UID_RECSUB_180303">
-              <UINT />
-            </q1:varDeclaration>
-            <q1:varDeclaration name="compatibility entry" uniqueID="UID_RECSUB_180304">
-              <USINT />
-            </q1:varDeclaration>
-            <q1:varDeclaration name="event timer" uniqueID="UID_RECSUB_180305">
-              <UINT />
-            </q1:varDeclaration>
-            <q1:varDeclaration name="SYNC start value" uniqueID="UID_RECSUB_180306">
-              <USINT />
-            </q1:varDeclaration>
-          </q1:struct>
           <q1:struct name="TPDO mapping parameter" uniqueID="UID_REC_1A00">
             <q1:varDeclaration name="Number of mapped objects" uniqueID="UID_RECSUB_1A0000">
               <USINT />
@@ -355,11 +300,6 @@
             </q1:varDeclaration>
             <q1:varDeclaration name="Mapped object 3" uniqueID="UID_RECSUB_1A0203">
               <UDINT />
-            </q1:varDeclaration>
-          </q1:struct>
-          <q1:struct name="TPDO mapping parameter" uniqueID="UID_REC_1A03">
-            <q1:varDeclaration name="Number of mapped objects" uniqueID="UID_RECSUB_1A0300">
-              <USINT />
             </q1:varDeclaration>
           </q1:struct>
           <q1:struct name="Version" uniqueID="UID_REC_2105">
@@ -745,17 +685,17 @@
             <q1:dataTypeIDRef uniqueIDRef="UID_REC_1400" />
             <q1:property name="CO_storageGroup" value="PERSIST_COMM" />
           </q1:parameter>
-          <q1:parameter uniqueID="UID_SUB_140000" access="noAccess">
+          <q1:parameter uniqueID="UID_SUB_140000">
             <label lang="en">max sub-index</label>
             <USINT />
             <q1:defaultValue value="6" />
           </q1:parameter>
-          <q1:parameter uniqueID="UID_SUB_140001" access="noAccess">
+          <q1:parameter uniqueID="UID_SUB_140001">
             <label lang="en">COB-ID used by RPDO</label>
             <UDINT />
             <q1:defaultValue value="0x1bf" />
           </q1:parameter>
-          <q1:parameter uniqueID="UID_SUB_140002" access="noAccess">
+          <q1:parameter uniqueID="UID_SUB_140002">
             <label lang="en">transmission type</label>
             <USINT />
             <q1:defaultValue value="255" />
@@ -779,46 +719,6 @@
             <label lang="en">transmission type</label>
             <USINT />
             <q1:defaultValue value="255" />
-          </q1:parameter>
-          <q1:parameter uniqueID="UID_OBJ_1402">
-            <label lang="en">RPDO communication parameter</label>
-            <q1:dataTypeIDRef uniqueIDRef="UID_REC_1402" />
-            <q1:property name="CO_storageGroup" value="PERSIST_COMM" />
-          </q1:parameter>
-          <q1:parameter uniqueID="UID_SUB_140200" access="noAccess">
-            <label lang="en">max sub-index</label>
-            <USINT />
-            <q1:defaultValue value="6" />
-          </q1:parameter>
-          <q1:parameter uniqueID="UID_SUB_140201" access="noAccess">
-            <label lang="en">COB-ID used by RPDO</label>
-            <UDINT />
-            <q1:defaultValue value="0x80000400" />
-          </q1:parameter>
-          <q1:parameter uniqueID="UID_SUB_140202" access="noAccess">
-            <label lang="en">transmission type</label>
-            <USINT />
-            <q1:defaultValue value="254" />
-          </q1:parameter>
-          <q1:parameter uniqueID="UID_OBJ_1403">
-            <label lang="en">RPDO communication parameter</label>
-            <q1:dataTypeIDRef uniqueIDRef="UID_REC_1403" />
-            <q1:property name="CO_storageGroup" value="PERSIST_COMM" />
-          </q1:parameter>
-          <q1:parameter uniqueID="UID_SUB_140300" access="noAccess">
-            <label lang="en">max sub-index</label>
-            <USINT />
-            <q1:defaultValue value="6" />
-          </q1:parameter>
-          <q1:parameter uniqueID="UID_SUB_140301" access="noAccess">
-            <label lang="en">COB-ID used by RPDO</label>
-            <UDINT />
-            <q1:defaultValue value="0x80000500" />
-          </q1:parameter>
-          <q1:parameter uniqueID="UID_SUB_140302" access="noAccess">
-            <label lang="en">transmission type</label>
-            <USINT />
-            <q1:defaultValue value="254" />
           </q1:parameter>
           <q1:parameter uniqueID="UID_OBJ_1600">
             <label lang="en">RPDO mapping parameter</label>
@@ -880,26 +780,6 @@
             <UDINT />
             <q1:defaultValue value="0x21100910" />
           </q1:parameter>
-          <q1:parameter uniqueID="UID_OBJ_1602">
-            <label lang="en">RPDO mapping parameter</label>
-            <q1:dataTypeIDRef uniqueIDRef="UID_REC_1602" />
-            <q1:property name="CO_storageGroup" value="PERSIST_COMM" />
-          </q1:parameter>
-          <q1:parameter uniqueID="UID_SUB_160200" access="noAccess">
-            <label lang="en">Number of mapped objects</label>
-            <USINT />
-            <q1:defaultValue value="0" />
-          </q1:parameter>
-          <q1:parameter uniqueID="UID_OBJ_1603">
-            <label lang="en">RPDO mapping parameter</label>
-            <q1:dataTypeIDRef uniqueIDRef="UID_REC_1603" />
-            <q1:property name="CO_storageGroup" value="PERSIST_COMM" />
-          </q1:parameter>
-          <q1:parameter uniqueID="UID_SUB_160300" access="noAccess">
-            <label lang="en">Number of mapped objects</label>
-            <USINT />
-            <q1:defaultValue value="0" />
-          </q1:parameter>
           <q1:parameter uniqueID="UID_OBJ_1800">
             <label lang="en">TPDO communication parameter</label>
             <q1:dataTypeIDRef uniqueIDRef="UID_REC_1800" />
@@ -913,7 +793,7 @@
           <q1:parameter uniqueID="UID_SUB_180001" access="noAccess">
             <label lang="en">COB-ID used by TPDO</label>
             <UDINT />
-            <q1:defaultValue value="0x23F" />
+            <q1:defaultValue value="0x23f" />
           </q1:parameter>
           <q1:parameter uniqueID="UID_SUB_180002" access="noAccess">
             <label lang="en">transmission type</label>
@@ -953,7 +833,7 @@
           <q1:parameter uniqueID="UID_SUB_180101" access="noAccess">
             <label lang="en">COB-ID used by TPDO</label>
             <UDINT />
-            <q1:defaultValue value="0x33F" />
+            <q1:defaultValue value="0x33f" />
           </q1:parameter>
           <q1:parameter uniqueID="UID_SUB_180102" access="noAccess">
             <label lang="en">transmission type</label>
@@ -993,7 +873,7 @@
           <q1:parameter uniqueID="UID_SUB_180201" access="noAccess">
             <label lang="en">COB-ID used by TPDO</label>
             <UDINT />
-            <q1:defaultValue value="0x43F" />
+            <q1:defaultValue value="0x43f" />
           </q1:parameter>
           <q1:parameter uniqueID="UID_SUB_180202" access="noAccess">
             <label lang="en">transmission type</label>
@@ -1016,46 +896,6 @@
             <q1:defaultValue value="0" />
           </q1:parameter>
           <q1:parameter uniqueID="UID_SUB_180206" access="noAccess">
-            <label lang="en">SYNC start value</label>
-            <USINT />
-            <q1:defaultValue value="0" />
-          </q1:parameter>
-          <q1:parameter uniqueID="UID_OBJ_1803">
-            <label lang="en">TPDO communication parameter</label>
-            <q1:dataTypeIDRef uniqueIDRef="UID_REC_1803" />
-            <q1:property name="CO_storageGroup" value="PERSIST_COMM" />
-          </q1:parameter>
-          <q1:parameter uniqueID="UID_SUB_180300" access="noAccess">
-            <label lang="en">max sub-index</label>
-            <USINT />
-            <q1:defaultValue value="6" />
-          </q1:parameter>
-          <q1:parameter uniqueID="UID_SUB_180301" access="noAccess">
-            <label lang="en">COB-ID used by TPDO</label>
-            <UDINT />
-            <q1:defaultValue value="0x0" />
-          </q1:parameter>
-          <q1:parameter uniqueID="UID_SUB_180302" access="noAccess">
-            <label lang="en">transmission type</label>
-            <USINT />
-            <q1:defaultValue value="254" />
-          </q1:parameter>
-          <q1:parameter uniqueID="UID_SUB_180303" access="noAccess">
-            <label lang="en">inhibit time</label>
-            <UINT />
-            <q1:defaultValue value="0" />
-          </q1:parameter>
-          <q1:parameter uniqueID="UID_SUB_180304" access="noAccess">
-            <label lang="en">compatibility entry</label>
-            <USINT />
-            <q1:defaultValue value="0" />
-          </q1:parameter>
-          <q1:parameter uniqueID="UID_SUB_180305" access="noAccess">
-            <label lang="en">event timer</label>
-            <UINT />
-            <q1:defaultValue value="0" />
-          </q1:parameter>
-          <q1:parameter uniqueID="UID_SUB_180306" access="noAccess">
             <label lang="en">SYNC start value</label>
             <USINT />
             <q1:defaultValue value="0" />
@@ -1145,16 +985,6 @@
             <UDINT />
             <q1:defaultValue value="0x21130808" />
           </q1:parameter>
-          <q1:parameter uniqueID="UID_OBJ_1A03">
-            <label lang="en">TPDO mapping parameter</label>
-            <q1:dataTypeIDRef uniqueIDRef="UID_REC_1A03" />
-            <q1:property name="CO_storageGroup" value="PERSIST_COMM" />
-          </q1:parameter>
-          <q1:parameter uniqueID="UID_SUB_1A0300" access="noAccess">
-            <label lang="en">Number of mapped objects</label>
-            <USINT />
-            <q1:defaultValue value="0" />
-          </q1:parameter>
           <q1:parameter uniqueID="UID_OBJ_2100">
             <description lang="en">Error Status Bits indicates internal error conditions inside stack or inside application. For details see CO_EM_errorStatusBits_t in CO_Emergency.h file or in https://canopennode.github.io/CANopenSocket/group__CO__Emergency.html</description>
             <BITSTRING />
@@ -1190,7 +1020,7 @@
           </q1:parameter>
           <q1:parameter uniqueID="UID_SUB_211000">
             <label lang="en">Highest sub-index supported</label>
-            <UINT />
+            <USINT />
             <q1:defaultValue value="0x0A" />
           </q1:parameter>
           <q1:parameter uniqueID="UID_SUB_211001" access="readWrite">
@@ -1558,7 +1388,7 @@
         <ProfileTechnology>CANopen</ProfileTechnology>
       </ISO15745Reference>
     </ProfileHeader>
-    <ProfileBody xmlns:q2="http://www.canopen.org/xml/1.1" xsi:type="q2:ProfileBody_CommunicationNetwork_CANopen" formatName="CANopen" formatVersion="1.0" fileName="device.xdd" fileCreator="Zylos" fileCreationDate="2020-11-28" fileCreationTime="07:37:54.0000000-04:00" fileModificationDate="2022-05-14" fileModificationTime="00:48:55.6204701-04:00" fileVersion="1" supportedLanguages="en" xmlns="">
+    <ProfileBody xmlns:q2="http://www.canopen.org/xml/1.1" xsi:type="q2:ProfileBody_CommunicationNetwork_CANopen" formatName="CANopen" formatVersion="1.0" fileName="device.xdd" fileCreator="Zylos" fileCreationDate="2020-11-28" fileCreationTime="07:37:54.0000000-04:00" fileModificationDate="2022-05-14" fileModificationTime="00:53:25.5330815-04:00" fileVersion="1" supportedLanguages="en" xmlns="">
       <ApplicationLayers>
         <q2:CANopenObjectList>
           <CANopenObject index="1000" name="Device type" objectType="7" PDOmapping="no" uniqueIDRef="UID_OBJ_1000" />
@@ -1639,16 +1469,6 @@
             <CANopenSubObject subIndex="01" name="COB-ID used by RPDO" objectType="7" PDOmapping="no" uniqueIDRef="UID_SUB_140101" />
             <CANopenSubObject subIndex="02" name="transmission type" objectType="7" PDOmapping="no" uniqueIDRef="UID_SUB_140102" />
           </CANopenObject>
-          <CANopenObject index="1402" name="RPDO communication parameter" objectType="9" uniqueIDRef="UID_OBJ_1402" subNumber="3">
-            <CANopenSubObject subIndex="00" name="max sub-index" objectType="7" PDOmapping="no" uniqueIDRef="UID_SUB_140200" />
-            <CANopenSubObject subIndex="01" name="COB-ID used by RPDO" objectType="7" PDOmapping="no" uniqueIDRef="UID_SUB_140201" />
-            <CANopenSubObject subIndex="02" name="transmission type" objectType="7" PDOmapping="no" uniqueIDRef="UID_SUB_140202" />
-          </CANopenObject>
-          <CANopenObject index="1403" name="RPDO communication parameter" objectType="9" uniqueIDRef="UID_OBJ_1403" subNumber="3">
-            <CANopenSubObject subIndex="00" name="max sub-index" objectType="7" PDOmapping="no" uniqueIDRef="UID_SUB_140300" />
-            <CANopenSubObject subIndex="01" name="COB-ID used by RPDO" objectType="7" PDOmapping="no" uniqueIDRef="UID_SUB_140301" />
-            <CANopenSubObject subIndex="02" name="transmission type" objectType="7" PDOmapping="no" uniqueIDRef="UID_SUB_140302" />
-          </CANopenObject>
           <CANopenObject index="1600" name="RPDO mapping parameter" objectType="9" uniqueIDRef="UID_OBJ_1600" subNumber="5">
             <CANopenSubObject subIndex="00" name="Number of mapped objects" objectType="7" PDOmapping="no" uniqueIDRef="UID_SUB_160000" />
             <CANopenSubObject subIndex="01" name="Mapped object 1" objectType="7" PDOmapping="no" uniqueIDRef="UID_SUB_160001" />
@@ -1662,12 +1482,6 @@
             <CANopenSubObject subIndex="02" name="Mapped object 2" objectType="7" PDOmapping="no" uniqueIDRef="UID_SUB_160102" />
             <CANopenSubObject subIndex="03" name="Mapped object 3" objectType="7" PDOmapping="no" uniqueIDRef="UID_SUB_160103" />
             <CANopenSubObject subIndex="04" name="Mapped object 4" objectType="7" PDOmapping="no" uniqueIDRef="UID_SUB_160104" />
-          </CANopenObject>
-          <CANopenObject index="1602" name="RPDO mapping parameter" objectType="9" uniqueIDRef="UID_OBJ_1602" subNumber="1">
-            <CANopenSubObject subIndex="00" name="Number of mapped objects" objectType="7" PDOmapping="no" uniqueIDRef="UID_SUB_160200" />
-          </CANopenObject>
-          <CANopenObject index="1603" name="RPDO mapping parameter" objectType="9" uniqueIDRef="UID_OBJ_1603" subNumber="1">
-            <CANopenSubObject subIndex="00" name="Number of mapped objects" objectType="7" PDOmapping="no" uniqueIDRef="UID_SUB_160300" />
           </CANopenObject>
           <CANopenObject index="1800" name="TPDO communication parameter" objectType="9" uniqueIDRef="UID_OBJ_1800" subNumber="7">
             <CANopenSubObject subIndex="00" name="max sub-index" objectType="7" PDOmapping="no" uniqueIDRef="UID_SUB_180000" />
@@ -1696,15 +1510,6 @@
             <CANopenSubObject subIndex="05" name="event timer" objectType="7" PDOmapping="no" uniqueIDRef="UID_SUB_180205" />
             <CANopenSubObject subIndex="06" name="SYNC start value" objectType="7" PDOmapping="no" uniqueIDRef="UID_SUB_180206" />
           </CANopenObject>
-          <CANopenObject index="1803" name="TPDO communication parameter" objectType="9" uniqueIDRef="UID_OBJ_1803" subNumber="7">
-            <CANopenSubObject subIndex="00" name="max sub-index" objectType="7" PDOmapping="no" uniqueIDRef="UID_SUB_180300" />
-            <CANopenSubObject subIndex="01" name="COB-ID used by TPDO" objectType="7" PDOmapping="no" uniqueIDRef="UID_SUB_180301" />
-            <CANopenSubObject subIndex="02" name="transmission type" objectType="7" PDOmapping="no" uniqueIDRef="UID_SUB_180302" />
-            <CANopenSubObject subIndex="03" name="inhibit time" objectType="7" PDOmapping="no" uniqueIDRef="UID_SUB_180303" />
-            <CANopenSubObject subIndex="04" name="compatibility entry" objectType="7" PDOmapping="no" uniqueIDRef="UID_SUB_180304" />
-            <CANopenSubObject subIndex="05" name="event timer" objectType="7" PDOmapping="no" uniqueIDRef="UID_SUB_180305" />
-            <CANopenSubObject subIndex="06" name="SYNC start value" objectType="7" PDOmapping="no" uniqueIDRef="UID_SUB_180306" />
-          </CANopenObject>
           <CANopenObject index="1A00" name="TPDO mapping parameter" objectType="9" uniqueIDRef="UID_OBJ_1A00" subNumber="2">
             <CANopenSubObject subIndex="00" name="Number of mapped objects" objectType="7" PDOmapping="no" uniqueIDRef="UID_SUB_1A0000" />
             <CANopenSubObject subIndex="01" name="Mapped object 1" objectType="7" PDOmapping="no" uniqueIDRef="UID_SUB_1A0001" />
@@ -1724,9 +1529,6 @@
             <CANopenSubObject subIndex="01" name="Mapped object 1" objectType="7" PDOmapping="no" uniqueIDRef="UID_SUB_1A0201" />
             <CANopenSubObject subIndex="02" name="Mapped object 2" objectType="7" PDOmapping="no" uniqueIDRef="UID_SUB_1A0202" />
             <CANopenSubObject subIndex="03" name="Mapped object 3" objectType="7" PDOmapping="no" uniqueIDRef="UID_SUB_1A0203" />
-          </CANopenObject>
-          <CANopenObject index="1A03" name="TPDO mapping parameter" objectType="9" uniqueIDRef="UID_OBJ_1A03" subNumber="1">
-            <CANopenSubObject subIndex="00" name="Number of mapped objects" objectType="7" PDOmapping="no" uniqueIDRef="UID_SUB_1A0300" />
           </CANopenObject>
           <CANopenObject index="2100" name="Error status bits" objectType="7" PDOmapping="TPDO" uniqueIDRef="UID_OBJ_2100" />
           <CANopenObject index="2105" name="Version" objectType="9" uniqueIDRef="UID_OBJ_2105" subNumber="3">

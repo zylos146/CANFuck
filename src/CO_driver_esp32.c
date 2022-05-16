@@ -544,6 +544,20 @@ void CO_CANinterrupt(void *args)
         twai_message_t temp_can_message; //ESP data type can message
         ESP_ERROR_CHECK(twai_receive(&temp_can_message, pdMS_TO_TICKS(CAN_MS_TO_WAIT)));
 
+/*
+        ESP_LOGI(
+          "CANreceive", 
+          "ID: %d , Data %d,%d,%d,%d,%d,%d", 
+          temp_can_message.identifier, 
+          temp_can_message.data[0], 
+          temp_can_message.data[1], 
+          temp_can_message.data[2], 
+          temp_can_message.data[3], 
+          temp_can_message.data[4], 
+          temp_can_message.data[5]
+        );
+*/
+
         CO_CANrxMsg_t rcvMsg;      /* pointer to received message in CAN module */
         uint16_t index;            /* index of received message */
         uint32_t rcvMsgIdent;      /* identifier of the received message */

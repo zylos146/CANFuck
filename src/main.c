@@ -11,8 +11,9 @@
 
 #include "config.h"
 
+
 // Periodic CAN Timer Task
-volatile uint32_t coInterruptCounter = 0U; /* variable increments each millisecond */
+volatile uint32_t coInterruptCounter = 0U;
 static void app_can_timer_task(void *arg);
 esp_timer_create_args_t coMainTaskArgs;
 esp_timer_handle_t periodicTimer;
@@ -22,6 +23,29 @@ uint32_t heapMemoryUsed;
 CO_config_t *config_ptr = NULL;
 
 uint8_t LED_red, LED_green;
+
+OD_extension_t OD_variable_linMotCMDHeader_extension = {
+    .object = NULL,
+    .read = OD_readOriginal,
+    .write = OD_writeOriginal
+};
+uint8_t *OD_variable_linMotCMDHeader_flagsPDO = NULL;
+
+
+volatile uint32_t linmotPDOCounter = 0U;
+ODR_t track_status_update(
+  OD_stream_t *stream, const void *buf,
+  OD_size_t count, OD_size_t *countWritten
+) {
+  linmotPDOCounter = 0;
+  return OD_writeOriginal(stream, buf, count, countWritten);
+}
+
+OD_extension_t OD_variable_linMotStatus_extension = {
+    .object = NULL,
+    .read = OD_readOriginal,
+    .write = track_status_update
+};
 
 void app_init_communication() {
   ESP_LOGI("init.comm", "Resetting communication...");
@@ -66,6 +90,23 @@ void app_init_communication() {
     return;
   }
 
+  // Initialize LinMot CMD Header as TPDO Mapped Object
+  //  - Must be before CO_CANopenInitPDO
+  //  - LinMot Parameters don't need to be mapped for OD_requestTPDO to work
+  //  - Allows using OD_requestTPDO for triggering
+  OD_extension_init(
+    OD_ENTRY_H2112_linMotCMD_Header,
+    &OD_variable_linMotCMDHeader_extension
+  );
+  OD_variable_linMotCMDHeader_flagsPDO = OD_getFlagsPDO(OD_ENTRY_H2112_linMotCMD_Header);
+
+  // Initialize LinMot Status Words as RPDO Mapped Object
+  //  - Used as a pesudo-heartbeat to detect alive-ness of LinMot
+  OD_extension_init(
+    OD_ENTRY_H2110_linMotStatus,
+    &OD_variable_linMotStatus_extension
+  );
+
   /* Initialize TPDO and RPDO if defined in CO_config.h */
   err = CO_CANopenInitPDO(CO, CO->em, OD, NODE_ID_SELF, &errInfo);
   if(err != CO_ERROR_NO) {
@@ -86,9 +127,6 @@ void app_init_communication() {
   /* start CAN */
   CO_CANsetNormalMode(CO->CANmodule);
 
-  /*Set Operating Mode of Slaves to Operational*/
-  CO_NMT_sendCommand(CO->NMT, CO_NMT_ENTER_OPERATIONAL, NODE_ID_LINMOT);
-
   ESP_LOGI("init.comm", "done");
 }
 
@@ -96,6 +134,7 @@ void app_loop() {
 
 }
 
+bool hasInitMot = false;
 void app_can_main_task(void *pvParameter) {
   CO = CO_new(config_ptr, &heapMemoryUsed);
   if (CO == NULL) {
@@ -126,6 +165,18 @@ void app_can_main_task(void *pvParameter) {
       app_loop();
 
       vTaskDelay(MAIN_WAIT / portTICK_PERIOD_MS);
+
+      if (hasInitMot == false) {
+        /*Set Operating Mode of Slaves to Operational*/
+        CO_NMT_sendCommand(CO->NMT, CO_NMT_ENTER_OPERATIONAL, NODE_ID_LINMOT);
+        hasInitMot = true;
+      }
+
+      // It's been 1000ms since we've last gotten a LinMot Status update
+      if (linmotPDOCounter > 1000) {
+        ESP_LOGE("task.main", "Error: Have not recieved LinMot RPDO in %d ms! Attempting to re-establish!\n", linmotPDOCounter);
+        CO_NMT_sendCommand(CO->NMT, CO_NMT_ENTER_OPERATIONAL, NODE_ID_LINMOT);
+      }
     }
 
     ESP_LOGI("task.main", "Communication reset was requested by CANOpen");
@@ -135,8 +186,44 @@ void app_can_main_task(void *pvParameter) {
   esp_restart();
 }
 
+// TODO - Somehow integrate into main app task? What happens on app/comm reset?
+// TODO - Ensure 16bit mapping is correct in Linmot
+uint16_t position = 0;
+static void app_linmot_task(void *pvParameter) {
+  while (true) {
+    // VAI 16Bit Go To Pos (090xh)
+    OD_set_u16(OD_ENTRY_H2112_linMotCMD_Header, 0x01, 0x0901, false);
+
+    // Target Position : 50mm
+    if (position == 0x01F4) {
+      position = 0x03E8;
+    } else {
+      position = 0x01F4;
+    }
+    OD_set_u8(OD_ENTRY_H2113_linMotCMD_Parameters, 0x01, (uint8_t)((position && 0xff00) >> 2), false);
+    OD_set_u8(OD_ENTRY_H2113_linMotCMD_Parameters, 0x02, (uint8_t)((position && 0x00ff) >> 0), false);
+
+    // Maximal Velocity : 1m/s
+    OD_set_u8(OD_ENTRY_H2113_linMotCMD_Parameters, 0x03, 0x03, false);
+    OD_set_u8(OD_ENTRY_H2113_linMotCMD_Parameters, 0x04, 0xE8, false);
+
+    // Acceleration : 10m/s2 
+    OD_set_u8(OD_ENTRY_H2113_linMotCMD_Parameters, 0x05, 0x00, false);
+    OD_set_u8(OD_ENTRY_H2113_linMotCMD_Parameters, 0x06, 0x64, false);
+
+    // De-acceleration : 10m/s2 
+    OD_set_u8(OD_ENTRY_H2113_linMotCMD_Parameters, 0x07, 0x00, false);
+    OD_set_u8(OD_ENTRY_H2113_linMotCMD_Parameters, 0x08, 0x64, false);
+
+    // Triggers both TDPO 1 & 2
+    OD_requestTPDO(OD_variable_linMotCMDHeader_flagsPDO, 1);
+    vTaskDelay(250 / portTICK_PERIOD_MS);
+  }
+}
+
 static void app_can_timer_task(void *arg) {
   coInterruptCounter++;
+  linmotPDOCounter++;
 
   CO_LOCK_OD(CO->CANmodule);
 
@@ -163,4 +250,5 @@ void app_main()
 {
   ESP_LOGI("boot", "Attempting to start Main Task...");
   xTaskCreate(&app_can_main_task, "app_can_main_task", 4096, NULL, 5, NULL);
+  xTaskCreate(&app_linmot_task, "app_linmot_task", 4096, NULL, 5, NULL);
 }
