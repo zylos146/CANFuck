@@ -15,7 +15,7 @@
         <ProfileTechnology>CANopen</ProfileTechnology>
       </ISO15745Reference>
     </ProfileHeader>
-    <ProfileBody xmlns:q1="http://www.canopen.org/xml/1.1" xsi:type="q1:ProfileBody_Device_CANopen" formatName="CANopen" formatVersion="1.0" fileName="device.xdd" fileCreator="Zylos" fileCreationDate="2020-11-28" fileCreationTime="07:37:54.0000000-04:00" fileModifiedBy="Zylos" fileModificationDate="2022-05-14" fileModificationTime="00:53:25.5330815-04:00" fileVersion="1" supportedLanguages="en" xmlns="">
+    <ProfileBody xmlns:q1="http://www.canopen.org/xml/1.1" xsi:type="q1:ProfileBody_Device_CANopen" formatName="CANopen" formatVersion="1.0" fileName="device.xdd" fileCreator="Zylos" fileCreationDate="2020-11-28" fileCreationTime="07:37:54.0000000-04:00" fileModifiedBy="Zylos" fileModificationDate="2022-05-16" fileModificationTime="21:18:36.6312472-04:00" fileVersion="1" supportedLanguages="en" xmlns="">
       <q1:DeviceIdentity>
         <q1:vendorName>Central Nexus</q1:vendorName>
         <q1:vendorID></q1:vendorID>
@@ -685,17 +685,17 @@
             <q1:dataTypeIDRef uniqueIDRef="UID_REC_1400" />
             <q1:property name="CO_storageGroup" value="PERSIST_COMM" />
           </q1:parameter>
-          <q1:parameter uniqueID="UID_SUB_140000">
+          <q1:parameter uniqueID="UID_SUB_140000" access="noAccess">
             <label lang="en">max sub-index</label>
             <USINT />
             <q1:defaultValue value="6" />
           </q1:parameter>
-          <q1:parameter uniqueID="UID_SUB_140001">
+          <q1:parameter uniqueID="UID_SUB_140001" access="noAccess">
             <label lang="en">COB-ID used by RPDO</label>
             <UDINT />
             <q1:defaultValue value="0x1bf" />
           </q1:parameter>
-          <q1:parameter uniqueID="UID_SUB_140002">
+          <q1:parameter uniqueID="UID_SUB_140002" access="noAccess">
             <label lang="en">transmission type</label>
             <USINT />
             <q1:defaultValue value="255" />
@@ -948,17 +948,17 @@
           <q1:parameter uniqueID="UID_SUB_1A0105" access="noAccess">
             <label lang="en">Mapped object 5</label>
             <UDINT />
-            <q1:defaultValue value="0x21130608" />
+            <q1:defaultValue value="0x21130408" />
           </q1:parameter>
           <q1:parameter uniqueID="UID_SUB_1A0106" access="noAccess">
             <label lang="en">Mapped object 6</label>
             <UDINT />
-            <q1:defaultValue value="0x21130408" />
+            <q1:defaultValue value="0x21130508" />
           </q1:parameter>
           <q1:parameter uniqueID="UID_SUB_1A0107" access="noAccess">
             <label lang="en">Mapped object 7</label>
             <UDINT />
-            <q1:defaultValue value="0x21130508" />
+            <q1:defaultValue value="0x21130608" />
           </q1:parameter>
           <q1:parameter uniqueID="UID_OBJ_1A02">
             <label lang="en">TPDO mapping parameter</label>
@@ -1076,11 +1076,13 @@
           <q1:parameter uniqueID="UID_OBJ_2111">
             <description lang="en">Vartiable is free to use by application.</description>
             <UINT />
+            <q1:defaultValue value="0" />
             <q1:property name="CO_flagsPDO" value="true" />
           </q1:parameter>
           <q1:parameter uniqueID="UID_OBJ_2112">
             <description lang="en">Vartiable is free to use by application.</description>
             <UINT />
+            <q1:defaultValue value="0" />
             <q1:property name="CO_flagsPDO" value="true" />
           </q1:parameter>
           <q1:parameter uniqueID="UID_OBJ_2113">
@@ -1388,7 +1390,7 @@
         <ProfileTechnology>CANopen</ProfileTechnology>
       </ISO15745Reference>
     </ProfileHeader>
-    <ProfileBody xmlns:q2="http://www.canopen.org/xml/1.1" xsi:type="q2:ProfileBody_CommunicationNetwork_CANopen" formatName="CANopen" formatVersion="1.0" fileName="device.xdd" fileCreator="Zylos" fileCreationDate="2020-11-28" fileCreationTime="07:37:54.0000000-04:00" fileModificationDate="2022-05-14" fileModificationTime="00:53:25.5330815-04:00" fileVersion="1" supportedLanguages="en" xmlns="">
+    <ProfileBody xmlns:q2="http://www.canopen.org/xml/1.1" xsi:type="q2:ProfileBody_CommunicationNetwork_CANopen" formatName="CANopen" formatVersion="1.0" fileName="device.xdd" fileCreator="Zylos" fileCreationDate="2020-11-28" fileCreationTime="07:37:54.0000000-04:00" fileModificationDate="2022-05-16" fileModificationTime="21:18:36.6312472-04:00" fileVersion="1" supportedLanguages="en" xmlns="">
       <ApplicationLayers>
         <q2:CANopenObjectList>
           <CANopenObject index="1000" name="Device type" objectType="7" PDOmapping="no" uniqueIDRef="UID_OBJ_1000" />
@@ -1629,6 +1631,10 @@
       <TransportLayers>
         <PhysicalLayer>
           <baudRate>
+            <supportedBaudRate value="10 Kbps" />
+            <supportedBaudRate value="20 Kbps" />
+            <supportedBaudRate value="50 Kbps" />
+            <supportedBaudRate value="125 Kbps" />
             <supportedBaudRate value="250 Kbps" />
             <supportedBaudRate value="500 Kbps" />
             <supportedBaudRate value="800 Kbps" />

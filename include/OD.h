@@ -16,7 +16,7 @@
 
         Created:      11/28/2020 7:37:54 AM
         Created By:   Zylos
-        Modified:     5/14/2022 12:50:25 AM
+        Modified:     5/16/2022 4:38:43 PM
         Modified By:  Zylos
 
     Device Info:
@@ -25,7 +25,7 @@
         Product Name: CANFuck
         Product ID:   
 
-        Description:  
+        Description:  Basic CANopen device with example usage.
 *******************************************************************************/
 
 #ifndef OD_H
@@ -183,6 +183,8 @@ typedef struct {
     } x2105_version;
     uint8_t x2110_linMotStatus_sub0;
     uint16_t x2110_linMotStatus[OD_CNT_ARR_2110];
+    uint16_t x2111_linMotControlWord;
+    uint16_t x2112_linMotCMD_Header;
     uint8_t x2113_linMotCMD_Parameters_sub0;
     uint8_t x2113_linMotCMD_Parameters[OD_CNT_ARR_2113];
     uint8_t x6000_readDigitalInput_8_bit_sub0;

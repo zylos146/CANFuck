@@ -106,9 +106,9 @@ OD_ATTR_PERSIST_COMM OD_PERSIST_COMM_t OD_PERSIST_COMM = {
         .mappedObject_2 = 0x21130108,
         .mappedObject_3 = 0x21130208,
         .mappedObject_4 = 0x21130308,
-        .mappedObject_5 = 0x21130608,
-        .mappedObject_6 = 0x21130408,
-        .mappedObject_7 = 0x21130508
+        .mappedObject_5 = 0x21130408,
+        .mappedObject_6 = 0x21130508,
+        .mappedObject_7 = 0x21130608
     },
     .x1A02_TPDOMappingParameter = {
         .numberOfMappedObjects = 0x03,
@@ -137,6 +137,8 @@ OD_ATTR_RAM OD_RAM_t OD_RAM = {
     },
     .x2110_linMotStatus_sub0 = 0x0A,
     .x2110_linMotStatus = {0x0000, 0x0000, 0x0000, 0x0000, 0x0000, 0x0000, 0x0000, 0x0000, 0x0000, 0x0000},
+    .x2111_linMotControlWord = 0x0000,
+    .x2112_linMotCMD_Header = 0x0000,
     .x2113_linMotCMD_Parameters_sub0 = 0x08,
     .x2113_linMotCMD_Parameters = {0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00},
     .x6000_readDigitalInput_8_bit_sub0 = 0x08,
@@ -725,12 +727,12 @@ static CO_PROGMEM ODObjs_t ODObjs = {
         .dataElementSizeof = sizeof(uint16_t)
     },
     .o_2111_linMotControlWord = {
-        .dataOrig = NULL,
+        .dataOrig = &OD_RAM.x2111_linMotControlWord,
         .attribute = ODA_SDO_R | ODA_TPDO | ODA_MB,
         .dataLength = 2
     },
     .o_2112_linMotCMD_Header = {
-        .dataOrig = NULL,
+        .dataOrig = &OD_RAM.x2112_linMotCMD_Header,
         .attribute = ODA_SDO_R | ODA_TPDO | ODA_MB,
         .dataLength = 2
     },
