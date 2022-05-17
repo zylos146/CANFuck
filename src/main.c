@@ -263,19 +263,20 @@ static void app_linmot_task(void *pvParameter) {
       } else {
         position = 0x01F4;
       }
-      OD_set_u8(OD_ENTRY_H2113_linMotCMD_Parameters, 0x01, 0xf4, false);
-      OD_set_u8(OD_ENTRY_H2113_linMotCMD_Parameters, 0x02, 0x01, false);
+      OD_set_u8(OD_ENTRY_H2113_linMotCMD_Parameters, 0x01, (uint8_t)((position >> 0) & 0xFF), false);
+      OD_set_u8(OD_ENTRY_H2113_linMotCMD_Parameters, 0x02, (uint8_t)((position >> 8) & 0xFF), false);
 
-      // Maximal Velocity : 1m/s
-      OD_set_u8(OD_ENTRY_H2113_linMotCMD_Parameters, 0x03, 0xE8, false);
-      OD_set_u8(OD_ENTRY_H2113_linMotCMD_Parameters, 0x04, 0x03, false);
+      // Maximal Velocity : 5m/s
+      uint16_t speed = 0x03E8 * 5;
+      OD_set_u8(OD_ENTRY_H2113_linMotCMD_Parameters, 0x03, (uint8_t)((speed >> 0) & 0xFF), false);
+      OD_set_u8(OD_ENTRY_H2113_linMotCMD_Parameters, 0x04, (uint8_t)((speed >> 8) & 0xFF), false);
 
-      // Acceleration : 10m/s2 
-      OD_set_u8(OD_ENTRY_H2113_linMotCMD_Parameters, 0x05, 0x64, false);
+      // Acceleration : 25m/s2 
+      OD_set_u8(OD_ENTRY_H2113_linMotCMD_Parameters, 0x05, 0xFF, false);
       OD_set_u8(OD_ENTRY_H2113_linMotCMD_Parameters, 0x06, 0x00, false);
 
-      // De-acceleration : 10m/s2 
-      OD_set_u8(OD_ENTRY_H2113_linMotCMD_Parameters, 0x07, 0x64, false);
+      // De-acceleration : 25m/s2 
+      OD_set_u8(OD_ENTRY_H2113_linMotCMD_Parameters, 0x07, 0xFF, false);
       OD_set_u8(OD_ENTRY_H2113_linMotCMD_Parameters, 0x08, 0x00, false);
 
       // Triggers both TDPO 1 & 2
@@ -283,7 +284,7 @@ static void app_linmot_task(void *pvParameter) {
       OD_requestTPDO(OD_variable_linMotCMDParameters_flagsPDO, 0x07);
     }
 
-    vTaskDelay(500 / portTICK_PERIOD_MS);
+    vTaskDelay(100 / portTICK_PERIOD_MS);
   }
 }
 
