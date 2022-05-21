@@ -390,7 +390,7 @@ CO_ReturnError_t CO_CANsend(CO_CANmodule_t *CANmodule, CO_CANtx_t *buffer)
         esp_err_t send_err = twai_transmit(&temp_can_message, pdMS_TO_TICKS(CAN_MS_TO_WAIT));
         if (send_err == ESP_OK)
         {
-            ESP_LOGI("CANsend", "ID: %d , Data %d,%d,%d,%d,%d,%d", temp_can_message.identifier, temp_can_message.data[0], temp_can_message.data[1], temp_can_message.data[2], temp_can_message.data[3], temp_can_message.data[4], temp_can_message.data[5]);
+            // TODO - Filter log system ESP_LOGI("CANsend", "ID: %d , Data %d,%d,%d,%d,%d,%d", temp_can_message.identifier, temp_can_message.data[0], temp_can_message.data[1], temp_can_message.data[2], temp_can_message.data[3], temp_can_message.data[4], temp_can_message.data[5]);
         }
         else
         {

@@ -191,9 +191,9 @@ void app_can_main_task(void *pvParameter) {
 
 // TODO - Somehow integrate into main app task? What happens on app/comm reset?
 // TODO - Ensure 16bit mapping is correct in Linmot
-#define LINMOT_CONTROL_SWITCH_ON (1 << 0)
-#define LINMOT_CONTROL_ERROR_ACKNOWLEDGE (1 << 7)
-#define LINMOT_CONTROL_HOME (1 << 11)
+#define LINMOT_CONTROL_SWITCH_ON ((uint16_t)(1 << 0))
+#define LINMOT_CONTROL_ERROR_ACKNOWLEDGE ((uint16_t)(1 << 7))
+#define LINMOT_CONTROL_HOME ((uint16_t)(1 << 11))
 
 #define LINMOT_STATUS_OPERATION_ENABLED (1 << 0)
 #define LINMOT_STATUS_SWITCH_ON (1 << 1)
@@ -212,46 +212,100 @@ void app_can_main_task(void *pvParameter) {
 #define LINMOT_WARN_MOTOR_DRIVE_HOT (1 << 6)
 #define LINMOT_WARN_MOTOR_NOT_HOMED (1 << 7)
 
+#define LINMOT_ERROR_CANBUS_GUARD_TIMEOUT (0xCD)
+
 uint16_t position = 0;
 uint8_t cmdCount = 0;
+uint16_t controlWord = 0x0000;
 static void app_linmot_task(void *pvParameter) {
   while (true) {
     if (reset != CO_RESET_NOT) {
+
       vTaskDelay(250 / portTICK_PERIOD_MS);
       continue;
     }
 
     if (hasInitMot == false) {
       /*Set Operating Mode of Slaves to Operational*/
+      ESP_LOGI("task.main", "Setting LinMot to Operational State!\n");
       CO_NMT_sendCommand(CO->NMT, CO_NMT_ENTER_OPERATIONAL, NODE_ID_LINMOT);
       hasInitMot = true;
+
+      vTaskDelay(250 / portTICK_PERIOD_MS);
+      continue;
     }
 
     // It's been 1000ms since we've last gotten a LinMot Status update
     if (linmotPDOCounter > 1000) {
       ESP_LOGE("task.main", "Error: Have not recieved LinMot RPDO in %d ms! Attempting to re-establish!\n", linmotPDOCounter);
       CO_NMT_sendCommand(CO->NMT, CO_NMT_ENTER_OPERATIONAL, NODE_ID_LINMOT);
+
+      vTaskDelay(250 / portTICK_PERIOD_MS);
+      continue;
     }
 
     // If not homed, attempt to home
     uint16_t statusWord;
+    uint16_t runWord;
+    uint16_t errorWord;
+    uint16_t warnWord;
+
     OD_get_u16(OD_ENTRY_H2110_linMotStatus, 0x01, &statusWord, false);
+    OD_get_u16(OD_ENTRY_H2110_linMotStatus, 0x02, &runWord, false);
+    OD_get_u16(OD_ENTRY_H2110_linMotStatus, 0x03, &errorWord, false);
+    OD_get_u16(OD_ENTRY_H2110_linMotStatus, 0x04, &warnWord, false);
+
     bool isEnabled = (statusWord & LINMOT_STATUS_OPERATION_ENABLED) > 0;
     bool isActive = (statusWord & LINMOT_STATUS_SWITCH_ON) > 0;
     bool isHomed = (statusWord & LINMOT_STATUS_HOMED) > 0;
     bool isMoving = (statusWord & LINMOT_STATUS_MOTION_ACTIVE) > 0;
+    bool isError = (statusWord & LINMOT_STATUS_ERROR) > 0;
+
+    if (isError && (errorWord == LINMOT_ERROR_CANBUS_GUARD_TIMEOUT)) {
+      ESP_LOGI("task.main", "LinMot is in CanBus Guard Timeout state. Acknowledging!\n");
+
+      controlWord |= LINMOT_CONTROL_ERROR_ACKNOWLEDGE;
+      OD_set_u16(OD_ENTRY_H2111_linMotControlWord, 0x00, controlWord, false);
+      OD_requestTPDO(OD_variable_linMotControlWord_flagsPDO, 0);
+
+      vTaskDelay(50 / portTICK_PERIOD_MS);
+
+      controlWord &= ~LINMOT_CONTROL_ERROR_ACKNOWLEDGE;
+      OD_set_u16(OD_ENTRY_H2111_linMotControlWord, 0x00, controlWord, false);
+      OD_requestTPDO(OD_variable_linMotControlWord_flagsPDO, 0);
+
+      vTaskDelay(50 / portTICK_PERIOD_MS);
+      continue;
+    }
 
     if (!isEnabled) {
-      OD_set_u16(OD_ENTRY_H2111_linMotControlWord, 0x00, (uint16_t)(LINMOT_CONTROL_SWITCH_ON), false);
+      ESP_LOGI("task.main", "Switching on LinMot!\n");
+
+      controlWord |= LINMOT_CONTROL_SWITCH_ON;
+      OD_set_u16(OD_ENTRY_H2111_linMotControlWord, 0x00, controlWord, false);
       OD_requestTPDO(OD_variable_linMotControlWord_flagsPDO, 0);
+
+      vTaskDelay(250 / portTICK_PERIOD_MS);
+      continue;
     }
 
     if (isEnabled && !isHomed && !isMoving) {
-      OD_set_u16(OD_ENTRY_H2111_linMotControlWord, 0x00, (uint16_t)(LINMOT_CONTROL_SWITCH_ON | LINMOT_CONTROL_HOME), false);
+      ESP_LOGI("task.main", "Homing LinMot!\n");
+
+      controlWord |= LINMOT_CONTROL_HOME;
+      OD_set_u16(OD_ENTRY_H2111_linMotControlWord, 0x00, controlWord, false);
       OD_requestTPDO(OD_variable_linMotControlWord_flagsPDO, 0);
+
+      // TODO - Should shut off homing state after this
+      // This is why Motion CMD error is encountered after rebooting drive!
+
+      vTaskDelay(500 / portTICK_PERIOD_MS);
+      continue;
     }
 
     if (isEnabled && isActive && isHomed && !isMoving) {
+      ESP_LOGI("task.main", "Sending LinMot Motion CMD!\n");
+
       // VAI 16Bit Go To Pos (090xh)
       cmdCount = (cmdCount + 1) % 16;
       uint16_t cmd = ((0x09 & 0xFF) << 8) | ((0x00 & 0x0F) << 4) | (cmdCount & 0x0F);
@@ -282,6 +336,9 @@ static void app_linmot_task(void *pvParameter) {
       // Triggers both TDPO 1 & 2
       OD_requestTPDO(OD_variable_linMotCMDParameters_flagsPDO, 0x01);
       OD_requestTPDO(OD_variable_linMotCMDParameters_flagsPDO, 0x07);
+
+      vTaskDelay(100 / portTICK_PERIOD_MS);
+      continue;
     }
 
     vTaskDelay(100 / portTICK_PERIOD_MS);
