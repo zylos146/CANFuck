@@ -3,7 +3,7 @@
 #include "freertos/task.h"
 
 #include "CO_main.h"
-#include "CO_linmot.h"
+#include "motor.hpp"
 
 #include "esp_log.h"
 #include "config.h"
@@ -70,9 +70,6 @@ void app_init_communication() {
     return;
   }
 
-  // TODO - Turn this into a registration of extensions
-  linmot_co_init();
-
   /* Initialize TPDO and RPDO if defined in CO_config.h */
   err = CO_CANopenInitPDO(CO, CO->em, OD, NODE_ID_SELF, &errInfo);
   if(err != CO_ERROR_NO) {
@@ -135,7 +132,6 @@ void canopen_main_task(void *pvParameter) {
 
 static void canopen_timer_task(void *arg) {
   coInterruptCounter++;
-  linmotPDOCounter++; // TODO - Instead rely on a global timer somewhere, rather than this hack?
 
   CO_LOCK_OD(CO->CANmodule);
 
