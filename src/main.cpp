@@ -2,6 +2,15 @@
 #include "motor_linmot.hpp"
 #include "esp_log.h"
 
+#include "blynk.hpp"
+
+static WiFiClient _blynkWifiClient;
+static BlynkEsp32Client _blynkTransport(_blynkWifiClient);
+BlynkWifi Blynk(_blynkTransport);
+
+char ssid[] = "DESKTOP-7FGKC64 1018";
+char pass[] = "taobao123";
+
 LinmotMotor* motor;
 float position = 0;
 void app_motion(void *pvParameter) {
@@ -17,11 +26,20 @@ void app_motion(void *pvParameter) {
       motor->goToPos(position, 500, 2500);
     }
 
-    vTaskDelay(200 / portTICK_PERIOD_MS);
+    vTaskDelay(100 / portTICK_PERIOD_MS);
   }
 }
 
-void app_main2() {
+void loop() {
+  Blynk.run();
+}
+
+void setup() {
+  Serial.begin(115200);
+  Serial.println("Booting");
+
+  Blynk.begin(BLYNK_AUTH_TOKEN, ssid, pass);
+
   motor = new LinmotMotor();
 
   motionBounds bounds = {
@@ -48,10 +66,5 @@ void app_main2() {
   motor->goToHome();
 
   xTaskCreate(&app_motion, "app_motion", 4096, NULL, 5, NULL);
-}
-
-extern "C" {
-  void app_main() {
-    app_main2();
-  }
+  //xTaskCreate(&app_blynk, "app_blynk", 4096, NULL, 5, NULL);
 }

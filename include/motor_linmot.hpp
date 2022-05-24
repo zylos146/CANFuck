@@ -28,6 +28,7 @@
 #define LINMOT_WARN_MOTOR_NOT_HOMED (1 << 7)
 
 #define LINMOT_STATE_ERROR (0x04)
+#define LINMOT_STATE_OPERATIONAL (0x08)
 #define LINMOT_STATE_HOMING (0x09)
 
 #define LINMOT_ERROR_MOTION_CMD_WRONG_STATE (0x86)
@@ -59,7 +60,9 @@ class LinmotMotor: public MotorInterface {
 
     void CO_sendCmd(uint16_t cmd, uint16_t parameter_a, uint16_t parameter_b, uint16_t parameter_c, uint16_t parameter_d);
 
-    void CO_rpdo_received();
+    void CO_run_rpdo_received();
+    void CO_motion_rpdo_received();
+    void CO_monitor_rpdo_received();
 
     // Tasks
     void task_motion();

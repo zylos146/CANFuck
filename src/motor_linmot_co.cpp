@@ -11,7 +11,9 @@ ODR_t track_status_update(
   return ret;
 };
 
-void LinmotMotor::CO_rpdo_received () {
+// TODO - Can we move some of this logic out to somewhere better?
+// NOTE - This is a time sensitive method. If it doesn't return in enough time, CANOpen Timeout errors will start occuring with the LinMot
+void LinmotMotor::CO_run_rpdo_received () {
   OD_get_u16(this->CO_statusWord_entry, 0x01, &this->CO_statusWord, false);
   OD_get_u16(this->CO_statusWord_entry, 0x02, &this->CO_runWord, false);
   OD_get_u16(this->CO_statusWord_entry, 0x03, &this->CO_errorWord, false);
@@ -33,11 +35,27 @@ void LinmotMotor::CO_rpdo_received () {
     this->state = MotorState::ERROR;
   } else if (runState == LINMOT_STATE_HOMING) {
     this->state = MotorState::HOMING;
+  } else if (runState == LINMOT_STATE_OPERATIONAL) {
+    this->state = MotorState::ACTIVE;
   }
 
   // ESP_LOGI("task.main", "RPDO CSword %d, CRunword %d, RunState %d, CErrorword %d,  CWarnword %d, Status %d, State %d!", this->CO_statusWord, this->CO_runWord, runState, this->CO_errorWord, this->CO_warnWord, this->status, (int)this->getState());
 
   time(&this->lastRPDOUpdate);
+}
+
+void LinmotMotor::CO_motion_rpdo_received () {
+  OD_get_u16(this->CO_statusWord_entry, 0x05, &this->CO_cmdWord, false);
+  OD_get_u16(this->CO_statusWord_entry, 0x06, &this->CO_actualPositionWord, false);
+  OD_get_u16(this->CO_statusWord_entry, 0x07, &this->CO_demandCurrentWord, false);
+  OD_get_u16(this->CO_statusWord_entry, 0x08, &this->CO_demandPositionWord, false);
+}
+
+void LinmotMotor::CO_monitor_rpdo_received () {
+  OD_get_u16(this->CO_statusWord_entry, 0x09, &this->CO_modelTempWord, false);
+  OD_get_u16(this->CO_statusWord_entry, 0x0a, &this->CO_realTempWord, false);
+  OD_get_u16(this->CO_statusWord_entry, 0x0b, &this->CO_motorVoltageWord, false);
+  OD_get_u16(this->CO_statusWord_entry, 0x0c, &this->CO_powerLossWord, false);
 }
 
 void LinmotMotor::CO_setNodeId(uint8_t nodeId) {
@@ -99,7 +117,7 @@ void LinmotMotor::CO_sendCmd(uint16_t cmd, uint16_t parameter_a, uint16_t parame
   this->CO_controlWord = (this->CO_controlWord + 1) % 16;
   uint16_t cmdWord = (cmd & 0xFFF0) | (this->CO_controlWord & 0x0F);
 
-  ESP_LOGI("task.main", "Sending LinMot Motion CMD %d, %d!\n", cmdWord, parameter_a);
+  //ESP_LOGI("task.main", "Sending LinMot Motion CMD %d, %d!\n", cmdWord, parameter_a);
   OD_set_u16(this->CO_cmdHeader_entry, 0x00, cmdWord, false);
 
   OD_set_u8(this->CO_cmdParameters_entry, 0x01, (uint8_t)((parameter_a >> 0) & 0xFF), false);

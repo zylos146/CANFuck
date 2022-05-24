@@ -74,6 +74,12 @@ class MotorInterface {
 
     // Status / State flags
     MotorState getState() { return this->state; }
+    char* getStateString() {
+      if (this->state == MotorState::INACTIVE) { return "INACTIVE"; }
+      if (this->state == MotorState::ACTIVE) { return "ACTIVE"; }
+      if (this->state == MotorState::HOMING) { return "HOMING"; }
+      if (this->state == MotorState::ERROR) { return "ERROR"; }
+    }
     uint32_t getStatus() { return this->status; }
     bool isInState(MotorState state) { return this->state == state; }
     bool hasStatusFlag(uint32_t flag) { return (this->status & flag) > 0; }
