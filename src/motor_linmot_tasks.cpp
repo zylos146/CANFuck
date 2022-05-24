@@ -108,8 +108,6 @@ void LinmotMotor::task_heartbeat() {
   Blynk.virtualWrite(BLYNK_LINMOT_REAL_TEMP, (float)this->CO_realTempWord);
   Blynk.virtualWrite(BLYNK_LINMOT_MOTOR_VOLTAGE, (float)this->CO_motorVoltageWord);
   Blynk.virtualWrite(BLYNK_LINMOT_POWER_LOSS, (float)this->CO_powerLossWord);
-  
-  ESP_LOGI("task.main", "Sending Blynk %d %d %d", this->CO_actualPositionWord, this->CO_realTempWord, this->CO_demandCurrentWord);
 }
 
 // Task Wrappers

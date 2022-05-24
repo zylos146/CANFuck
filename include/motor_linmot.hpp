@@ -90,19 +90,19 @@ class LinmotMotor: public MotorInterface {
 
     uint16_t CO_controlWord = 0x003E;
 
-    // statusWord 1 - 4
+    // TPDO 1
     uint16_t CO_statusWord;
     uint16_t CO_runWord;
     uint16_t CO_errorWord;
     uint16_t CO_warnWord;
 
-    // statusWord 5 - 8
+    // TPDO 2
     uint16_t CO_cmdWord;
     int16_t CO_demandPositionWord; // UPID 0xE9A4 - SInt16 - 0.0001 mm Scale
     int16_t CO_actualPositionWord; // UPID 0xE9A5 - SInt16 - 0.0001 mm Scale
     int16_t CO_demandCurrentWord; // UPID 0xE9E7 - SInt16 - 0.001 A Scale
 
-    // statusWord 9 - 12
+    // TPDO 3
     int16_t CO_modelTempWord; // UPID 0xEB10 - SInt16 - 0.1 C Scale
     uint16_t CO_realTempWord; // UPID 0x6990 - UInt16 - 0.980392156862745 C Scale, -50 C Offset
     int16_t CO_motorVoltageWord; // UPID 0xE96D - SInt16 - 0.01 V Scale
