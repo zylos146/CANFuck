@@ -99,6 +99,17 @@ void LinmotMotor::task_heartbeat() {
   Blynk.virtualWrite(BLYNK_LINMOT_STATE_PIN, (float)runState);
   Blynk.virtualWrite(BLYNK_STATUS_PIN, (float)this->status);
   Blynk.virtualWrite(BLYNK_STATE_PIN, this->getStateString());
+  
+  Blynk.virtualWrite(BLYNK_LINMOT_ACTUAL_POSITION, (float)this->CO_actualPositionWord);
+  Blynk.virtualWrite(BLYNK_LINMOT_DEMAND_CURRENT, (float)this->CO_demandCurrentWord);
+  Blynk.virtualWrite(BLYNK_LINMOT_DEMAND_POSITION, (float)this->CO_demandPositionWord);
+
+  Blynk.virtualWrite(BLYNK_LINMOT_MODEL_TEMP, (float)this->CO_modelTempWord);
+  Blynk.virtualWrite(BLYNK_LINMOT_REAL_TEMP, (float)this->CO_realTempWord);
+  Blynk.virtualWrite(BLYNK_LINMOT_MOTOR_VOLTAGE, (float)this->CO_motorVoltageWord);
+  Blynk.virtualWrite(BLYNK_LINMOT_POWER_LOSS, (float)this->CO_powerLossWord);
+  
+  ESP_LOGI("task.main", "Sending Blynk %d %d %d", this->CO_actualPositionWord, this->CO_realTempWord, this->CO_demandCurrentWord);
 }
 
 // Task Wrappers

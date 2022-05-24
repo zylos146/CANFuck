@@ -54,6 +54,7 @@ class LinmotMotor: public MotorInterface {
     void CO_setCmdHeader(OD_entry_t *entry);
     void CO_setCmdParameters(OD_entry_t *entry);
     void CO_setStatus(OD_entry_t *entry);
+    void CO_setMonitor(OD_entry_t *entry);
 
     void CO_control_addFlag(uint16_t flag);
     void CO_control_removeFlag(uint16_t flag);
@@ -72,7 +73,10 @@ class LinmotMotor: public MotorInterface {
     uint8_t CO_nodeId;
     
     OD_entry_t *CO_statusWord_entry;
-    OD_extension_t CO_statusWorld_extension;
+    OD_extension_t CO_statusWord_extension;
+    
+    OD_entry_t *CO_monitorWord_entry;
+    OD_extension_t CO_monitorWord_extension;
 
     OD_entry_t *CO_controlWord_entry;
     OD_extension_t CO_controlWord_extension;
@@ -85,10 +89,24 @@ class LinmotMotor: public MotorInterface {
     uint8_t *CO_cmdParameters_flags;
 
     uint16_t CO_controlWord = 0x003E;
+
+    // statusWord 1 - 4
     uint16_t CO_statusWord;
     uint16_t CO_runWord;
     uint16_t CO_errorWord;
     uint16_t CO_warnWord;
+
+    // statusWord 5 - 8
+    uint16_t CO_cmdWord;
+    int16_t CO_demandPositionWord; // UPID 0xE9A4 - SInt16 - 0.0001 mm Scale
+    int16_t CO_actualPositionWord; // UPID 0xE9A5 - SInt16 - 0.0001 mm Scale
+    int16_t CO_demandCurrentWord; // UPID 0xE9E7 - SInt16 - 0.001 A Scale
+
+    // statusWord 9 - 12
+    int16_t CO_modelTempWord; // UPID 0xEB10 - SInt16 - 0.1 C Scale
+    uint16_t CO_realTempWord; // UPID 0x6990 - UInt16 - 0.980392156862745 C Scale, -50 C Offset
+    int16_t CO_motorVoltageWord; // UPID 0xE96D - SInt16 - 0.01 V Scale
+    int16_t CO_powerLossWord; // UPID 0xEADB - SInt16 - 0.1 W Scale
 
     uint8_t CO_cmdCount = 0;
     uint16_t position = 0;

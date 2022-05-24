@@ -6,7 +6,23 @@ ODR_t track_status_update(
   OD_size_t count, OD_size_t *countWritten
 ) {
   ODR_t ret = OD_writeOriginal(stream, buf, count, countWritten);
-  ((LinmotMotor*)(stream->object))->CO_rpdo_received();
+
+  // TODO - Determine which RPDO was updated
+  ((LinmotMotor*)(stream->object))->CO_run_rpdo_received();
+
+  return ret;
+};
+
+// TODO - Not really a clean status / monitor split. Real Temp is in Status Update
+ODR_t track_monitor_update(
+  OD_stream_t *stream, const void *buf,
+  OD_size_t count, OD_size_t *countWritten
+) {
+  ODR_t ret = OD_writeOriginal(stream, buf, count, countWritten);
+
+  // TODO - Determine which RPDO was updated
+  ((LinmotMotor*)(stream->object))->CO_motion_rpdo_received();
+  ((LinmotMotor*)(stream->object))->CO_run_rpdo_received();
 
   return ret;
 };
@@ -46,16 +62,16 @@ void LinmotMotor::CO_run_rpdo_received () {
 
 void LinmotMotor::CO_motion_rpdo_received () {
   OD_get_u16(this->CO_statusWord_entry, 0x05, &this->CO_cmdWord, false);
-  OD_get_u16(this->CO_statusWord_entry, 0x06, &this->CO_actualPositionWord, false);
-  OD_get_u16(this->CO_statusWord_entry, 0x07, &this->CO_demandCurrentWord, false);
-  OD_get_u16(this->CO_statusWord_entry, 0x08, &this->CO_demandPositionWord, false);
+  OD_get_i16(this->CO_monitorWord_entry, 0x01, &this->CO_actualPositionWord, false);
+  OD_get_i16(this->CO_monitorWord_entry, 0x02, &this->CO_demandCurrentWord, false);
+  OD_get_i16(this->CO_monitorWord_entry, 0x03, &this->CO_demandPositionWord, false);
 }
 
 void LinmotMotor::CO_monitor_rpdo_received () {
-  OD_get_u16(this->CO_statusWord_entry, 0x09, &this->CO_modelTempWord, false);
-  OD_get_u16(this->CO_statusWord_entry, 0x0a, &this->CO_realTempWord, false);
-  OD_get_u16(this->CO_statusWord_entry, 0x0b, &this->CO_motorVoltageWord, false);
-  OD_get_u16(this->CO_statusWord_entry, 0x0c, &this->CO_powerLossWord, false);
+  OD_get_i16(this->CO_monitorWord_entry, 0x04, &this->CO_modelTempWord, false);
+  OD_get_u16(this->CO_statusWord_entry, 0x06, &this->CO_realTempWord, false);
+  OD_get_i16(this->CO_monitorWord_entry, 0x05, &this->CO_motorVoltageWord, false);
+  OD_get_i16(this->CO_monitorWord_entry, 0x06, &this->CO_powerLossWord, false);
 }
 
 void LinmotMotor::CO_setNodeId(uint8_t nodeId) {
@@ -92,13 +108,24 @@ void LinmotMotor::CO_setCmdParameters(OD_entry_t *entry) {
 
 void LinmotMotor::CO_setStatus(OD_entry_t *entry) {
   this->CO_statusWord_entry = entry;
-  this->CO_statusWorld_extension = {
+  this->CO_statusWord_extension = {
     .object = this,
     .read = OD_readOriginal,
     .write = track_status_update
   };
 
-  OD_extension_init(entry, &this->CO_statusWorld_extension);
+  OD_extension_init(entry, &this->CO_statusWord_extension);
+};
+
+void LinmotMotor::CO_setMonitor(OD_entry_t *entry) {
+  this->CO_monitorWord_entry = entry;
+  this->CO_monitorWord_extension = {
+    .object = this,
+    .read = OD_readOriginal,
+    .write = track_monitor_update
+  };
+
+  OD_extension_init(entry, &this->CO_monitorWord_extension);
 };
 
 void LinmotMotor::CO_control_addFlag(uint16_t flag) {

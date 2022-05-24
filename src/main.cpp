@@ -52,7 +52,8 @@ void setup() {
   motor->setBounds(bounds);
 
   motor->CO_setNodeId(NODE_ID_LINMOT);
-  motor->CO_setStatus(OD_ENTRY_H2110_linMotStatus);
+  motor->CO_setStatus(OD_ENTRY_H2110_linMotStatusUInt16);
+  motor->CO_setMonitor(OD_ENTRY_H2114_linMotStatusSInt16);
   motor->CO_setControl(OD_ENTRY_H2111_linMotControlWord);
   motor->CO_setCmdHeader(OD_ENTRY_H2112_linMotCMD_Header);
   motor->CO_setCmdParameters(OD_ENTRY_H2113_linMotCMD_Parameters);

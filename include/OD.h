@@ -16,7 +16,7 @@
 
         Created:      11/28/2020 7:37:54 AM
         Created By:   Zylos
-        Modified:     5/16/2022 4:38:43 PM
+        Modified:     5/24/2022 5:01:06 PM
         Modified By:  Zylos
 
     Device Info:
@@ -45,7 +45,7 @@
 #define OD_CNT_SDO_SRV 1
 #define OD_CNT_SDO_CLI 1
 #define OD_CNT_TPDO 3
-#define OD_CNT_RPDO 2
+#define OD_CNT_RPDO 3
 
 
 /*******************************************************************************
@@ -55,8 +55,9 @@
 #define OD_CNT_ARR_1010 6
 #define OD_CNT_ARR_1011 6
 #define OD_CNT_ARR_1016 8
-#define OD_CNT_ARR_2110 10
+#define OD_CNT_ARR_2110 6
 #define OD_CNT_ARR_2113 8
+#define OD_CNT_ARR_2114 6
 #define OD_CNT_ARR_6000 8
 #define OD_CNT_ARR_6200 8
 #define OD_CNT_ARR_6401 16
@@ -102,6 +103,11 @@ typedef struct {
         uint8_t transmissionType;
     } x1401_RPDOCommunicationParameter;
     struct {
+        uint8_t maxSub_index;
+        uint32_t COB_IDUsedByRPDO;
+        uint8_t transmissionType;
+    } x1402_RPDOCommunicationParameter;
+    struct {
         uint8_t numberOfMappedObjects;
         uint32_t mappedObject_1;
         uint32_t mappedObject_2;
@@ -115,6 +121,13 @@ typedef struct {
         uint32_t mappedObject_3;
         uint32_t mappedObject_4;
     } x1601_RPDOMappingParameter;
+    struct {
+        uint8_t numberOfMappedObjects;
+        uint32_t mappedObject_1;
+        uint32_t mappedObject_2;
+        uint32_t mappedObject_3;
+        uint32_t mappedObject_4;
+    } x1602_RPDOMappingParameter;
     struct {
         uint8_t maxSub_index;
         uint32_t COB_IDUsedByTPDO;
@@ -181,12 +194,14 @@ typedef struct {
     struct {
         uint8_t highestSub_indexSupported;
     } x2105_version;
-    uint8_t x2110_linMotStatus_sub0;
-    uint16_t x2110_linMotStatus[OD_CNT_ARR_2110];
+    uint8_t x2110_linMotStatusUInt16_sub0;
+    uint16_t x2110_linMotStatusUInt16[OD_CNT_ARR_2110];
     uint16_t x2111_linMotControlWord;
     uint16_t x2112_linMotCMD_Header;
     uint8_t x2113_linMotCMD_Parameters_sub0;
     uint8_t x2113_linMotCMD_Parameters[OD_CNT_ARR_2113];
+    uint8_t x2114_linMotStatusSInt16_sub0;
+    int16_t x2114_linMotStatusSInt16[OD_CNT_ARR_2114];
     uint8_t x6000_readDigitalInput_8_bit_sub0;
     uint8_t x6000_readDigitalInput_8_bit[OD_CNT_ARR_6000];
     uint8_t x6200_writeDigitalOutput_8_bit_sub0;
@@ -244,25 +259,28 @@ extern OD_ATTR_OD OD_t *OD;
 #define OD_ENTRY_H1280 &OD->list[16]
 #define OD_ENTRY_H1400 &OD->list[17]
 #define OD_ENTRY_H1401 &OD->list[18]
-#define OD_ENTRY_H1600 &OD->list[19]
-#define OD_ENTRY_H1601 &OD->list[20]
-#define OD_ENTRY_H1800 &OD->list[21]
-#define OD_ENTRY_H1801 &OD->list[22]
-#define OD_ENTRY_H1802 &OD->list[23]
-#define OD_ENTRY_H1A00 &OD->list[24]
-#define OD_ENTRY_H1A01 &OD->list[25]
-#define OD_ENTRY_H1A02 &OD->list[26]
-#define OD_ENTRY_H2100 &OD->list[27]
-#define OD_ENTRY_H2105 &OD->list[28]
-#define OD_ENTRY_H2106 &OD->list[29]
-#define OD_ENTRY_H2110 &OD->list[30]
-#define OD_ENTRY_H2111 &OD->list[31]
-#define OD_ENTRY_H2112 &OD->list[32]
-#define OD_ENTRY_H2113 &OD->list[33]
-#define OD_ENTRY_H6000 &OD->list[34]
-#define OD_ENTRY_H6200 &OD->list[35]
-#define OD_ENTRY_H6401 &OD->list[36]
-#define OD_ENTRY_H6411 &OD->list[37]
+#define OD_ENTRY_H1402 &OD->list[19]
+#define OD_ENTRY_H1600 &OD->list[20]
+#define OD_ENTRY_H1601 &OD->list[21]
+#define OD_ENTRY_H1602 &OD->list[22]
+#define OD_ENTRY_H1800 &OD->list[23]
+#define OD_ENTRY_H1801 &OD->list[24]
+#define OD_ENTRY_H1802 &OD->list[25]
+#define OD_ENTRY_H1A00 &OD->list[26]
+#define OD_ENTRY_H1A01 &OD->list[27]
+#define OD_ENTRY_H1A02 &OD->list[28]
+#define OD_ENTRY_H2100 &OD->list[29]
+#define OD_ENTRY_H2105 &OD->list[30]
+#define OD_ENTRY_H2106 &OD->list[31]
+#define OD_ENTRY_H2110 &OD->list[32]
+#define OD_ENTRY_H2111 &OD->list[33]
+#define OD_ENTRY_H2112 &OD->list[34]
+#define OD_ENTRY_H2113 &OD->list[35]
+#define OD_ENTRY_H2114 &OD->list[36]
+#define OD_ENTRY_H6000 &OD->list[37]
+#define OD_ENTRY_H6200 &OD->list[38]
+#define OD_ENTRY_H6401 &OD->list[39]
+#define OD_ENTRY_H6411 &OD->list[40]
 
 
 /*******************************************************************************
@@ -287,25 +305,28 @@ extern OD_ATTR_OD OD_t *OD;
 #define OD_ENTRY_H1280_SDOClientParameter &OD->list[16]
 #define OD_ENTRY_H1400_RPDOCommunicationParameter &OD->list[17]
 #define OD_ENTRY_H1401_RPDOCommunicationParameter &OD->list[18]
-#define OD_ENTRY_H1600_RPDOMappingParameter &OD->list[19]
-#define OD_ENTRY_H1601_RPDOMappingParameter &OD->list[20]
-#define OD_ENTRY_H1800_TPDOCommunicationParameter &OD->list[21]
-#define OD_ENTRY_H1801_TPDOCommunicationParameter &OD->list[22]
-#define OD_ENTRY_H1802_TPDOCommunicationParameter &OD->list[23]
-#define OD_ENTRY_H1A00_TPDOMappingParameter &OD->list[24]
-#define OD_ENTRY_H1A01_TPDOMappingParameter &OD->list[25]
-#define OD_ENTRY_H1A02_TPDOMappingParameter &OD->list[26]
-#define OD_ENTRY_H2100_errorStatusBits &OD->list[27]
-#define OD_ENTRY_H2105_version &OD->list[28]
-#define OD_ENTRY_H2106_power_onCounter &OD->list[29]
-#define OD_ENTRY_H2110_linMotStatus &OD->list[30]
-#define OD_ENTRY_H2111_linMotControlWord &OD->list[31]
-#define OD_ENTRY_H2112_linMotCMD_Header &OD->list[32]
-#define OD_ENTRY_H2113_linMotCMD_Parameters &OD->list[33]
-#define OD_ENTRY_H6000_readDigitalInput_8_bit &OD->list[34]
-#define OD_ENTRY_H6200_writeDigitalOutput_8_bit &OD->list[35]
-#define OD_ENTRY_H6401_readAnalogInput_16_bit &OD->list[36]
-#define OD_ENTRY_H6411_writeAnalogOutput_16_bit &OD->list[37]
+#define OD_ENTRY_H1402_RPDOCommunicationParameter &OD->list[19]
+#define OD_ENTRY_H1600_RPDOMappingParameter &OD->list[20]
+#define OD_ENTRY_H1601_RPDOMappingParameter &OD->list[21]
+#define OD_ENTRY_H1602_RPDOMappingParameter &OD->list[22]
+#define OD_ENTRY_H1800_TPDOCommunicationParameter &OD->list[23]
+#define OD_ENTRY_H1801_TPDOCommunicationParameter &OD->list[24]
+#define OD_ENTRY_H1802_TPDOCommunicationParameter &OD->list[25]
+#define OD_ENTRY_H1A00_TPDOMappingParameter &OD->list[26]
+#define OD_ENTRY_H1A01_TPDOMappingParameter &OD->list[27]
+#define OD_ENTRY_H1A02_TPDOMappingParameter &OD->list[28]
+#define OD_ENTRY_H2100_errorStatusBits &OD->list[29]
+#define OD_ENTRY_H2105_version &OD->list[30]
+#define OD_ENTRY_H2106_power_onCounter &OD->list[31]
+#define OD_ENTRY_H2110_linMotStatusUInt16 &OD->list[32]
+#define OD_ENTRY_H2111_linMotControlWord &OD->list[33]
+#define OD_ENTRY_H2112_linMotCMD_Header &OD->list[34]
+#define OD_ENTRY_H2113_linMotCMD_Parameters &OD->list[35]
+#define OD_ENTRY_H2114_linMotStatusSInt16 &OD->list[36]
+#define OD_ENTRY_H6000_readDigitalInput_8_bit &OD->list[37]
+#define OD_ENTRY_H6200_writeDigitalOutput_8_bit &OD->list[38]
+#define OD_ENTRY_H6401_readAnalogInput_16_bit &OD->list[39]
+#define OD_ENTRY_H6411_writeAnalogOutput_16_bit &OD->list[40]
 
 
 /*******************************************************************************
