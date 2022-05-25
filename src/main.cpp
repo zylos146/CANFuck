@@ -19,6 +19,7 @@ Controller* controller;
 float position = 0;
 void app_motion(void *pvParameter) {
   while (true) {
+    // TODO - Doesn't restart after restarting the drive due to removal of slider
     if (motor->isInState(MotorState::ACTIVE) && motor->hasStatusFlag(MOTOR_FLAG_HOMED) && !engine->isActive()) {
       ESP_LOGE("main", "Motor ready and homed. Attempting to start Stroke Engine");
       engine->startPattern();

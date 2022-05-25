@@ -38,13 +38,13 @@ void LinmotMotor::CO_run_rpdo_received () {
   uint16_t statusWord = this->CO_statusWord;
   // uint16_t errorWord = this->CO_errorWord;
 
-  if ((statusWord & LINMOT_STATUS_HOMED) > 0) { this->status |= MOTOR_FLAG_HOMED; }
-  if ((statusWord & LINMOT_STATUS_MOTION_ACTIVE) > 0) { this->status |= MOTOR_FLAG_MOTION_ACTIVE; }
-  if ((statusWord & LINMOT_STATUS_AT_TARGET) > 0) { this->status |= MOTOR_FLAG_AT_TARGET; }
+  if ((statusWord & LINMOT_STATUS_HOMED) > 0) { this->addStatusFlag(MOTOR_FLAG_HOMED); } else { this->removeStatusFlag(MOTOR_FLAG_HOMED); }
+  if ((statusWord & LINMOT_STATUS_MOTION_ACTIVE) > 0) { this->addStatusFlag(MOTOR_FLAG_MOTION_ACTIVE); } else { this->removeStatusFlag(MOTOR_FLAG_MOTION_ACTIVE); }
+  if ((statusWord & LINMOT_STATUS_AT_TARGET) > 0) { this->addStatusFlag(MOTOR_FLAG_AT_TARGET); } else { this->removeStatusFlag(MOTOR_FLAG_AT_TARGET); }
 
-  if ((statusWord & LINMOT_STATUS_WARNING) > 0) { this->status |= MOTOR_FLAG_WARNING; }
-  if ((statusWord & LINMOT_STATUS_ERROR) > 0) { this->status |= MOTOR_FLAG_ERROR; }
-  if ((statusWord & LINMOT_STATUS_FATAL_ERROR) > 0) { this->status |= MOTOR_FLAG_FATAL; }
+  if ((statusWord & LINMOT_STATUS_WARNING) > 0) { this->addStatusFlag(MOTOR_FLAG_WARNING); } else { this->removeStatusFlag(MOTOR_FLAG_WARNING); }
+  if ((statusWord & LINMOT_STATUS_ERROR) > 0) { this->addStatusFlag(MOTOR_FLAG_ERROR); } else { this->removeStatusFlag(MOTOR_FLAG_ERROR); }
+  if ((statusWord & LINMOT_STATUS_FATAL_ERROR) > 0) { this->addStatusFlag(MOTOR_FLAG_FATAL); } else { this->removeStatusFlag(MOTOR_FLAG_FATAL); }
 
   uint8_t runState = (this->CO_runWord & 0xff00) >> 8;
   if (runState == LINMOT_STATE_ERROR) {
