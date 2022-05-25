@@ -26,9 +26,19 @@ StrokeParameter Controller::getEncoderParameter(uint8_t num) {
   }
 }
 
+// TODO - Need to use delta readings so we can sync Blynk and Hardware controller?
+// Really, StrokeEngine is the master parameter holder here
+// TODO - This needs to check delta and only report if there was a change
+// TODO - need to adjust delta and scale based on reported Parameter range from Engine
 void Controller::fetchEncoderValues() {
   for (uint8_t enc=0; enc < CONTROLLER_ENCODER_COUNT; enc++) {
-    this->engine->setParameter(this->getEncoderParameter(enc), this->encoders[enc]->getEncoderPosition());
+    StrokeParameter parameter = this->getEncoderParameter(enc);
+    int32_t delta = this->encoders[enc]->getEncoderDelta();
+
+    if (delta != 0) {
+      float value = this->engine->getParameter(parameter);
+      this->engine->setParameter(parameter, value + delta, false);
+    }
   }
 }
 
