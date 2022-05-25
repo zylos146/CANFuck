@@ -1,6 +1,11 @@
 #include "motor_linmot.hpp"
 
 void LinmotMotor::goToPos(float position, float speed, float acceleration) {
+  if (!this->isInState(MotorState::ACTIVE)) {
+    ESP_LOGE("LinmotMotor", "Attempted to issue Motion CMD while in incorrect state '%s'!", this->getStateString());
+    return;
+  }
+
   this->CO_sendCmd(
     0x0900, 
     static_cast<uint16_t>(position * 10), 

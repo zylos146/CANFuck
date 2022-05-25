@@ -18,14 +18,12 @@ StrokeEngine* engine = NULL;
 float position = 0;
 void app_motion(void *pvParameter) {
   while (true) {
-    if (motor->isInState(MotorState::ACTIVE) && motor->hasStatusFlag(MOTOR_FLAG_HOMED)) {
+    if (motor->isInState(MotorState::ACTIVE) && motor->hasStatusFlag(MOTOR_FLAG_HOMED) && !engine->isActive()) {
       ESP_LOGE("main", "Motor ready and homed. Attempting to start Stroke Engine");
-      engine->ready();
       engine->startPattern();
-      vTaskSuspend(NULL);
     }
 
-    vTaskDelay(100 / portTICK_PERIOD_MS);
+    vTaskDelay(1000 / portTICK_PERIOD_MS);
   }
 }
 

@@ -39,7 +39,15 @@ void LinmotMotor::task_motion() {
 
       return;
     } else {
-      ESP_LOGE("task.main", "LinMot is in a unknown error state! Unrecoverable, please restart drive!");
+      ESP_LOGE("task.main", "LinMot is in a unknown error state 0x%04X! Unrecoverable, attempting to restart drive!", errorWord);
+      CO_NMT_sendCommand(CO->NMT, CO_NMT_RESET_NODE, this->CO_nodeId);
+
+      // TODO - Bit of a hack to make sure error waits until refresh
+      OD_set_u16(this->CO_statusWord_entry, 0x01, 0x0000, false);
+      OD_set_u16(this->CO_statusWord_entry, 0x02, 0x0000, false);
+      OD_set_u16(this->CO_statusWord_entry, 0x03, 0x0000, false);
+      OD_set_u16(this->CO_statusWord_entry, 0x04, 0x0000, false);
+
       vTaskDelay(5000 / portTICK_PERIOD_MS);
       return;
     }
@@ -91,6 +99,7 @@ void LinmotMotor::task_heartbeat() {
   double diff = difftime(now, this->lastRPDOUpdate);
   if (diff > 1.0) {
     ESP_LOGE("task.main", "Error: Have not recieved LinMot RPDO in %d ms! Attempting to re-establish!", (int)(diff * 1000));
+    this->state = MotorState::ERROR;
     CO_NMT_sendCommand(CO->NMT, CO_NMT_ENTER_OPERATIONAL, this->CO_nodeId);
   }
 
