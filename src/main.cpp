@@ -2,18 +2,19 @@
 #include "motor_linmot.hpp"
 #include "esp_log.h"
 
+#include "config.h"
 #include "blynk.hpp"
 #include "StrokeEngine.h"
+#include "Wire.h"
+#include "controller.hpp"
 
 static WiFiClient _blynkWifiClient;
 static BlynkEsp32Client _blynkTransport(_blynkWifiClient);
 BlynkWifi Blynk(_blynkTransport);
 
-char ssid[] = "DESKTOP-7FGKC64 1018";
-char pass[] = "taobao123";
-
 LinmotMotor* motor;
-StrokeEngine* engine = NULL;
+StrokeEngine* engine;
+Controller* controller;
 
 float position = 0;
 void app_motion(void *pvParameter) {
@@ -33,10 +34,22 @@ void loop() {
 
 void setup() {
   Serial.begin(115200);
+  Wire.begin(I2C_SDA_PIN, I2C_SCL_PIN);
 
   ESP_LOGI("main", "Starting Blynk");
-  Blynk.begin(BLYNK_AUTH_TOKEN, ssid, pass);
+  Blynk.begin(BLYNK_AUTH_TOKEN, WIFI_SSID, WIFI_PASS);
 
+  if (CONTROLLER_USED) {
+    ESP_LOGI("main", "Initializing Hardware Controller");
+    controller = new Controller();
+    if (controller->start() == false) {
+      ESP_LOGE("main", "Unable to initialize Hardware Controller");
+      esp_restart();
+    }
+
+  } else {
+    ESP_LOGI("main", "No Hardware Controller, only Blynk Controls will be available!");
+  }
 
   ESP_LOGI("main", "Configuring Motor");
   motor = new LinmotMotor();
@@ -66,10 +79,18 @@ void setup() {
   engine->setParameter(StrokeParameter::STROKE, 50);
   engine->setParameter(StrokeParameter::SENSATION, 0);
 
-  ESP_LOGI("main", "Registering Motor Tasks");
+  if (controller != NULL) {
+    controller->attachEngine(engine);
+  }
+
+  ESP_LOGI("main", "Registering Tasks (CO, Motor, Controller)");
   // CO Startup must occur after motor CO configuration due to OD extension initialization
   CO_register_tasks();
   motor->registerTasks();
+  
+  if (controller != NULL) {
+    controller->registerTasks();
+  }
 
   ESP_LOGI("main", "Homing Motor");
   motor->enable();
