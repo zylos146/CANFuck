@@ -147,6 +147,8 @@ void linmot_heartbeat_task(void * pvParameter) {
 }
 
 void LinmotMotor::registerTasks() {
+  // CO Startup must occur after motor CO configuration due to OD extension initialization
+  CO_register_tasks();
   xTaskCreate(&linmot_run_task, "linmot_run_task", 4096, this, 5, NULL);
   xTaskCreate(&linmot_heartbeat_task, "linmot_heartbeat_task", 4096, this, 5, NULL);
 }

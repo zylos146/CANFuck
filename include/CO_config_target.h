@@ -1,6 +1,7 @@
 #ifndef CO_CONFIG_TARGET_H
 #define CO_CONFIG_TARGET_H
 
+#include "config.h"
 #include "301/CO_config.h"
 
 #define CO_CONFIG_NMT ( \
@@ -14,8 +15,6 @@
 #define CO_CONFIG_LSS (CO_CONFIG_LSS_MASTER | CO_CONFIG_LSS_SLAVE | CO_CONFIG_GLOBAL_FLAG_CALLBACK_PRE)
 #define CO_CONFIG_FIFO (CO_CONFIG_FIFO_ENABLE)
 
-#define CAN_TX_IO (34)  /** CAN TX pin */
-#define CAN_RX_IO (35) /** CAN RX pin */
 #define CAN_TX_QUEUE_LENGTH (5) /** CAN TX buffer size */
 #define CAN_RX_QUEUE_LENGTH (5) /** CAN RX buffer size */
 
@@ -23,10 +22,6 @@
 #define CO_MAIN_TASK_INTERVAL (1000)   /* Interval of tmrTask thread in microseconds */
 
 #define CAN_MS_TO_WAIT (10000) /*CAN TX/RX Timeout value*/
-
-#define CAN_BITRATE 500    /* kbit */
-#define NODE_ID_SELF 0x01
-#define NODE_ID_LINMOT 0x3F
 
 #define NMT_CONTROL ((CO_NMT_control_t)(CO_NMT_STARTUP_TO_OPERATIONAL | CO_NMT_ERR_ON_ERR_REG))
 #define FIRST_HB_TIME 500

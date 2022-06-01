@@ -32,12 +32,27 @@ StrokeParameter Controller::getEncoderParameter(uint8_t num) {
 // TODO - need to adjust delta and scale based on reported Parameter range from Engine
 void Controller::fetchEncoderValues() {
   for (uint8_t enc=0; enc < CONTROLLER_ENCODER_COUNT; enc++) {
+    Adafruit_seesaw* encoder = this->encoders[enc];
+    seesaw_NeoPixel* pixel = this->encoderPixels[enc];
+
+    bool active = encoder->digitalRead(SS_SWITCH);
+    
     StrokeParameter parameter = this->getEncoderParameter(enc);
-    int32_t delta = this->encoders[enc]->getEncoderDelta();
+    int32_t delta = encoder->getEncoderDelta();
 
     if (delta != 0) {
       float value = this->engine->getParameter(parameter);
       this->engine->setParameter(parameter, value + delta, false);
+    }
+
+    if (active) {
+      pixel->setBrightness(10);
+      pixel->setPixelColor(0, pixel->Color(255, 165, 0));
+      pixel->show();
+    } else {
+      pixel->setBrightness(10);
+      pixel->setPixelColor(0, pixel->Color(0, 255, 0));
+      pixel->show();
     }
   }
 }
