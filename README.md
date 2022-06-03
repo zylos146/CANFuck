@@ -15,6 +15,11 @@ but can be used for any other hardware
 
 <a name="getting-started"></a>
 # Getting Started (TODO)
+CANFuck is only meant to run on ESP32 hardware, as it has some tight integrations with in.
+Raspberry Pi's are not a supported target for this software.
+
+CANFuck is built on PlatformIO through VSCode.
+
 - Talk about how to use ESP32 Parameters to configure drive without needing to use code. Intent is to allow just flashing an ESP32, and attaching it to any Machine after configuration via Web
 
 <a name="drives-supported"></a>
@@ -25,13 +30,14 @@ CANFuck started as a driver for CANOpen-based LinMot drivers, but now supports a
     - :question: Rtelligent ECT60 / ECT40 Closed-Loop Servos
     - :question: LinMot EtherCat CiA 402 capable drives (E1200-DC, etc)
 - CANOpen
-  - LinMot CANOpen capable drives
+  - LinMot CiA 402 CANOpen capable drives
     - :x: E1200-EC / E1200-DC are not supported unless EtherCat support is built
-    - :heavy_check_mark: E1200-GP-xx
-    - :heavy_check_mark: E1100-GP-xx
-    - :heavy_check_mark: E1100-CO-xx
+    - :heavy_check_mark: E1200-GP-xx (Haven't confirmed yet, but should work)
+    - :heavy_check_mark: E1100-GP-xx (Haven't confirmed yet, but should work)
+    - :heavy_check_mark: E1100-CO-xx (Haven't confirmed yet, but should work)
     - :heavy_check_mark: B1100-GP-xx
     - :heavy_check_mark: A1100-GP-LC
+  - Other CiA 402 drives could likely be ported with minimal effort
 - ModBus
   - :heavy_check_mark: iHSV57 V6xx Servos 100/140/180W - **TODO, not yet implemented, but definitely will be**
   - :x: iHSV57 V5xx is **NOT SUPPORTED** due to differing communication protocol with V6xx drivers
