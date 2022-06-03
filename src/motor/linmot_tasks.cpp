@@ -120,20 +120,6 @@ void LinmotMotor::task_heartbeat() {
 }
 
 // Task Wrappers
-static void linmot_run_task(void *pvParameter) {
-  LinmotMotor* motor = (LinmotMotor*) pvParameter;
-
-  while (true) {
-    if (!comm_canopen_is_ready()) {
-      vTaskDelay(250 / portTICK_PERIOD_MS);
-      continue;
-    }
-
-    motor->task_motion();
-    vTaskDelay(100 / portTICK_PERIOD_MS);
-  }
-}
-
 void linmot_heartbeat_task(void * pvParameter) {
   LinmotMotor* motor = (LinmotMotor*) pvParameter;
 
@@ -146,9 +132,32 @@ void linmot_heartbeat_task(void * pvParameter) {
   }
 }
 
-void LinmotMotor::registerTasks() {
+static void linmot_run_task(void *pvParameter) {
+  LinmotMotor* motor = (LinmotMotor*) pvParameter;
+
+  // Wait for motor enable
+  bool motorDisabled = true;
+  while (motorDisabled) {
+    motorDisabled = motor->hasStatusFlag(MOTOR_FLAG_ENABLED);
+    vTaskDelay(100 / portTICK_PERIOD_MS);
+  }
+  
   // CO Startup must occur after motor CO configuration due to OD extension initialization
   CO_register_tasks();
+  xTaskCreate(&linmot_heartbeat_task, "linmot_heartbeat_task", 4096, motor, 5, NULL);
+
+  while (true) {
+    if (!comm_canopen_is_ready()) {
+      vTaskDelay(250 / portTICK_PERIOD_MS);
+      continue;
+    }
+
+    motor->task_motion();
+    vTaskDelay(100 / portTICK_PERIOD_MS);
+  }
+}
+
+// TODO - move constructor to linmot.cpp?
+LinmotMotor::LinmotMotor() {
   xTaskCreate(&linmot_run_task, "linmot_run_task", 4096, this, 5, NULL);
-  xTaskCreate(&linmot_heartbeat_task, "linmot_heartbeat_task", 4096, this, 5, NULL);
 }

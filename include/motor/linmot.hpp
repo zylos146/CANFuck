@@ -40,9 +40,9 @@
 
 class LinmotMotor: public MotorInterface {
   public:
+    LinmotMotor();
     // Motion
     //void goToHome();
-    void goToPos(float position, float speed, float acceleration);
     void stopMotion();
 
     // General
@@ -68,6 +68,9 @@ class LinmotMotor: public MotorInterface {
     // Tasks
     void task_motion();
     void task_heartbeat();
+
+  protected:
+    void unsafeGoToPos(float position, float speed, float acceleration);
 
   private:
     uint8_t CO_nodeId;

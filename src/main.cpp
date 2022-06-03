@@ -74,10 +74,8 @@ void setup() {
   if (controller != NULL) {
     controller->attachEngine(engine);
   }
-
-  ESP_LOGI("main", "Registering Tasks (Motor, Controller)");
-  motor->registerTasks();
   
+  // TODO - Move controller tasks into init/attach
   if (controller != NULL) {
     controller->registerTasks();
   }
