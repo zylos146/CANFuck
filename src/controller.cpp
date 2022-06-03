@@ -1,19 +1,19 @@
-#include "controller.hpp"
+#include "controller/canfuck.hpp"
 
 #define ENCODER_1_PARAMETER StrokeParameter::DEPTH
 #define ENCODER_2_PARAMETER StrokeParameter::STROKE
 #define ENCODER_3_PARAMETER StrokeParameter::RATE
-#define ENCODER_4_PARAMETER c::SENSATION
+#define ENCODER_4_PARAMETER StrokeParameter::SENSATION
 
 void controller_poll(void* pvParameter) {
-  Controller* controller = (Controller*)pvParameter;
+  CANFuckController* controller = (CANFuckController*)pvParameter;
   while (true) {
     controller->fetchEncoderValues();
     vTaskDelay(10 / portTICK_PERIOD_MS);
   }
 }
 
-StrokeParameter Controller::getEncoderParameter(uint8_t num) {
+StrokeParameter CANFuckController::getEncoderParameter(uint8_t num) {
   switch (num) {
     case 1:
       return StrokeParameter::DEPTH;
@@ -30,7 +30,7 @@ StrokeParameter Controller::getEncoderParameter(uint8_t num) {
 // Really, StrokeEngine is the master parameter holder here
 // TODO - This needs to check delta and only report if there was a change
 // TODO - need to adjust delta and scale based on reported Parameter range from Engine
-void Controller::fetchEncoderValues() {
+void CANFuckController::fetchEncoderValues() {
   for (uint8_t enc=0; enc < CONTROLLER_ENCODER_COUNT; enc++) {
     Adafruit_seesaw* encoder = this->encoders[enc];
     seesaw_NeoPixel* pixel = this->encoderPixels[enc];
@@ -57,7 +57,7 @@ void Controller::fetchEncoderValues() {
   }
 }
 
-bool Controller::start() {
+bool CANFuckController::start() {
   ESP_LOGI("controller", "Attempting to register %d encoders!", CONTROLLER_ENCODER_COUNT);
   bool encoderSuccess = true;
 
@@ -111,7 +111,7 @@ bool Controller::start() {
   return true;
 }
 
-void Controller::registerTasks() {
+void CANFuckController::registerTasks() {
   ESP_LOGI("controller", "Registering tasks");
   xTaskCreate(&controller_poll, "app_motion", 4096, this, 5, NULL);
 }

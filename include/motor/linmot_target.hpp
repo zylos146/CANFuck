@@ -2,7 +2,7 @@
 #define MOTOR_LINMOT_TARGET_H
 
 #include "CO_main.h"
-#include "motor_linmot.hpp"
+#include "motor/linmot.hpp"
 
 MotorInterface* setupTargetMotor() {
   LinmotMotor* motor = new LinmotMotor();

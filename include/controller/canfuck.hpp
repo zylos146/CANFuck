@@ -1,5 +1,5 @@
-#ifndef CONTROLLER_H
-#define CONTROLLER_H
+#ifndef CONTROLLER_CANFUCK_H
+#define CONTROLLER_CANFUCK_H
 
 #include "config.h"
 #include "StrokeEngine.h"
@@ -15,7 +15,7 @@
 
 #define CONTROLLER_ENCODER_COUNT 4
 
-class Controller {
+class CANFuckController {
   public:
     bool start();
     void attachEngine(StrokeEngine* engine) { this->engine = engine; }

@@ -7,7 +7,7 @@
 
 #include "config.h"
 
-#include "motor_linmot.hpp"
+#include "motor/linmot.hpp"
 #include "blynk.hpp"
 
 void LinmotMotor::task_motion() {

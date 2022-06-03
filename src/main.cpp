@@ -1,16 +1,19 @@
 #include "esp_log.h"
-#include "config.h"
+#include "Wire.h"
+#include <Preferences.h>
+
 #include "blynk.hpp"
 #include "StrokeEngine.h"
-#include "Wire.h"
-#include "controller.hpp"
+
+#include "config.h"
+#include "controller/canfuck.hpp"
 
 #if MOTOR_USED==MOTOR_LINMOT
-#include "motor_linmot_target.hpp"
+#include "motor/linmot_target.hpp"
 #endif
 
 #if MOTOR_USED==MOTOR_STEPPER
-#include "motor_stepper_target.hpp"
+#include "motor/stepper_target.hpp"
 #endif
 
 static WiFiClient _blynkWifiClient;
@@ -19,7 +22,7 @@ BlynkWifi Blynk(_blynkTransport);
 
 MotorInterface* motor;
 StrokeEngine* engine;
-Controller* controller;
+CANFuckController* controller; // TODO - Abstract interface with controller away? Use similar system to Object Dictionary with CANOpen?
 
 float position = 0;
 void app_motion(void *pvParameter) {
@@ -47,7 +50,7 @@ void setup() {
 
   if (CONTROLLER_USED) {
     ESP_LOGI("main", "Initializing Hardware Controller");
-    controller = new Controller();
+    controller = new CANFuckController();
     if (controller->start() == false) {
       ESP_LOGE("main", "Unable to initialize Hardware Controller");
       esp_restart();

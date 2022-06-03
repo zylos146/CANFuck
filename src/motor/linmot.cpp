@@ -1,4 +1,4 @@
-#include "motor_linmot.hpp"
+#include "motor/linmot.hpp"
 
 void LinmotMotor::goToPos(float position, float speed, float acceleration) {
   if (!this->isInState(MotorState::ACTIVE)) {
