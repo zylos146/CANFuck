@@ -17,14 +17,11 @@
 AsyncWebServer server(80);
 AsyncWebSocket ws("/ws"); // access at ws://[esp ip]/ws
 
-static WiFiClient _blynkWifiClient;
-static BlynkEsp32Client _blynkTransport(_blynkWifiClient);
-BlynkWifi Blynk(_blynkTransport);
-
 // TODO - Allow ESP32 Perferences to choose motor implementation
 LinmotMotor* motor;
 StrokeEngine* engine;
 CANFuckController* controller; // TODO - Abstract interface with controller away? Use similar system to Object Dictionary with CANOpen?
+BlynkController* blynk = NULL;
 
 void onRequest(AsyncWebServerRequest *request){
   //Handle Unknown Request
@@ -44,7 +41,9 @@ void onEvent(AsyncWebSocket * server, AsyncWebSocketClient * client, AwsEventTyp
 }
 
 void loop() {
-  Blynk.run();
+  if (blynk != NULL) {
+    blynk->loop();
+  }
 }
 
 void setup() {
@@ -57,8 +56,8 @@ void setup() {
     return;
   }
 
-  ESP_LOGI("main", "Starting Blynk");
-  Blynk.begin(BLYNK_AUTH_TOKEN, WIFI_SSID, WIFI_PASS);
+  ESP_LOGI("main", "Starting Bylnk!");
+  blynk = new BlynkController();
   
   ESP_LOGI("main", "Starting Web Server");
   server.serveStatic("/", SPIFFS, "/www/").setDefaultFile("index.html");
@@ -79,6 +78,7 @@ void setup() {
   } else {
     ESP_LOGI("main", "No Hardware Controller, only Blynk Controls will be available!");
   }
+
 
   ESP_LOGI("main", "Configuring Motor");
   motor = new LinmotMotor();
@@ -103,17 +103,20 @@ void setup() {
   ESP_LOGI("main", "Attaching Motor to Stroke Engine");
   engine->attachMotor(motor);
 
+  if (controller != NULL) {
+  ESP_LOGI("main", "Attaching Controller to Stroke Engine");
+    controller->attachEngine(engine);
+  }
+
+  ESP_LOGI("main", "Attaching Blynk to Motor and Engine");
+  blynk->attach(engine, motor);
+
   ESP_LOGI("main", "Configuring Stroke Engine");
   engine->setParameter(StrokeParameter::PATTERN, 0);
   engine->setParameter(StrokeParameter::RATE, 50);
   engine->setParameter(StrokeParameter::DEPTH, 100);
   engine->setParameter(StrokeParameter::STROKE, 50);
   engine->setParameter(StrokeParameter::SENSATION, 0);
-
-  if (controller != NULL) {
-  ESP_LOGI("main", "Attaching Controller to Stroke Engine");
-    controller->attachEngine(engine);
-  }
   
   // TODO - Move controller tasks into init/attach
   if (controller != NULL) {
@@ -128,33 +131,3 @@ void setup() {
   //xTaskCreate(&app_motion, "app_motion", 4096, NULL, 5, NULL);
 }
 
-BLYNK_WRITE(BLYNK_SPEED) {
-  engine->setParameter(StrokeParameter::RATE, param.asFloat());
-}
-
-BLYNK_WRITE(BLYNK_DEPTH) {
-  engine->setParameter(StrokeParameter::DEPTH, param.asFloat());
-}
-
-BLYNK_WRITE(BLYNK_STROKE) {
-  engine->setParameter(StrokeParameter::STROKE, param.asFloat());
-}
-
-BLYNK_WRITE(BLYNK_SENSATION) {
-  engine->setParameter(StrokeParameter::SENSATION, param.asFloat());
-}
-
-BLYNK_WRITE(BLYNK_DEVICE_ENABLE) {
-  if (param.asInt() == 1) {
-    ESP_LOGI("main", "Blynk commanded an enable!");
-    if (motor->isInState(MotorState::ACTIVE) && motor->hasStatusFlag(MOTOR_FLAG_HOMED) && !engine->isActive()) {
-      ESP_LOGI("main", "Motor ready and homed. Attempting to start Stroke Engine");
-      engine->startPattern();
-    } else {
-      ESP_LOGE("main", "Motor was not ready or homed! Unable to enable device!");
-      Blynk.virtualWrite(BLYNK_DEVICE_ENABLE, (float)0);
-    }
-  } else {
-    engine->stopPattern();
-  }
-}

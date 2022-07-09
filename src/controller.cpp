@@ -1,10 +1,5 @@
 #include "controller/canfuck.hpp"
 
-#define ENCODER_1_PARAMETER StrokeParameter::DEPTH
-#define ENCODER_2_PARAMETER StrokeParameter::STROKE
-#define ENCODER_3_PARAMETER StrokeParameter::RATE
-#define ENCODER_4_PARAMETER StrokeParameter::SENSATION
-
 void controller_poll(void* pvParameter) {
   CANFuckController* controller = (CANFuckController*)pvParameter;
   while (true) {
@@ -15,13 +10,13 @@ void controller_poll(void* pvParameter) {
 
 StrokeParameter CANFuckController::getEncoderParameter(uint8_t num) {
   switch (num) {
-    case 1:
+    case 0:
       return StrokeParameter::DEPTH;
-    case 2:
+    case 1:
       return StrokeParameter::STROKE;
-    case 3:
+    case 2:
       return StrokeParameter::RATE;
-    case 4:
+    case 3:
       return StrokeParameter::SENSATION;
   }
 }
@@ -42,7 +37,7 @@ void CANFuckController::fetchEncoderValues() {
 
     if (delta != 0) {
       float value = this->engine->getParameter(parameter);
-      this->engine->setParameter(parameter, value + delta, false);
+      this->engine->setParameter(parameter, value + delta, true);
     }
 
     if (active) {
