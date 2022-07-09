@@ -20,58 +20,15 @@ but can be used for any other hardware.
 CANFuck is only meant to run on ESP32 hardware, as it has some tight integrations with in.
 Raspberry Pi's are not a supported target for this software.
 
-CANFuck is built on PlatformIO through VSCode.
+CANFuck is built on PlatformIO through VSCode. Arduino IDE is not supported.
+
+`git clone --recursive https://github.com/zylos146/CANFuck/`
 
 ```# Talk about how to use ESP32 Parameters to configure drive without needing to use code. Intent is to allow just flashing an ESP32, and attaching it to any Machine after configuration via Web```
 
 <a name="motion-supported"></a>
 # Motion Generation
-Two types of Motion Generation are planned
-- Streaming
-- Patterns
-
-## Streaming
-CANFuck will support ingesting Motion Commands or T-Codes and sending them directly to the Motor. These will act in a similar way to G-Code. Either a pre-built file can be loaded, or an external integration can stream them in.
-
-Streaming/Loading T-Codes is not currently supported, but is a intended goal
-
-## Patterns
-Patterns allow a set of pre-built, real-time configurable strokes to be generated on-demand.
-Pattern Generation happens all through the [StrokeEngine](https://github.com/theelims/StrokeEngine)
-
-
-The following Patterns are offered by default
-
-
-### Simple Stroke
-Simple Stroke Pattern. It creates a trapezoidal stroke profile with 1/3 acceleration, 1/3 coasting, 1/3 deceleration. Sensation has no effect.
-
-### Teasing or Pounding
-The sensation value can change the speed ratio between in and out. Sensation > 0 makes the in-move faster (up to 5x) giving a hard pounding sensation. Values < 0 make the out-move going faster. This gives a more pleasing sensation. The time for the overall stroke remains always the same and only depends on the global speed parameter.
-
-### Robo Stroke
-Sensation controls the acceleration of the stroke. Positive value increase acceleration until it is a constant speed motion (feels robotic). Neutral is equal to simple stroke (1/3, 1/3, 1/3). Negative reduces acceleration into a triangle profile.
-
-### Half'n'Half
-Similar to Teasing or Pounding, but every second stroke is only half the depth. The sensation value can change the speed ratio between in and out. Sensation > 0 make the in move faster (up to 5x) giving a hard pounding sensation. Values < 0 make the out move going faster. This gives a more pleasing sensation. The time for the overall stroke remains the same for all strokes, even half ones.
-
-### Deeper
-The insertion depth ramps up gradually with each stroke until it reaches its maximum. It then resets and restarts. Sensations controls how many strokes there are in a ramp.
-
-### Stop'n'Go
-Pauses between a series of strokes. The number of strokes ramps from 1 stroke to 5 strokes and back. Sensation changes the length of the pauses between stroke series.
-
-### Insist
-Sensation reduces the effective stroke length while keeping the stroke speed constant to the full stroke. This creates interesting vibrational pattern at higher sensation values. With positive sensation the strokes will wander towards the front, with negative values towards the back.
-
-### Jack Hammer
-Vibrational pattern that works like a jack hammer. Vibrates on the way in and pulls out smoothly in one go. Sensation sets the vibration amplitude from 3mm to 25mm.
-
-### Stroke Nibbler
-Simple vibrational overlay pattern. Vibrates on the way in and out. Sensation sets the vibration amplitude from 3mm to 25mm.
-
-### Custom Patterns
-Further documentation on Custom Patterns can be found in [StrokeEngine Patterns](https://github.com/theelims/StrokeEngine/blob/main/Pattern.md)
+Motion Generation is provided via StrokeEngine
 
 <a name="drives-supported"></a>
 # Drives Supported

@@ -2,6 +2,3 @@
 	path = lib/StrokeEngine
 	url = https://github.com/theelims/StrokeEngine.git
 	branch = main
-[submodule "lib/CANOpenNode"]
-	path = lib/CANOpenNode
-	url = https://github.com/zylos146/CANOpenNode-ESP32
