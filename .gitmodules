@@ -4,4 +4,4 @@
 	branch = main
 [submodule "lib/StrokeEngine-CANOpen"]
 	path = lib/StrokeEngine-CANOpen
-	url = https://github.com/zylos146/CANOpenNode-ESP32
+url=https://github.com/zylos146/StrokeEngine-CANOpen
