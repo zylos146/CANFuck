@@ -15,11 +15,11 @@
         <ProfileTechnology>CANopen</ProfileTechnology>
       </ISO15745Reference>
     </ProfileHeader>
-    <ProfileBody xmlns:q1="http://www.canopen.org/xml/1.1" xsi:type="q1:ProfileBody_Device_CANopen" formatName="CANopen" formatVersion="1.0" fileName="device.xdd" fileCreator="Zylos" fileCreationDate="2020-11-28" fileCreationTime="07:37:54.0000000-04:00" fileModifiedBy="Zylos" fileModificationDate="2022-05-24" fileModificationTime="17:01:06.9926687-04:00" fileVersion="1" supportedLanguages="en" xmlns="">
+    <ProfileBody xmlns:q1="http://www.canopen.org/xml/1.1" xsi:type="q1:ProfileBody_Device_CANopen" formatName="CANopen" formatVersion="1.0" fileName="linmot-b1100.xdd" fileCreator="Zylos" fileCreationDate="2020-11-28" fileCreationTime="07:37:54.0000000-04:00" fileModifiedBy="Zylos" fileModificationDate="2022-07-29" fileModificationTime="19:37:51.6056337-04:00" fileVersion="1" supportedLanguages="en" xmlns="">
       <q1:DeviceIdentity>
         <q1:vendorName>Central Nexus</q1:vendorName>
         <q1:vendorID></q1:vendorID>
-        <q1:productName>CANFuck</q1:productName>
+        <q1:productName>B1100 CANFuck</q1:productName>
         <q1:productID></q1:productID>
         <q1:productText>
           <description lang="en">Basic CANopen device with example usage.</description>
@@ -64,7 +64,7 @@
             <UDINT />
           </q1:array>
           <q1:array name="LinMot Status UInt16" uniqueID="UID_ARR_2110">
-            <q1:subrange lowerLimit="0" upperLimit="6" />
+            <q1:subrange lowerLimit="0" upperLimit="7" />
             <UINT />
           </q1:array>
           <q1:array name="LinMot CMD Parameters" uniqueID="UID_ARR_2113">
@@ -72,24 +72,12 @@
             <USINT />
           </q1:array>
           <q1:array name="LinMot Status SInt16" uniqueID="UID_ARR_2114">
-            <q1:subrange lowerLimit="0" upperLimit="6" />
+            <q1:subrange lowerLimit="0" upperLimit="1" />
             <INT />
           </q1:array>
-          <q1:array name="Read digital input 8-bit" uniqueID="UID_ARR_6000">
-            <q1:subrange lowerLimit="0" upperLimit="8" />
-            <USINT />
-          </q1:array>
-          <q1:array name="Write digital output 8-bit" uniqueID="UID_ARR_6200">
-            <q1:subrange lowerLimit="0" upperLimit="8" />
-            <USINT />
-          </q1:array>
-          <q1:array name="Read analog input 16-bit" uniqueID="UID_ARR_6401">
-            <q1:subrange lowerLimit="0" upperLimit="16" />
-            <INT />
-          </q1:array>
-          <q1:array name="Write analog output 16-bit" uniqueID="UID_ARR_6411">
-            <q1:subrange lowerLimit="0" upperLimit="8" />
-            <INT />
+          <q1:array name="LinMot Status SInt32" uniqueID="UID_ARR_2115">
+            <q1:subrange lowerLimit="0" upperLimit="3" />
+            <DINT />
           </q1:array>
           <q1:struct name="Identity" uniqueID="UID_REC_1018">
             <q1:varDeclaration name="Highest sub-index supported" uniqueID="UID_RECSUB_101800">
@@ -191,12 +179,6 @@
               <UDINT />
             </q1:varDeclaration>
             <q1:varDeclaration name="Mapped object 2" uniqueID="UID_RECSUB_160102">
-              <UDINT />
-            </q1:varDeclaration>
-            <q1:varDeclaration name="Mapped object 3" uniqueID="UID_RECSUB_160103">
-              <UDINT />
-            </q1:varDeclaration>
-            <q1:varDeclaration name="Mapped object 4" uniqueID="UID_RECSUB_160104">
               <UDINT />
             </q1:varDeclaration>
           </q1:struct>
@@ -810,27 +792,17 @@
           <q1:parameter uniqueID="UID_SUB_160100">
             <label lang="en">Number of mapped objects</label>
             <USINT />
-            <q1:defaultValue value="4" />
+            <q1:defaultValue value="2" />
           </q1:parameter>
           <q1:parameter uniqueID="UID_SUB_160101">
             <label lang="en">Mapped object 1</label>
             <UDINT />
-            <q1:defaultValue value="0x21100510" />
+            <q1:defaultValue value="0x21150120" />
           </q1:parameter>
           <q1:parameter uniqueID="UID_SUB_160102">
             <label lang="en">Mapped object 2</label>
             <UDINT />
-            <q1:defaultValue value="0x21140110" />
-          </q1:parameter>
-          <q1:parameter uniqueID="UID_SUB_160103">
-            <label lang="en">Mapped object 3</label>
-            <UDINT />
-            <q1:defaultValue value="0x21140210" />
-          </q1:parameter>
-          <q1:parameter uniqueID="UID_SUB_160104">
-            <label lang="en">Mapped object 4</label>
-            <UDINT />
-            <q1:defaultValue value="0x21140310" />
+            <q1:defaultValue value="0x21150220" />
           </q1:parameter>
           <q1:parameter uniqueID="UID_OBJ_1602">
             <label lang="en">RPDO mapping parameter</label>
@@ -845,22 +817,22 @@
           <q1:parameter uniqueID="UID_SUB_160201">
             <label lang="en">Mapped object 1</label>
             <UDINT />
-            <q1:defaultValue value="0x21140410" />
+            <q1:defaultValue value="0x21100510" />
           </q1:parameter>
           <q1:parameter uniqueID="UID_SUB_160202">
             <label lang="en">Mapped object 2</label>
             <UDINT />
-            <q1:defaultValue value="0x21100610" />
+            <q1:defaultValue value="0x21140110" />
           </q1:parameter>
           <q1:parameter uniqueID="UID_SUB_160203">
             <label lang="en">Mapped object 3</label>
             <UDINT />
-            <q1:defaultValue value="0x21140510" />
+            <q1:defaultValue value="0x21100710" />
           </q1:parameter>
           <q1:parameter uniqueID="UID_SUB_160204">
             <label lang="en">Mapped object 4</label>
             <UDINT />
-            <q1:defaultValue value="0x21140610" />
+            <q1:defaultValue value="0x21100610" />
           </q1:parameter>
           <q1:parameter uniqueID="UID_OBJ_1800">
             <label lang="en">TPDO communication parameter</label>
@@ -1030,17 +1002,17 @@
           <q1:parameter uniqueID="UID_SUB_1A0105">
             <label lang="en">Mapped object 5</label>
             <UDINT />
-            <q1:defaultValue value="0x21130408" />
+            <q1:defaultValue value="0x21130608" />
           </q1:parameter>
           <q1:parameter uniqueID="UID_SUB_1A0106">
             <label lang="en">Mapped object 6</label>
             <UDINT />
-            <q1:defaultValue value="0x21130508" />
+            <q1:defaultValue value="0x21130408" />
           </q1:parameter>
           <q1:parameter uniqueID="UID_SUB_1A0107">
             <label lang="en">Mapped object 7</label>
             <UDINT />
-            <q1:defaultValue value="0x21130608" />
+            <q1:defaultValue value="0x21130508" />
           </q1:parameter>
           <q1:parameter uniqueID="UID_OBJ_1A02">
             <label lang="en">TPDO mapping parameter</label>
@@ -1103,7 +1075,7 @@
           <q1:parameter uniqueID="UID_SUB_211000">
             <label lang="en">Highest sub-index supported</label>
             <USINT />
-            <q1:defaultValue value="0x06" />
+            <q1:defaultValue value="0x07" />
           </q1:parameter>
           <q1:parameter uniqueID="UID_SUB_211001" access="readWrite">
             <label lang="en">Status Word</label>
@@ -1111,7 +1083,7 @@
             <q1:defaultValue value="0" />
           </q1:parameter>
           <q1:parameter uniqueID="UID_SUB_211002" access="readWrite">
-            <label lang="en">Run State</label>
+            <label lang="en">State Var</label>
             <UINT />
             <q1:defaultValue value="0" />
           </q1:parameter>
@@ -1126,12 +1098,17 @@
             <q1:defaultValue value="0" />
           </q1:parameter>
           <q1:parameter uniqueID="UID_SUB_211005" access="readWrite">
-            <label lang="en">CMD Status</label>
+            <label lang="en">Motor Supply Voltage</label>
             <UINT />
             <q1:defaultValue value="0" />
           </q1:parameter>
           <q1:parameter uniqueID="UID_SUB_211006" access="readWrite">
-            <description lang="en">UPID 0x6990 - UInt16 - 0.980392156862745 C Scale, -50 C Offset</description>
+            <label lang="en">Motor Power Losses</label>
+            <UINT />
+            <q1:defaultValue value="0" />
+          </q1:parameter>
+          <q1:parameter uniqueID="UID_SUB_211007" access="readWrite">
+            <label lang="en">Motor Real Temp 1</label>
             <UINT />
             <q1:defaultValue value="0" />
           </q1:parameter>
@@ -1205,274 +1182,36 @@
           <q1:parameter uniqueID="UID_SUB_211400">
             <label lang="en">Highest sub-index supported</label>
             <USINT />
-            <q1:defaultValue value="0x06" />
+            <q1:defaultValue value="0x01" />
           </q1:parameter>
           <q1:parameter uniqueID="UID_SUB_211401" access="readWrite">
-            <description lang="en">UPID 0xE9A5 - SInt16 - 0.0001 mm Scale</description>
+            <label lang="en">Model Ph1 Temp</label>
             <INT />
             <q1:defaultValue value="0" />
           </q1:parameter>
-          <q1:parameter uniqueID="UID_SUB_211402" access="readWrite">
-            <description lang="en">UPID 0xE9E7 - SInt16 - 0.001 A Scale</description>
-            <INT />
-            <q1:defaultValue value="0" />
-          </q1:parameter>
-          <q1:parameter uniqueID="UID_SUB_211403" access="readWrite">
-            <description lang="en">UPID 0xE9A4 - SInt16 - 0.0001 mm Scale</description>
-            <INT />
-            <q1:defaultValue value="0" />
-          </q1:parameter>
-          <q1:parameter uniqueID="UID_SUB_211404" access="readWrite">
-            <description lang="en">UPID 0xEB10 - SInt16 - 0.1 C Scale</description>
-            <INT />
-            <q1:defaultValue value="0" />
-          </q1:parameter>
-          <q1:parameter uniqueID="UID_SUB_211405" access="readWrite">
-            <description lang="en">UPID 0xE96D - SInt16 - 0.01 V Scale</description>
-            <INT />
-            <q1:defaultValue value="0" />
-          </q1:parameter>
-          <q1:parameter uniqueID="UID_SUB_211406" access="readWrite">
-            <description lang="en">UPID 0xEADB - SInt16 - 0.1 W Scale</description>
-            <INT />
-            <q1:defaultValue value="0" />
-          </q1:parameter>
-          <q1:parameter uniqueID="UID_OBJ_6000">
-            <description lang="en">Digital inputs from hardware.</description>
-            <q1:dataTypeIDRef uniqueIDRef="UID_ARR_6000" />
+          <q1:parameter uniqueID="UID_OBJ_2115">
+            <description lang="en">Vartiable is free to use by application.</description>
+            <q1:dataTypeIDRef uniqueIDRef="UID_ARR_2115" />
             <q1:property name="CO_flagsPDO" value="true" />
           </q1:parameter>
-          <q1:parameter uniqueID="UID_SUB_600000">
+          <q1:parameter uniqueID="UID_SUB_211500">
             <label lang="en">Highest sub-index supported</label>
             <USINT />
-            <q1:defaultValue value="0x08" />
+            <q1:defaultValue value="0x03" />
           </q1:parameter>
-          <q1:parameter uniqueID="UID_SUB_600001">
-            <label lang="en">Input</label>
-            <USINT />
-            <q1:defaultValue value="0x00" />
-          </q1:parameter>
-          <q1:parameter uniqueID="UID_SUB_600002">
-            <label lang="en">Input</label>
-            <USINT />
-            <q1:defaultValue value="0x00" />
-          </q1:parameter>
-          <q1:parameter uniqueID="UID_SUB_600003">
-            <label lang="en">Input</label>
-            <USINT />
-            <q1:defaultValue value="0x00" />
-          </q1:parameter>
-          <q1:parameter uniqueID="UID_SUB_600004">
-            <label lang="en">Input</label>
-            <USINT />
-            <q1:defaultValue value="0x00" />
-          </q1:parameter>
-          <q1:parameter uniqueID="UID_SUB_600005">
-            <label lang="en">Input</label>
-            <USINT />
-            <q1:defaultValue value="0x00" />
-          </q1:parameter>
-          <q1:parameter uniqueID="UID_SUB_600006">
-            <label lang="en">Input</label>
-            <USINT />
-            <q1:defaultValue value="0x00" />
-          </q1:parameter>
-          <q1:parameter uniqueID="UID_SUB_600007">
-            <label lang="en">Input</label>
-            <USINT />
-            <q1:defaultValue value="0x00" />
-          </q1:parameter>
-          <q1:parameter uniqueID="UID_SUB_600008">
-            <label lang="en">Input</label>
-            <USINT />
-            <q1:defaultValue value="0x00" />
-          </q1:parameter>
-          <q1:parameter uniqueID="UID_OBJ_6200">
-            <description lang="en">Digital outputs on hardware.</description>
-            <q1:dataTypeIDRef uniqueIDRef="UID_ARR_6200" />
-          </q1:parameter>
-          <q1:parameter uniqueID="UID_SUB_620000">
-            <label lang="en">Highest sub-index supported</label>
-            <USINT />
-            <q1:defaultValue value="0x08" />
-          </q1:parameter>
-          <q1:parameter uniqueID="UID_SUB_620001" access="readWrite">
-            <label lang="en">Output</label>
-            <USINT />
-            <q1:defaultValue value="0x00" />
-          </q1:parameter>
-          <q1:parameter uniqueID="UID_SUB_620002" access="readWrite">
-            <label lang="en">Output</label>
-            <USINT />
-            <q1:defaultValue value="0x00" />
-          </q1:parameter>
-          <q1:parameter uniqueID="UID_SUB_620003" access="readWrite">
-            <label lang="en">Output</label>
-            <USINT />
-            <q1:defaultValue value="0x00" />
-          </q1:parameter>
-          <q1:parameter uniqueID="UID_SUB_620004" access="readWrite">
-            <label lang="en">Output</label>
-            <USINT />
-            <q1:defaultValue value="0x00" />
-          </q1:parameter>
-          <q1:parameter uniqueID="UID_SUB_620005" access="readWrite">
-            <label lang="en">Output</label>
-            <USINT />
-            <q1:defaultValue value="0x00" />
-          </q1:parameter>
-          <q1:parameter uniqueID="UID_SUB_620006" access="readWrite">
-            <label lang="en">Output</label>
-            <USINT />
-            <q1:defaultValue value="0x00" />
-          </q1:parameter>
-          <q1:parameter uniqueID="UID_SUB_620007" access="readWrite">
-            <label lang="en">Output</label>
-            <USINT />
-            <q1:defaultValue value="0x00" />
-          </q1:parameter>
-          <q1:parameter uniqueID="UID_SUB_620008" access="readWrite">
-            <label lang="en">Output</label>
-            <USINT />
-            <q1:defaultValue value="0x00" />
-          </q1:parameter>
-          <q1:parameter uniqueID="UID_OBJ_6401">
-            <description lang="en">Analogue inputs from hardware. The integer value is left adjusted.</description>
-            <q1:dataTypeIDRef uniqueIDRef="UID_ARR_6401" />
-            <q1:property name="CO_flagsPDO" value="true" />
-          </q1:parameter>
-          <q1:parameter uniqueID="UID_SUB_640100">
-            <label lang="en">Highest sub-index supported</label>
-            <USINT />
-            <q1:defaultValue value="0x10" />
-          </q1:parameter>
-          <q1:parameter uniqueID="UID_SUB_640101">
-            <label lang="en">Input</label>
-            <INT />
+          <q1:parameter uniqueID="UID_SUB_211501" access="readWrite">
+            <label lang="en">Actual Position</label>
+            <DINT />
             <q1:defaultValue value="0" />
           </q1:parameter>
-          <q1:parameter uniqueID="UID_SUB_640102">
-            <label lang="en">Input</label>
-            <INT />
+          <q1:parameter uniqueID="UID_SUB_211502" access="readWrite">
+            <label lang="en">Actual Velocity</label>
+            <DINT />
             <q1:defaultValue value="0" />
           </q1:parameter>
-          <q1:parameter uniqueID="UID_SUB_640103">
-            <label lang="en">Input</label>
-            <INT />
-            <q1:defaultValue value="0" />
-          </q1:parameter>
-          <q1:parameter uniqueID="UID_SUB_640104">
-            <label lang="en">Input</label>
-            <INT />
-            <q1:defaultValue value="0" />
-          </q1:parameter>
-          <q1:parameter uniqueID="UID_SUB_640105">
-            <label lang="en">Input</label>
-            <INT />
-            <q1:defaultValue value="0" />
-          </q1:parameter>
-          <q1:parameter uniqueID="UID_SUB_640106">
-            <label lang="en">Input</label>
-            <INT />
-            <q1:defaultValue value="0" />
-          </q1:parameter>
-          <q1:parameter uniqueID="UID_SUB_640107">
-            <label lang="en">Input</label>
-            <INT />
-            <q1:defaultValue value="0" />
-          </q1:parameter>
-          <q1:parameter uniqueID="UID_SUB_640108">
-            <label lang="en">Input</label>
-            <INT />
-            <q1:defaultValue value="0" />
-          </q1:parameter>
-          <q1:parameter uniqueID="UID_SUB_640109">
-            <label lang="en">Input</label>
-            <INT />
-            <q1:defaultValue value="0" />
-          </q1:parameter>
-          <q1:parameter uniqueID="UID_SUB_64010A">
-            <label lang="en">Input</label>
-            <INT />
-            <q1:defaultValue value="0" />
-          </q1:parameter>
-          <q1:parameter uniqueID="UID_SUB_64010B">
-            <label lang="en">Input</label>
-            <INT />
-            <q1:defaultValue value="0" />
-          </q1:parameter>
-          <q1:parameter uniqueID="UID_SUB_64010C">
-            <label lang="en">Input</label>
-            <INT />
-            <q1:defaultValue value="0" />
-          </q1:parameter>
-          <q1:parameter uniqueID="UID_SUB_64010D">
-            <label lang="en">Input</label>
-            <INT />
-            <q1:defaultValue value="0" />
-          </q1:parameter>
-          <q1:parameter uniqueID="UID_SUB_64010E">
-            <label lang="en">Input</label>
-            <INT />
-            <q1:defaultValue value="0" />
-          </q1:parameter>
-          <q1:parameter uniqueID="UID_SUB_64010F">
-            <label lang="en">Input</label>
-            <INT />
-            <q1:defaultValue value="0" />
-          </q1:parameter>
-          <q1:parameter uniqueID="UID_SUB_640110">
-            <label lang="en">Input</label>
-            <INT />
-            <q1:defaultValue value="0" />
-          </q1:parameter>
-          <q1:parameter uniqueID="UID_OBJ_6411">
-            <description lang="en">Analogue outputs on hardware. The integer value is left adjusted.</description>
-            <q1:dataTypeIDRef uniqueIDRef="UID_ARR_6411" />
-          </q1:parameter>
-          <q1:parameter uniqueID="UID_SUB_641100">
-            <label lang="en">Highest sub-index supported</label>
-            <USINT />
-            <q1:defaultValue value="0x08" />
-          </q1:parameter>
-          <q1:parameter uniqueID="UID_SUB_641101" access="readWrite">
-            <label lang="en">Output</label>
-            <INT />
-            <q1:defaultValue value="0" />
-          </q1:parameter>
-          <q1:parameter uniqueID="UID_SUB_641102" access="readWrite">
-            <label lang="en">Output</label>
-            <INT />
-            <q1:defaultValue value="0" />
-          </q1:parameter>
-          <q1:parameter uniqueID="UID_SUB_641103" access="readWrite">
-            <label lang="en">Output</label>
-            <INT />
-            <q1:defaultValue value="0" />
-          </q1:parameter>
-          <q1:parameter uniqueID="UID_SUB_641104" access="readWrite">
-            <label lang="en">Output</label>
-            <INT />
-            <q1:defaultValue value="0" />
-          </q1:parameter>
-          <q1:parameter uniqueID="UID_SUB_641105" access="readWrite">
-            <label lang="en">Output</label>
-            <INT />
-            <q1:defaultValue value="0" />
-          </q1:parameter>
-          <q1:parameter uniqueID="UID_SUB_641106" access="readWrite">
-            <label lang="en">Output</label>
-            <INT />
-            <q1:defaultValue value="0" />
-          </q1:parameter>
-          <q1:parameter uniqueID="UID_SUB_641107" access="readWrite">
-            <label lang="en">Output</label>
-            <INT />
-            <q1:defaultValue value="0" />
-          </q1:parameter>
-          <q1:parameter uniqueID="UID_SUB_641108" access="readWrite">
-            <label lang="en">Output</label>
-            <INT />
+          <q1:parameter uniqueID="UID_SUB_211503" access="readWrite">
+            <label lang="en">Actual Force</label>
+            <DINT />
             <q1:defaultValue value="0" />
           </q1:parameter>
         </q1:parameterList>
@@ -1492,7 +1231,7 @@
         <ProfileTechnology>CANopen</ProfileTechnology>
       </ISO15745Reference>
     </ProfileHeader>
-    <ProfileBody xmlns:q2="http://www.canopen.org/xml/1.1" xsi:type="q2:ProfileBody_CommunicationNetwork_CANopen" formatName="CANopen" formatVersion="1.0" fileName="device.xdd" fileCreator="Zylos" fileCreationDate="2020-11-28" fileCreationTime="07:37:54.0000000-04:00" fileModificationDate="2022-05-24" fileModificationTime="17:01:06.9926687-04:00" fileVersion="1" supportedLanguages="en" xmlns="">
+    <ProfileBody xmlns:q2="http://www.canopen.org/xml/1.1" xsi:type="q2:ProfileBody_CommunicationNetwork_CANopen" formatName="CANopen" formatVersion="1.0" fileName="linmot-b1100.xdd" fileCreator="Zylos" fileCreationDate="2020-11-28" fileCreationTime="07:37:54.0000000-04:00" fileModificationDate="2022-07-29" fileModificationTime="19:37:51.6056337-04:00" fileVersion="1" supportedLanguages="en" xmlns="">
       <ApplicationLayers>
         <q2:CANopenObjectList>
           <CANopenObject index="1000" name="Device type" objectType="7" PDOmapping="no" uniqueIDRef="UID_OBJ_1000" />
@@ -1585,12 +1324,10 @@
             <CANopenSubObject subIndex="03" name="Mapped object 3" objectType="7" PDOmapping="no" uniqueIDRef="UID_SUB_160003" />
             <CANopenSubObject subIndex="04" name="Mapped object 4" objectType="7" PDOmapping="no" uniqueIDRef="UID_SUB_160004" />
           </CANopenObject>
-          <CANopenObject index="1601" name="RPDO mapping parameter" objectType="9" uniqueIDRef="UID_OBJ_1601" subNumber="5">
+          <CANopenObject index="1601" name="RPDO mapping parameter" objectType="9" uniqueIDRef="UID_OBJ_1601" subNumber="3">
             <CANopenSubObject subIndex="00" name="Number of mapped objects" objectType="7" PDOmapping="no" uniqueIDRef="UID_SUB_160100" />
             <CANopenSubObject subIndex="01" name="Mapped object 1" objectType="7" PDOmapping="no" uniqueIDRef="UID_SUB_160101" />
             <CANopenSubObject subIndex="02" name="Mapped object 2" objectType="7" PDOmapping="no" uniqueIDRef="UID_SUB_160102" />
-            <CANopenSubObject subIndex="03" name="Mapped object 3" objectType="7" PDOmapping="no" uniqueIDRef="UID_SUB_160103" />
-            <CANopenSubObject subIndex="04" name="Mapped object 4" objectType="7" PDOmapping="no" uniqueIDRef="UID_SUB_160104" />
           </CANopenObject>
           <CANopenObject index="1602" name="RPDO mapping parameter" objectType="9" uniqueIDRef="UID_OBJ_1602" subNumber="5">
             <CANopenSubObject subIndex="00" name="Number of mapped objects" objectType="7" PDOmapping="no" uniqueIDRef="UID_SUB_160200" />
@@ -1653,14 +1390,15 @@
             <CANopenSubObject subIndex="02" name="Application" objectType="7" PDOmapping="no" uniqueIDRef="UID_SUB_210502" />
           </CANopenObject>
           <CANopenObject index="2106" name="Power-on counter" objectType="7" PDOmapping="no" uniqueIDRef="UID_OBJ_2106" />
-          <CANopenObject index="2110" name="LinMot Status UInt16" objectType="8" uniqueIDRef="UID_OBJ_2110" subNumber="7">
+          <CANopenObject index="2110" name="LinMot Status UInt16" objectType="8" uniqueIDRef="UID_OBJ_2110" subNumber="8">
             <CANopenSubObject subIndex="00" name="Highest sub-index supported" objectType="7" PDOmapping="optional" uniqueIDRef="UID_SUB_211000" />
             <CANopenSubObject subIndex="01" name="Status Word" objectType="7" PDOmapping="optional" uniqueIDRef="UID_SUB_211001" />
-            <CANopenSubObject subIndex="02" name="Run State" objectType="7" PDOmapping="optional" uniqueIDRef="UID_SUB_211002" />
+            <CANopenSubObject subIndex="02" name="State Var" objectType="7" PDOmapping="optional" uniqueIDRef="UID_SUB_211002" />
             <CANopenSubObject subIndex="03" name="Error Code" objectType="7" PDOmapping="optional" uniqueIDRef="UID_SUB_211003" />
             <CANopenSubObject subIndex="04" name="Warn Word" objectType="7" PDOmapping="optional" uniqueIDRef="UID_SUB_211004" />
-            <CANopenSubObject subIndex="05" name="CMD Status" objectType="7" PDOmapping="optional" uniqueIDRef="UID_SUB_211005" />
-            <CANopenSubObject subIndex="06" name="Real Temp" objectType="7" PDOmapping="optional" uniqueIDRef="UID_SUB_211006" />
+            <CANopenSubObject subIndex="05" name="Motor Supply Voltage" objectType="7" PDOmapping="optional" uniqueIDRef="UID_SUB_211005" />
+            <CANopenSubObject subIndex="06" name="Motor Power Losses" objectType="7" PDOmapping="optional" uniqueIDRef="UID_SUB_211006" />
+            <CANopenSubObject subIndex="07" name="Motor Real Temp 1" objectType="7" PDOmapping="optional" uniqueIDRef="UID_SUB_211007" />
           </CANopenObject>
           <CANopenObject index="2111" name="LinMot Control Word" objectType="7" PDOmapping="TPDO" uniqueIDRef="UID_OBJ_2111" />
           <CANopenObject index="2112" name="LinMot CMD Header" objectType="7" PDOmapping="TPDO" uniqueIDRef="UID_OBJ_2112" />
@@ -1675,66 +1413,15 @@
             <CANopenSubObject subIndex="07" name="Parameter Byte 6" objectType="7" PDOmapping="TPDO" uniqueIDRef="UID_SUB_211307" />
             <CANopenSubObject subIndex="08" name="Parameter Byte 7" objectType="7" PDOmapping="TPDO" uniqueIDRef="UID_SUB_211308" />
           </CANopenObject>
-          <CANopenObject index="2114" name="LinMot Status SInt16" objectType="8" uniqueIDRef="UID_OBJ_2114" subNumber="7">
+          <CANopenObject index="2114" name="LinMot Status SInt16" objectType="8" uniqueIDRef="UID_OBJ_2114" subNumber="2">
             <CANopenSubObject subIndex="00" name="Highest sub-index supported" objectType="7" PDOmapping="optional" uniqueIDRef="UID_SUB_211400" />
-            <CANopenSubObject subIndex="01" name="Actual Position" objectType="7" PDOmapping="optional" uniqueIDRef="UID_SUB_211401" />
-            <CANopenSubObject subIndex="02" name="Demand Current" objectType="7" PDOmapping="optional" uniqueIDRef="UID_SUB_211402" />
-            <CANopenSubObject subIndex="03" name="Demand Position" objectType="7" PDOmapping="optional" uniqueIDRef="UID_SUB_211403" />
-            <CANopenSubObject subIndex="04" name="Model Temp" objectType="7" PDOmapping="optional" uniqueIDRef="UID_SUB_211404" />
-            <CANopenSubObject subIndex="05" name="Motor Voltage" objectType="7" PDOmapping="optional" uniqueIDRef="UID_SUB_211405" />
-            <CANopenSubObject subIndex="06" name="Motor Power Loss" objectType="7" PDOmapping="optional" uniqueIDRef="UID_SUB_211406" />
+            <CANopenSubObject subIndex="01" name="Model Ph1 Temp" objectType="7" PDOmapping="optional" uniqueIDRef="UID_SUB_211401" />
           </CANopenObject>
-          <CANopenObject index="6000" name="Read digital input 8-bit" objectType="8" uniqueIDRef="UID_OBJ_6000" subNumber="9">
-            <CANopenSubObject subIndex="00" name="Highest sub-index supported" objectType="7" PDOmapping="no" uniqueIDRef="UID_SUB_600000" />
-            <CANopenSubObject subIndex="01" name="Input" objectType="7" PDOmapping="TPDO" uniqueIDRef="UID_SUB_600001" />
-            <CANopenSubObject subIndex="02" name="Input" objectType="7" PDOmapping="TPDO" uniqueIDRef="UID_SUB_600002" />
-            <CANopenSubObject subIndex="03" name="Input" objectType="7" PDOmapping="TPDO" uniqueIDRef="UID_SUB_600003" />
-            <CANopenSubObject subIndex="04" name="Input" objectType="7" PDOmapping="TPDO" uniqueIDRef="UID_SUB_600004" />
-            <CANopenSubObject subIndex="05" name="Input" objectType="7" PDOmapping="TPDO" uniqueIDRef="UID_SUB_600005" />
-            <CANopenSubObject subIndex="06" name="Input" objectType="7" PDOmapping="TPDO" uniqueIDRef="UID_SUB_600006" />
-            <CANopenSubObject subIndex="07" name="Input" objectType="7" PDOmapping="TPDO" uniqueIDRef="UID_SUB_600007" />
-            <CANopenSubObject subIndex="08" name="Input" objectType="7" PDOmapping="TPDO" uniqueIDRef="UID_SUB_600008" />
-          </CANopenObject>
-          <CANopenObject index="6200" name="Write digital output 8-bit" objectType="8" uniqueIDRef="UID_OBJ_6200" subNumber="9">
-            <CANopenSubObject subIndex="00" name="Highest sub-index supported" objectType="7" PDOmapping="optional" uniqueIDRef="UID_SUB_620000" />
-            <CANopenSubObject subIndex="01" name="Output" objectType="7" PDOmapping="optional" uniqueIDRef="UID_SUB_620001" />
-            <CANopenSubObject subIndex="02" name="Output" objectType="7" PDOmapping="optional" uniqueIDRef="UID_SUB_620002" />
-            <CANopenSubObject subIndex="03" name="Output" objectType="7" PDOmapping="optional" uniqueIDRef="UID_SUB_620003" />
-            <CANopenSubObject subIndex="04" name="Output" objectType="7" PDOmapping="optional" uniqueIDRef="UID_SUB_620004" />
-            <CANopenSubObject subIndex="05" name="Output" objectType="7" PDOmapping="optional" uniqueIDRef="UID_SUB_620005" />
-            <CANopenSubObject subIndex="06" name="Output" objectType="7" PDOmapping="optional" uniqueIDRef="UID_SUB_620006" />
-            <CANopenSubObject subIndex="07" name="Output" objectType="7" PDOmapping="optional" uniqueIDRef="UID_SUB_620007" />
-            <CANopenSubObject subIndex="08" name="Output" objectType="7" PDOmapping="optional" uniqueIDRef="UID_SUB_620008" />
-          </CANopenObject>
-          <CANopenObject index="6401" name="Read analog input 16-bit" objectType="8" uniqueIDRef="UID_OBJ_6401" subNumber="17">
-            <CANopenSubObject subIndex="00" name="Highest sub-index supported" objectType="7" PDOmapping="optional" uniqueIDRef="UID_SUB_640100" />
-            <CANopenSubObject subIndex="01" name="Input" objectType="7" PDOmapping="optional" uniqueIDRef="UID_SUB_640101" />
-            <CANopenSubObject subIndex="02" name="Input" objectType="7" PDOmapping="optional" uniqueIDRef="UID_SUB_640102" />
-            <CANopenSubObject subIndex="03" name="Input" objectType="7" PDOmapping="optional" uniqueIDRef="UID_SUB_640103" />
-            <CANopenSubObject subIndex="04" name="Input" objectType="7" PDOmapping="optional" uniqueIDRef="UID_SUB_640104" />
-            <CANopenSubObject subIndex="05" name="Input" objectType="7" PDOmapping="optional" uniqueIDRef="UID_SUB_640105" />
-            <CANopenSubObject subIndex="06" name="Input" objectType="7" PDOmapping="optional" uniqueIDRef="UID_SUB_640106" />
-            <CANopenSubObject subIndex="07" name="Input" objectType="7" PDOmapping="optional" uniqueIDRef="UID_SUB_640107" />
-            <CANopenSubObject subIndex="08" name="Input" objectType="7" PDOmapping="optional" uniqueIDRef="UID_SUB_640108" />
-            <CANopenSubObject subIndex="09" name="Input" objectType="7" PDOmapping="optional" uniqueIDRef="UID_SUB_640109" />
-            <CANopenSubObject subIndex="0A" name="Input" objectType="7" PDOmapping="optional" uniqueIDRef="UID_SUB_64010A" />
-            <CANopenSubObject subIndex="0B" name="Input" objectType="7" PDOmapping="optional" uniqueIDRef="UID_SUB_64010B" />
-            <CANopenSubObject subIndex="0C" name="Input" objectType="7" PDOmapping="optional" uniqueIDRef="UID_SUB_64010C" />
-            <CANopenSubObject subIndex="0D" name="Input" objectType="7" PDOmapping="optional" uniqueIDRef="UID_SUB_64010D" />
-            <CANopenSubObject subIndex="0E" name="Input" objectType="7" PDOmapping="optional" uniqueIDRef="UID_SUB_64010E" />
-            <CANopenSubObject subIndex="0F" name="Input" objectType="7" PDOmapping="optional" uniqueIDRef="UID_SUB_64010F" />
-            <CANopenSubObject subIndex="10" name="Input" objectType="7" PDOmapping="optional" uniqueIDRef="UID_SUB_640110" />
-          </CANopenObject>
-          <CANopenObject index="6411" name="Write analog output 16-bit" objectType="8" uniqueIDRef="UID_OBJ_6411" subNumber="9">
-            <CANopenSubObject subIndex="00" name="Highest sub-index supported" objectType="7" PDOmapping="optional" uniqueIDRef="UID_SUB_641100" />
-            <CANopenSubObject subIndex="01" name="Output" objectType="7" PDOmapping="optional" uniqueIDRef="UID_SUB_641101" />
-            <CANopenSubObject subIndex="02" name="Output" objectType="7" PDOmapping="optional" uniqueIDRef="UID_SUB_641102" />
-            <CANopenSubObject subIndex="03" name="Output" objectType="7" PDOmapping="optional" uniqueIDRef="UID_SUB_641103" />
-            <CANopenSubObject subIndex="04" name="Output" objectType="7" PDOmapping="optional" uniqueIDRef="UID_SUB_641104" />
-            <CANopenSubObject subIndex="05" name="Output" objectType="7" PDOmapping="optional" uniqueIDRef="UID_SUB_641105" />
-            <CANopenSubObject subIndex="06" name="Output" objectType="7" PDOmapping="optional" uniqueIDRef="UID_SUB_641106" />
-            <CANopenSubObject subIndex="07" name="Output" objectType="7" PDOmapping="optional" uniqueIDRef="UID_SUB_641107" />
-            <CANopenSubObject subIndex="08" name="Output" objectType="7" PDOmapping="optional" uniqueIDRef="UID_SUB_641108" />
+          <CANopenObject index="2115" name="LinMot Status SInt32" objectType="8" uniqueIDRef="UID_OBJ_2115" subNumber="4">
+            <CANopenSubObject subIndex="00" name="Highest sub-index supported" objectType="7" PDOmapping="optional" uniqueIDRef="UID_SUB_211500" />
+            <CANopenSubObject subIndex="01" name="Actual Position" objectType="7" PDOmapping="optional" uniqueIDRef="UID_SUB_211501" />
+            <CANopenSubObject subIndex="02" name="Actual Velocity" objectType="7" PDOmapping="optional" uniqueIDRef="UID_SUB_211502" />
+            <CANopenSubObject subIndex="03" name="Actual Force" objectType="7" PDOmapping="optional" uniqueIDRef="UID_SUB_211503" />
           </CANopenObject>
         </q2:CANopenObjectList>
         <dummyUsage>
@@ -1750,7 +1437,13 @@
       <TransportLayers>
         <PhysicalLayer>
           <baudRate>
+            <supportedBaudRate value="10 Kbps" />
+            <supportedBaudRate value="20 Kbps" />
+            <supportedBaudRate value="50 Kbps" />
+            <supportedBaudRate value="125 Kbps" />
+            <supportedBaudRate value="250 Kbps" />
             <supportedBaudRate value="500 Kbps" />
+            <supportedBaudRate value="800 Kbps" />
             <supportedBaudRate value="1000 Kbps" />
           </baudRate>
         </PhysicalLayer>

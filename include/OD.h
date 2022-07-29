@@ -11,18 +11,18 @@
 
     File info:
         File Names:   OD.h; OD.c
-        Project File: device.xdd
+        Project File: linmot-b1100.xdd
         File Version: 1
 
         Created:      11/28/2020 7:37:54 AM
         Created By:   Zylos
-        Modified:     5/24/2022 5:01:06 PM
+        Modified:     7/29/2022 7:37:51 PM
         Modified By:  Zylos
 
     Device Info:
         Vendor Name:  Central Nexus
         Vendor ID:    
-        Product Name: CANFuck
+        Product Name: B1100 CANFuck
         Product ID:   
 
         Description:  Basic CANopen device with example usage.
@@ -55,13 +55,10 @@
 #define OD_CNT_ARR_1010 6
 #define OD_CNT_ARR_1011 6
 #define OD_CNT_ARR_1016 8
-#define OD_CNT_ARR_2110 6
+#define OD_CNT_ARR_2110 7
 #define OD_CNT_ARR_2113 8
-#define OD_CNT_ARR_2114 6
-#define OD_CNT_ARR_6000 8
-#define OD_CNT_ARR_6200 8
-#define OD_CNT_ARR_6401 16
-#define OD_CNT_ARR_6411 8
+#define OD_CNT_ARR_2114 1
+#define OD_CNT_ARR_2115 3
 
 
 /*******************************************************************************
@@ -118,8 +115,6 @@ typedef struct {
         uint8_t numberOfMappedObjects;
         uint32_t mappedObject_1;
         uint32_t mappedObject_2;
-        uint32_t mappedObject_3;
-        uint32_t mappedObject_4;
     } x1601_RPDOMappingParameter;
     struct {
         uint8_t numberOfMappedObjects;
@@ -202,14 +197,8 @@ typedef struct {
     uint8_t x2113_linMotCMD_Parameters[OD_CNT_ARR_2113];
     uint8_t x2114_linMotStatusSInt16_sub0;
     int16_t x2114_linMotStatusSInt16[OD_CNT_ARR_2114];
-    uint8_t x6000_readDigitalInput_8_bit_sub0;
-    uint8_t x6000_readDigitalInput_8_bit[OD_CNT_ARR_6000];
-    uint8_t x6200_writeDigitalOutput_8_bit_sub0;
-    uint8_t x6200_writeDigitalOutput_8_bit[OD_CNT_ARR_6200];
-    uint8_t x6401_readAnalogInput_16_bit_sub0;
-    int16_t x6401_readAnalogInput_16_bit[OD_CNT_ARR_6401];
-    uint8_t x6411_writeAnalogOutput_16_bit_sub0;
-    int16_t x6411_writeAnalogOutput_16_bit[OD_CNT_ARR_6411];
+    uint8_t x2115_linMotStatusSInt32_sub0;
+    int32_t x2115_linMotStatusSInt32[OD_CNT_ARR_2115];
 } OD_RAM_t;
 
 typedef struct {
@@ -277,10 +266,7 @@ extern OD_ATTR_OD OD_t *OD;
 #define OD_ENTRY_H2112 &OD->list[34]
 #define OD_ENTRY_H2113 &OD->list[35]
 #define OD_ENTRY_H2114 &OD->list[36]
-#define OD_ENTRY_H6000 &OD->list[37]
-#define OD_ENTRY_H6200 &OD->list[38]
-#define OD_ENTRY_H6401 &OD->list[39]
-#define OD_ENTRY_H6411 &OD->list[40]
+#define OD_ENTRY_H2115 &OD->list[37]
 
 
 /*******************************************************************************
@@ -323,10 +309,7 @@ extern OD_ATTR_OD OD_t *OD;
 #define OD_ENTRY_H2112_linMotCMD_Header &OD->list[34]
 #define OD_ENTRY_H2113_linMotCMD_Parameters &OD->list[35]
 #define OD_ENTRY_H2114_linMotStatusSInt16 &OD->list[36]
-#define OD_ENTRY_H6000_readDigitalInput_8_bit &OD->list[37]
-#define OD_ENTRY_H6200_writeDigitalOutput_8_bit &OD->list[38]
-#define OD_ENTRY_H6401_readAnalogInput_16_bit &OD->list[39]
-#define OD_ENTRY_H6411_writeAnalogOutput_16_bit &OD->list[40]
+#define OD_ENTRY_H2115_linMotStatusSInt32 &OD->list[37]
 
 
 /*******************************************************************************
