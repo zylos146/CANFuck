@@ -96,7 +96,11 @@ void app_init_communication() {
   // CO_CANsetConfigurationMode((void *)&CANptr); - Not needed on ESP32 - We handle this in CO_CANinit
   // TODO - ESP_ERR_INVALID_STATE - CO_CANmodule_disable(CO->CANmodule);
 
-  CO_linmot_a1100_TPDO_init();
+  if (CAN_OD_USED == CAN_A1100_OD) {
+    CO_linmot_a1100_TPDO_init();
+  } else {
+    CO_linmot_b1100_TPDO_init();
+  }
 
   /* Initialize CAN Device */
   err = CO_CANinit(CO, NULL, CAN_BITRATE /* bit rate */);

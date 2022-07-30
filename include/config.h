@@ -22,8 +22,7 @@
 #define CAN_B1100_OD 1
 #define CAN_E1100_OD 1
 #define CAN_A1100_OD 2
-#define CAN_OD_USED CAN_B1100_OD
-
+#define CAN_OD_USED CAN_A1100_OD
 
 // #### Logging #### //
 // TODO - Doesn't do anything yet
