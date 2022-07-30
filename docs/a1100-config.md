@@ -1,6 +1,25 @@
-# PDO Configuration for A1100 class devices
+# Linmot Talk Configuration for A1100 class devices
+# Motion Control SW
+## 16 Bit Interface Scaling
+- Position Scale = 1000
+- Max Speed Scale = 1000
+- Acceleration Scale = 10000
+  
+## Errors & Warnings > Error Behavior > Quick Stop Error Behavior
+- Position Lag Always = False
+
+# CANOpen Interface
+## NMT Error Control > Node Guarding Protocol should be disabled
+- Guard time = 0
+  
+## NMT Error Control > Heartbeat Protocol should be enabled
+- Consumer Time = 150ms
+- Consumed Node ID = 1
 
 ## TxPDO1
+- Transmission Type = Asyncronous (254)
+- Inhibit Time = 10000 us
+- Event Time = 100 ms
 
 | Name              | Size    | UPID  |
 | -----------       | ------- | ----- |
@@ -9,15 +28,25 @@
 | Logged Error Code | UInt16  | 1D96h |
 | Warn Word         | UInt16  | 1D8Eh |
 
+</br>
+
 ## TxPDO2
+- Transmission Type = Asyncronous (254)
+- Inhibit Time = 10000 us
+- Event Time = 100 ms
 
 | Name                    | Size    | UPID  | Scale   |
 | -----------             | ------- | ----- | -----   |
 | Actual Position         | SInt32  | 1B8Dh | 0.1 um  |
 | Actual Velocity         | SInt32  | 1BAFh | 1 um/s  |
 
-## TxPDO3
+</br>
 
+## TxPDO3
+- Transmission Type = Asyncronous (254)
+- Inhibit Time = 10000 us
+- Event Time = 100 ms
+  
 | Name                    | Size    | UPID  | Scale   |
 | -----------             | ------- | ----- | -----   |
 | Motor Supply Voltage    | UInt16  | 1BBDh | 0.01 V  |
@@ -25,13 +54,21 @@
 | Model Ph1 Temp          | SInt16  | 1BE4h | 0.1 C   |
 | Motor Temp 1            | UInt16  | 1E28h | 0.980 C |
 
+</br>
+
 ## TxPDO4
+- Transmission Type = Asyncronous (254)
+- Inhibit Time = 10000 us
+- Event Time = 100 ms
 
 | Name                    | Size    | UPID  | Scale |
 | -----------             | ------- | ----- | ----- |
 | Actual Force            | SInt32  | 1BFFh | 0.1 N |
 
+</br>
+
 ## RxPDO 1
+- Transmission Type = Asyncronous (254)
 
 | Name                      | Size    | UPID  |
 | -----------               | ------- | ----- |
@@ -39,7 +76,10 @@
 | Motion Cmd Header         | UInt16  |       |
 | Motion Cmd Par Byte 0..3  | UInt32  |       |
 
+</br>
+
 ## RxPDO 2
+- Transmission Type = Asyncronous (254)
 
 | Name                      | Size    | UPID  |
 | -----------               | ------- | ----- |

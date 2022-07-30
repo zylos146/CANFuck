@@ -11,18 +11,18 @@
 
     File info:
         File Names:   OD.h; OD.c
-        Project File: linmot-b1100.xdd
+        Project File: linmot.xdd
         File Version: 1
 
         Created:      11/28/2020 7:37:54 AM
         Created By:   Zylos
-        Modified:     7/29/2022 7:37:51 PM
+        Modified:     7/29/2022 9:38:44 PM
         Modified By:  Zylos
 
     Device Info:
         Vendor Name:  Central Nexus
         Vendor ID:    
-        Product Name: B1100 CANFuck
+        Product Name: CANFuck
         Product ID:   
 
         Description:  Basic CANopen device with example usage.
@@ -45,7 +45,7 @@
 #define OD_CNT_SDO_SRV 1
 #define OD_CNT_SDO_CLI 1
 #define OD_CNT_TPDO 3
-#define OD_CNT_RPDO 3
+#define OD_CNT_RPDO 4
 
 
 /*******************************************************************************
@@ -105,6 +105,11 @@ typedef struct {
         uint8_t transmissionType;
     } x1402_RPDOCommunicationParameter;
     struct {
+        uint8_t maxSub_index;
+        uint32_t COB_IDUsedByRPDO;
+        uint8_t transmissionType;
+    } x1403_RPDOCommunicationParameter;
+    struct {
         uint8_t numberOfMappedObjects;
         uint32_t mappedObject_1;
         uint32_t mappedObject_2;
@@ -123,6 +128,10 @@ typedef struct {
         uint32_t mappedObject_3;
         uint32_t mappedObject_4;
     } x1602_RPDOMappingParameter;
+    struct {
+        uint8_t numberOfMappedObjects;
+        uint32_t mappedObject_1;
+    } x1603_RPDOMappingParameter;
     struct {
         uint8_t maxSub_index;
         uint32_t COB_IDUsedByTPDO;
@@ -153,6 +162,11 @@ typedef struct {
     struct {
         uint8_t numberOfMappedObjects;
         uint32_t mappedObject_1;
+        uint32_t mappedObject_2;
+        uint32_t mappedObject_3;
+        uint32_t mappedObject_4;
+        uint32_t mappedObject_5;
+        uint32_t mappedObject_6;
     } x1A00_TPDOMappingParameter;
     struct {
         uint8_t numberOfMappedObjects;
@@ -169,6 +183,10 @@ typedef struct {
         uint32_t mappedObject_1;
         uint32_t mappedObject_2;
         uint32_t mappedObject_3;
+        uint32_t mappedObject_4;
+        uint32_t mappedObject_5;
+        uint32_t mappedObject_6;
+        uint32_t mappedObject_7;
     } x1A02_TPDOMappingParameter;
 } OD_PERSIST_COMM_t;
 
@@ -249,24 +267,26 @@ extern OD_ATTR_OD OD_t *OD;
 #define OD_ENTRY_H1400 &OD->list[17]
 #define OD_ENTRY_H1401 &OD->list[18]
 #define OD_ENTRY_H1402 &OD->list[19]
-#define OD_ENTRY_H1600 &OD->list[20]
-#define OD_ENTRY_H1601 &OD->list[21]
-#define OD_ENTRY_H1602 &OD->list[22]
-#define OD_ENTRY_H1800 &OD->list[23]
-#define OD_ENTRY_H1801 &OD->list[24]
-#define OD_ENTRY_H1802 &OD->list[25]
-#define OD_ENTRY_H1A00 &OD->list[26]
-#define OD_ENTRY_H1A01 &OD->list[27]
-#define OD_ENTRY_H1A02 &OD->list[28]
-#define OD_ENTRY_H2100 &OD->list[29]
-#define OD_ENTRY_H2105 &OD->list[30]
-#define OD_ENTRY_H2106 &OD->list[31]
-#define OD_ENTRY_H2110 &OD->list[32]
-#define OD_ENTRY_H2111 &OD->list[33]
-#define OD_ENTRY_H2112 &OD->list[34]
-#define OD_ENTRY_H2113 &OD->list[35]
-#define OD_ENTRY_H2114 &OD->list[36]
-#define OD_ENTRY_H2115 &OD->list[37]
+#define OD_ENTRY_H1403 &OD->list[20]
+#define OD_ENTRY_H1600 &OD->list[21]
+#define OD_ENTRY_H1601 &OD->list[22]
+#define OD_ENTRY_H1602 &OD->list[23]
+#define OD_ENTRY_H1603 &OD->list[24]
+#define OD_ENTRY_H1800 &OD->list[25]
+#define OD_ENTRY_H1801 &OD->list[26]
+#define OD_ENTRY_H1802 &OD->list[27]
+#define OD_ENTRY_H1A00 &OD->list[28]
+#define OD_ENTRY_H1A01 &OD->list[29]
+#define OD_ENTRY_H1A02 &OD->list[30]
+#define OD_ENTRY_H2100 &OD->list[31]
+#define OD_ENTRY_H2105 &OD->list[32]
+#define OD_ENTRY_H2106 &OD->list[33]
+#define OD_ENTRY_H2110 &OD->list[34]
+#define OD_ENTRY_H2111 &OD->list[35]
+#define OD_ENTRY_H2112 &OD->list[36]
+#define OD_ENTRY_H2113 &OD->list[37]
+#define OD_ENTRY_H2114 &OD->list[38]
+#define OD_ENTRY_H2115 &OD->list[39]
 
 
 /*******************************************************************************
@@ -292,24 +312,26 @@ extern OD_ATTR_OD OD_t *OD;
 #define OD_ENTRY_H1400_RPDOCommunicationParameter &OD->list[17]
 #define OD_ENTRY_H1401_RPDOCommunicationParameter &OD->list[18]
 #define OD_ENTRY_H1402_RPDOCommunicationParameter &OD->list[19]
-#define OD_ENTRY_H1600_RPDOMappingParameter &OD->list[20]
-#define OD_ENTRY_H1601_RPDOMappingParameter &OD->list[21]
-#define OD_ENTRY_H1602_RPDOMappingParameter &OD->list[22]
-#define OD_ENTRY_H1800_TPDOCommunicationParameter &OD->list[23]
-#define OD_ENTRY_H1801_TPDOCommunicationParameter &OD->list[24]
-#define OD_ENTRY_H1802_TPDOCommunicationParameter &OD->list[25]
-#define OD_ENTRY_H1A00_TPDOMappingParameter &OD->list[26]
-#define OD_ENTRY_H1A01_TPDOMappingParameter &OD->list[27]
-#define OD_ENTRY_H1A02_TPDOMappingParameter &OD->list[28]
-#define OD_ENTRY_H2100_errorStatusBits &OD->list[29]
-#define OD_ENTRY_H2105_version &OD->list[30]
-#define OD_ENTRY_H2106_power_onCounter &OD->list[31]
-#define OD_ENTRY_H2110_linMotStatusUInt16 &OD->list[32]
-#define OD_ENTRY_H2111_linMotControlWord &OD->list[33]
-#define OD_ENTRY_H2112_linMotCMD_Header &OD->list[34]
-#define OD_ENTRY_H2113_linMotCMD_Parameters &OD->list[35]
-#define OD_ENTRY_H2114_linMotStatusSInt16 &OD->list[36]
-#define OD_ENTRY_H2115_linMotStatusSInt32 &OD->list[37]
+#define OD_ENTRY_H1403_RPDOCommunicationParameter &OD->list[20]
+#define OD_ENTRY_H1600_RPDOMappingParameter &OD->list[21]
+#define OD_ENTRY_H1601_RPDOMappingParameter &OD->list[22]
+#define OD_ENTRY_H1602_RPDOMappingParameter &OD->list[23]
+#define OD_ENTRY_H1603_RPDOMappingParameter &OD->list[24]
+#define OD_ENTRY_H1800_TPDOCommunicationParameter &OD->list[25]
+#define OD_ENTRY_H1801_TPDOCommunicationParameter &OD->list[26]
+#define OD_ENTRY_H1802_TPDOCommunicationParameter &OD->list[27]
+#define OD_ENTRY_H1A00_TPDOMappingParameter &OD->list[28]
+#define OD_ENTRY_H1A01_TPDOMappingParameter &OD->list[29]
+#define OD_ENTRY_H1A02_TPDOMappingParameter &OD->list[30]
+#define OD_ENTRY_H2100_errorStatusBits &OD->list[31]
+#define OD_ENTRY_H2105_version &OD->list[32]
+#define OD_ENTRY_H2106_power_onCounter &OD->list[33]
+#define OD_ENTRY_H2110_linMotStatusUInt16 &OD->list[34]
+#define OD_ENTRY_H2111_linMotControlWord &OD->list[35]
+#define OD_ENTRY_H2112_linMotCMD_Header &OD->list[36]
+#define OD_ENTRY_H2113_linMotCMD_Parameters &OD->list[37]
+#define OD_ENTRY_H2114_linMotStatusSInt16 &OD->list[38]
+#define OD_ENTRY_H2115_linMotStatusSInt32 &OD->list[39]
 
 
 /*******************************************************************************

@@ -8,6 +8,17 @@
 #include "esp_log.h"
 #include "config.h"
 
+#define OD_LINMOT_CONTROL_WORD 0x21110010
+#define OD_LINMOT_CMD_HEADER   0x21120010
+#define OD_LINMOT_CMD_PARAM_0  0x21130108
+#define OD_LINMOT_CMD_PARAM_1  0x21130208
+#define OD_LINMOT_CMD_PARAM_2  0x21130308
+#define OD_LINMOT_CMD_PARAM_3  0x21130408
+#define OD_LINMOT_CMD_PARAM_4  0x21130508
+#define OD_LINMOT_CMD_PARAM_5  0x21130608
+#define OD_LINMOT_CMD_PARAM_6  0x21130708
+#define OD_LINMOT_CMD_PARAM_7  0x21130808
+
 CO_t *CO = NULL;
 CO_NMT_reset_cmd_t reset = CO_RESET_COMM;
 
@@ -27,6 +38,55 @@ static void canopen_timer_task(void *arg);
 esp_timer_create_args_t coMainTaskArgs;
 esp_timer_handle_t periodicTimer;
 
+void CO_linmot_b1100_TPDO_init() {
+  // Disable TPDO via Number of mapped objects = 0
+  OD_set_u8(OD_ENTRY_H1A00_TPDOMappingParameter, 0x00, 0, false);
+  OD_set_u8(OD_ENTRY_H1A01_TPDOMappingParameter, 0x00, 0, false);
+  OD_set_u8(OD_ENTRY_H1A02_TPDOMappingParameter, 0x00, 0, false);
+
+  OD_set_u32(OD_ENTRY_H1A00_TPDOMappingParameter, 0x01, OD_LINMOT_CONTROL_WORD, false);
+
+  OD_set_u32(OD_ENTRY_H1A01_TPDOMappingParameter, 0x01, OD_LINMOT_CMD_HEADER, false);
+  OD_set_u32(OD_ENTRY_H1A01_TPDOMappingParameter, 0x02, OD_LINMOT_CMD_PARAM_0, false);
+  OD_set_u32(OD_ENTRY_H1A01_TPDOMappingParameter, 0x03, OD_LINMOT_CMD_PARAM_1, false);
+  OD_set_u32(OD_ENTRY_H1A01_TPDOMappingParameter, 0x04, OD_LINMOT_CMD_PARAM_2, false);
+  OD_set_u32(OD_ENTRY_H1A01_TPDOMappingParameter, 0x05, OD_LINMOT_CMD_PARAM_3, false);
+  OD_set_u32(OD_ENTRY_H1A01_TPDOMappingParameter, 0x06, OD_LINMOT_CMD_PARAM_4, false);
+  OD_set_u32(OD_ENTRY_H1A01_TPDOMappingParameter, 0x07, OD_LINMOT_CMD_PARAM_5, false);
+  
+  OD_set_u32(OD_ENTRY_H1A02_TPDOMappingParameter, 0x01, OD_LINMOT_CMD_HEADER, false);
+  OD_set_u32(OD_ENTRY_H1A02_TPDOMappingParameter, 0x02, OD_LINMOT_CMD_PARAM_6, false);
+  OD_set_u32(OD_ENTRY_H1A02_TPDOMappingParameter, 0x03, OD_LINMOT_CMD_PARAM_7, false);
+  
+  OD_set_u8(OD_ENTRY_H1A00_TPDOMappingParameter, 0x00, 1, false);
+  OD_set_u8(OD_ENTRY_H1A01_TPDOMappingParameter, 0x00, 7, false);
+  OD_set_u8(OD_ENTRY_H1A02_TPDOMappingParameter, 0x00, 3, false);
+}
+
+void CO_linmot_a1100_TPDO_init() {
+  // Disable TPDO via Number of mapped objects = 0
+  OD_set_u8(OD_ENTRY_H1A00_TPDOMappingParameter, 0x00, 0, false);
+  OD_set_u8(OD_ENTRY_H1A01_TPDOMappingParameter, 0x00, 0, false);
+  OD_set_u8(OD_ENTRY_H1A02_TPDOMappingParameter, 0x00, 0, false);
+
+  OD_set_u32(OD_ENTRY_H1A00_TPDOMappingParameter, 0x01, OD_LINMOT_CONTROL_WORD, false);
+  OD_set_u32(OD_ENTRY_H1A00_TPDOMappingParameter, 0x02, OD_LINMOT_CMD_HEADER, false);
+  OD_set_u32(OD_ENTRY_H1A00_TPDOMappingParameter, 0x03, OD_LINMOT_CMD_PARAM_0, false);
+  OD_set_u32(OD_ENTRY_H1A00_TPDOMappingParameter, 0x04, OD_LINMOT_CMD_PARAM_1, false);
+  OD_set_u32(OD_ENTRY_H1A00_TPDOMappingParameter, 0x05, OD_LINMOT_CMD_PARAM_2, false);
+  OD_set_u32(OD_ENTRY_H1A00_TPDOMappingParameter, 0x06, OD_LINMOT_CMD_PARAM_3, false);
+
+  OD_set_u32(OD_ENTRY_H1A01_TPDOMappingParameter, 0x01, OD_LINMOT_CMD_HEADER, false);
+  OD_set_u32(OD_ENTRY_H1A01_TPDOMappingParameter, 0x02, OD_LINMOT_CMD_PARAM_4, false);
+  OD_set_u32(OD_ENTRY_H1A01_TPDOMappingParameter, 0x03, OD_LINMOT_CMD_PARAM_5, false);
+  OD_set_u32(OD_ENTRY_H1A01_TPDOMappingParameter, 0x04, OD_LINMOT_CMD_PARAM_6, false);
+  OD_set_u32(OD_ENTRY_H1A01_TPDOMappingParameter, 0x05, OD_LINMOT_CMD_PARAM_7, false);
+  
+  OD_set_u8(OD_ENTRY_H1A00_TPDOMappingParameter, 0x00, 6, false);
+  OD_set_u8(OD_ENTRY_H1A01_TPDOMappingParameter, 0x00, 5, false);
+  OD_set_u8(OD_ENTRY_H1A02_TPDOMappingParameter, 0x00, 0, false);
+}
+
 void app_init_communication() {
   ESP_LOGI("init.comm", "Resetting communication...");
   CO_ReturnError_t err;
@@ -35,6 +95,8 @@ void app_init_communication() {
   CO->CANmodule->CANnormal = false;
   // CO_CANsetConfigurationMode((void *)&CANptr); - Not needed on ESP32 - We handle this in CO_CANinit
   // TODO - ESP_ERR_INVALID_STATE - CO_CANmodule_disable(CO->CANmodule);
+
+  CO_linmot_a1100_TPDO_init();
 
   /* Initialize CAN Device */
   err = CO_CANinit(CO, NULL, CAN_BITRATE /* bit rate */);

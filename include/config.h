@@ -2,7 +2,7 @@
 #define CONFIG_H
 
 // #### Stroke Engine #### //
-#define CONTROLLER_USED true
+#define CONTROLLER_USED false
 
 #define WIFI_SSID "DESKTOP-7FGKC64 1018"
 #define WIFI_PASS "taobao123"
@@ -12,12 +12,18 @@
 #define MOTOR_USED 1
 
 // #### CANOpen #### //
-#define CAN_TX_IO (34)  /** CAN TX pin */
-#define CAN_RX_IO (35) /** CAN RX pin */
+#define CAN_TX_IO (35)  /** CAN TX pin */
+#define CAN_RX_IO (36) /** CAN RX pin */
 
 #define CAN_BITRATE 500    /* kbit */
 #define NODE_ID_SELF 0x01
 #define NODE_ID_LINMOT 0x3F
+
+#define CAN_B1100_OD 1
+#define CAN_E1100_OD 1
+#define CAN_A1100_OD 2
+#define CAN_OD_USED CAN_B1100_OD
+
 
 // #### Logging #### //
 // TODO - Doesn't do anything yet
