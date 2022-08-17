@@ -50,15 +50,15 @@ void setup() {
   Serial.begin(UART_SPEED);
   Wire.begin(I2C_SDA_PIN, I2C_SCL_PIN);
 
+  ESP_LOGI("main", "Starting Bylnk!");
+  blynk = new BlynkController();
+
   ESP_LOGI("main", "Mounting SPIFFS");
   if(!SPIFFS.begin(true)){
     ESP_LOGE("main", "An Error has occurred while mounting SPIFFS");
     return;
   }
 
-  ESP_LOGI("main", "Starting Bylnk!");
-  blynk = new BlynkController();
-  
   ESP_LOGI("main", "Starting Web Server");
   server.serveStatic("/", SPIFFS, "/www/").setDefaultFile("index.html");
   server.onNotFound([](AsyncWebServerRequest *request) {
@@ -89,7 +89,7 @@ void setup() {
     .keepout = 10 // mm
   };
   motor->setMaxSpeed(5000); // 5 m/s
-  motor->setMaxAcceleration(25000); // 25 m/s^2
+  motor->setMaxAcceleration(500); // 25 m/s^2
   motor->setMachineGeometry(bounds);
 
   motor->CO_setNodeId(NODE_ID_LINMOT);
