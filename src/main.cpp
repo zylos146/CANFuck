@@ -14,8 +14,10 @@
 #include "CO_main.h"
 #include "motor/linmot.hpp"
 
+#include "data_logger.hpp"
+
 AsyncWebServer server(80);
-AsyncWebSocket ws("/ws"); // access at ws://[esp ip]/ws
+AsyncWebSocket ws("/"); // access at ws://[esp ip]/
 
 // TODO - Allow ESP32 Perferences to choose motor implementation
 LinmotMotor* motor;
@@ -36,14 +38,29 @@ void onUpload(AsyncWebServerRequest *request, String filename, size_t index, uin
   //Handle upload
 }
 
-void onEvent(AsyncWebSocket * server, AsyncWebSocketClient * client, AwsEventType type, void * arg, uint8_t *data, size_t len){
-  //Handle WebSocket event
+void onEvent(AsyncWebSocket *server, AsyncWebSocketClient *client, AwsEventType type,
+             void *arg, uint8_t *data, size_t len) {
+  switch (type) {
+    case WS_EVT_CONNECT:
+      Serial.printf("WebSocket client #%u connected from %s\n", client->id(), client->remoteIP().toString().c_str());
+      break;
+    case WS_EVT_DISCONNECT:
+      Serial.printf("WebSocket client #%u disconnected\n", client->id());
+      break;
+    case WS_EVT_DATA:
+      // TODO - Might support incoming data at some point, but not a concern right now
+      break;
+    case WS_EVT_PONG:
+    case WS_EVT_ERROR:
+      break;
+  }
 }
 
 void loop() {
   if (blynk != NULL) {
     blynk->loop();
   }
+  ws.cleanupClients();
 }
 
 void setup() {
@@ -68,19 +85,22 @@ void setup() {
 
   server.begin();
 
+  ws.onEvent(onEvent);
+  server.addHandler(&ws);
+  wlog.attachWebsocket(&ws);
+
   if (CONTROLLER_USED) {
-    ESP_LOGI("main", "Initializing Hardware Controller");
+    WEB_LOGI("main", "Initializing Hardware Controller");
     controller = new CANFuckController();
     if (controller->start() == false) {
-      ESP_LOGE("main", "Unable to initialize Hardware Controller");
+      WEB_LOGE("main", "Unable to initialize Hardware Controller");
       esp_restart();
     }
   } else {
-    ESP_LOGI("main", "No Hardware Controller, only Blynk Controls will be available!");
+    WEB_LOGI("main", "No Hardware Controller, only Blynk Controls will be available!");
   }
 
-
-  ESP_LOGI("main", "Configuring Motor");
+  WEB_LOGI("main", "Configuring Motor");
   motor = new LinmotMotor();
 
   MachineGeometry bounds = {
@@ -100,18 +120,18 @@ void setup() {
   motor->CO_setCmdParameters(OD_ENTRY_H2113_linMotCMD_Parameters);
 
   engine = new StrokeEngine();
-  ESP_LOGI("main", "Attaching Motor to Stroke Engine");
+  WEB_LOGI("main", "Attaching Motor to Stroke Engine");
   engine->attachMotor(motor);
 
   if (controller != NULL) {
-  ESP_LOGI("main", "Attaching Controller to Stroke Engine");
+  WEB_LOGI("main", "Attaching Controller to Stroke Engine");
     controller->attachEngine(engine);
   }
 
-  ESP_LOGI("main", "Attaching Blynk to Motor and Engine");
+  WEB_LOGI("main", "Attaching Blynk to Motor and Engine");
   blynk->attach(engine, motor);
 
-  ESP_LOGI("main", "Configuring Stroke Engine");
+  WEB_LOGI("main", "Configuring Stroke Engine");
   engine->setParameter(StrokeParameter::PATTERN, 0);
   engine->setParameter(StrokeParameter::RATE, 50);
   engine->setParameter(StrokeParameter::DEPTH, 100);
@@ -123,11 +143,10 @@ void setup() {
     controller->registerTasks();
   }
 
-  ESP_LOGI("main", "Homing Motor");
+  WEB_LOGI("main", "Homing Motor");
   motor->enable();
   motor->goToHome();
   
   //ESP_LOGI("main", "Starting Motion Task!");
   //xTaskCreate(&app_motion, "app_motion", 4096, NULL, 5, NULL);
 }
-
