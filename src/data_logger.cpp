@@ -59,21 +59,43 @@ void WebLogger::log(WebLogLevel level, char* format, ...) {
     return;
   }
 
-  char buffer[1024];
-  va_list args;
-  va_start (args, format);
-  vsnprintf (buffer, 1024, format, args);
-  va_end(args);
+  // TODO - Combine with standard log printf to serial
+  static char loc_buf[64];
+  char * temp = loc_buf;
+  int len;
+  va_list arg;
+  va_list copy;
+  va_start(arg, format);
+  va_copy(copy, arg);
+  len = vsnprintf(NULL, 0, format, copy);
+  va_end(copy);
+  if(len >= sizeof(loc_buf)){
+      temp = (char*)malloc(len+1);
+      if(temp == NULL) {
+          va_end(arg);
+          return;
+      }
+  }
 
+  vsnprintf(temp, len+1, format, arg);
+  
   StaticJsonDocument<1024> doc;
   doc["type"] = "log";
   doc["level"] = WebLogLevel_KEYS[static_cast<uint8_t>(level)];
-  doc["msg"] = buffer;
+  doc["msg"] = temp;
   
-  size_t len = measureJson(doc);
-  AsyncWebSocketMessageBuffer *jsBuffer = ws->makeBuffer(len);
-  serializeJson(doc, (char *)jsBuffer->get(), len + 1);
+  size_t jsLen = measureJson(doc);
+  char* jsBuffer = (char*)malloc(jsLen+1);
+  serializeJson(doc, jsBuffer, jsLen + 1);
+
   ws->textAll(jsBuffer);
+
+  free(jsBuffer);
+  
+  va_end(arg);
+  if(len >= sizeof(loc_buf)){
+      free(temp);
+  }
 }
 
 void WebLogger::sendData() {
