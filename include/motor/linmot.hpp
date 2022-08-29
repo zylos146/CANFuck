@@ -53,8 +53,10 @@ class LinmotMotor: public MotorInterface {
     void CO_setControl(OD_entry_t *entry);
     void CO_setCmdHeader(OD_entry_t *entry);
     void CO_setCmdParameters(OD_entry_t *entry);
-    void CO_setStatus(OD_entry_t *entry);
-    void CO_setMonitor(OD_entry_t *entry);
+    void CO_setStatusUInt16(OD_entry_t *entry);
+    void CO_setMonitorUInt16(OD_entry_t *entry); // Not used yet, merged with Status UInt16 at the moment
+    void CO_setMonitorSInt16(OD_entry_t *entry);
+    void CO_setMonitorSInt32(OD_entry_t *entry);
 
     void CO_control_addFlag(uint16_t flag);
     void CO_control_removeFlag(uint16_t flag);
@@ -78,8 +80,14 @@ class LinmotMotor: public MotorInterface {
     OD_entry_t *CO_statusWord_entry;
     OD_extension_t CO_statusWord_extension;
     
-    OD_entry_t *CO_monitorWord_entry;
-    OD_extension_t CO_monitorWord_extension;
+    OD_entry_t *CO_monitorUInt16_entry;
+    OD_extension_t CO_monitorUInt16_extension;
+    
+    OD_entry_t *CO_monitorSInt16_entry;
+    OD_extension_t CO_monitorSInt16_extension;
+    
+    OD_entry_t *CO_monitorSInt32_entry;
+    OD_extension_t CO_monitorSInt32_extension;
 
     OD_entry_t *CO_controlWord_entry;
     OD_extension_t CO_controlWord_extension;
@@ -100,16 +108,17 @@ class LinmotMotor: public MotorInterface {
     uint16_t CO_warnWord;
 
     // TPDO 2
-    uint16_t CO_cmdWord;
-    int16_t CO_demandPositionWord; // UPID 0xE9A4 - SInt16 - 0.0001 mm Scale
-    int16_t CO_actualPositionWord; // UPID 0xE9A5 - SInt16 - 0.0001 mm Scale
-    int16_t CO_demandCurrentWord; // UPID 0xE9E7 - SInt16 - 0.001 A Scale
+    int32_t CO_actualPosition;  // 0.0001mm Scale
+    int32_t CO_actualVelocity;  // 1E-6 m/s Scale
 
     // TPDO 3
-    int16_t CO_modelTempWord; // UPID 0xEB10 - SInt16 - 0.1 C Scale
-    uint16_t CO_realTempWord; // UPID 0x6990 - UInt16 - 0.980392156862745 C Scale, -50 C Offset
-    int16_t CO_motorVoltageWord; // UPID 0xE96D - SInt16 - 0.01 V Scale
-    int16_t CO_powerLossWord; // UPID 0xEADB - SInt16 - 0.1 W Scale
+    uint16_t CO_motorVoltage;   // 0.01 V Scale
+    int16_t CO_modelTemp;       // 0.1 C Scale
+    uint16_t CO_realTemp;       // 0.980392156862745 C Scale, -50 C Offset
+    uint16_t CO_powerLoss;      // 0.1 W Scale
+
+    // TPDO 4
+    int32_t CO_actualForce;     // 0.1 N Scale
 
     uint8_t CO_cmdCount = 0;
     uint16_t position = 0;

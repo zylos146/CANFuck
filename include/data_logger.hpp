@@ -99,12 +99,17 @@ class WebLogger {
       this->ws = ws;
     }
 
+    void attachEventsource(AsyncEventSource *es) {
+      this->es = es;
+    }
+
     void startTask();
     void log(DataParameter key, float value);
     void log(WebLogLevel level, char* format, ...);
 
   private:
     AsyncWebSocket *ws;
+    AsyncEventSource *es;
 
     static void sendData(void* _this) {
       while (true) {
@@ -116,6 +121,17 @@ class WebLogger {
     }
     void sendData();
     TaskHandle_t sendDataHandle = NULL;
+
+    static void sendHeartbeat(void* _this) {
+      while (true) {
+        static_cast<WebLogger*>(_this)->sendHeartbeat();
+        
+        // Attempt 60fps update (1/60 ~= 16.667ms)
+        vTaskDelay(16.667 / portTICK_PERIOD_MS);
+      }
+    }
+    void sendHeartbeat();
+    TaskHandle_t sendHeartbeatHandle = NULL;
 
     uint8_t datapoints_readHead[DataParameter_NUM_OF_ITEMS];
     uint8_t datapoints_writeHead[DataParameter_NUM_OF_ITEMS];

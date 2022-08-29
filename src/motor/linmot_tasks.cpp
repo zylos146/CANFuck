@@ -122,6 +122,9 @@ void LinmotMotor::task_heartbeat() {
   Blynk.virtualWrite(BLYNK_LINMOT_MOTOR_VOLTAGE, (float)this->CO_motorVoltageWord);
   Blynk.virtualWrite(BLYNK_LINMOT_POWER_LOSS, (float)this->CO_powerLossWord);
   */
+
+  wlog.log(DataParameter::ACTUAL_POSITON, (float)this->CO_actualPosition / pow(10, 4));
+  wlog.log(DataParameter::ACTUAL_VELOCITY, (float)this->CO_actualVelocity / pow(10, 6));
 }
 
 // Task Wrappers

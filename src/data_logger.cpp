@@ -35,7 +35,8 @@ const char* DataParameter_KEYS[DataParameter_NUM_OF_ITEMS] = {
 WebLogger wlog;
 
 void WebLogger::startTask() {
-  xTaskCreate(&WebLogger::sendData, "weblogger_send_data", 4096, this, 5, &this->sendDataHandle);
+  xTaskCreate(&WebLogger::sendData, "weblogger_send_data", 10000, this, 5, &this->sendDataHandle);
+  xTaskCreate(&WebLogger::sendHeartbeat, "weblogger_send_heartbeat", 2000, this, 5, &this->sendHeartbeatHandle);
 }
 
 void WebLogger::log(DataParameter key, float value) {
@@ -99,7 +100,7 @@ void WebLogger::log(WebLogLevel level, char* format, ...) {
 }
 
 void WebLogger::sendData() {
-  if (this->ws == NULL) {
+  if (this->es == NULL) {
     return;
   }
 
@@ -108,9 +109,10 @@ void WebLogger::sendData() {
     return;
   }
 
+  // TODO - Switch to a more compact encoding style
   StaticJsonDocument<4064> doc;
-  doc["type"] = "points";
 
+  uint8_t updatesToSend = 0;
   for (uint8_t i = 0; i < DataParameter_NUM_OF_ITEMS; i++) {
     uint8_t writeHead = datapoints_writeHead[i];
     uint8_t readHead = datapoints_readHead[i];
@@ -134,18 +136,34 @@ void WebLogger::sendData() {
     uint8_t head = readHead;
     for (uint8_t x = 0; x < itemsToSend; x++) {
       JsonArray point = dataPoints.createNestedArray();
-      dataPoints.add(datapoints[i][head].time / 1000000.0);
-      dataPoints.add(datapoints[i][head].value);
+      point.add(datapoints[i][head].time / 1000000.0);
+      point.add(datapoints[i][head].value);
       head = (head + 1) % WEBLOGGER_BUFFER_SIZE;
     }
 
     datapoints_readHead[i] = writeHead;
+    updatesToSend += 1;
   }
 
-  size_t len = measureJson(doc);
-  AsyncWebSocketMessageBuffer *buffer = ws->makeBuffer(len);
-  serializeJson(doc, (char *)buffer->get(), len + 1);
-  ws->textAll(buffer);
+  if (updatesToSend == 0) {
+    xSemaphoreGive(datapoints_readLock);
+    return;
+  }
 
-  xSemaphoreGive(datapoints_writeLock);
+  size_t jsLen = measureJson(doc);
+  char* jsBuffer = (char*)malloc(jsLen+1);
+  serializeJson(doc, jsBuffer, jsLen + 1);
+
+  es->send(jsBuffer, "points", millis());
+  free(jsBuffer);
+  
+  xSemaphoreGive(datapoints_readLock);
+}
+
+void WebLogger::sendHeartbeat() {
+  if (this->es == NULL) {
+    return;
+  }
+
+  es->send("", "heartbeat", millis());
 }

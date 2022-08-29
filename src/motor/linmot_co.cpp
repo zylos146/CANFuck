@@ -61,17 +61,16 @@ void LinmotMotor::CO_run_rpdo_received () {
 }
 
 void LinmotMotor::CO_motion_rpdo_received () {
-  OD_get_u16(this->CO_statusWord_entry, 0x05, &this->CO_cmdWord, false);
-  OD_get_i16(this->CO_monitorWord_entry, 0x01, &this->CO_actualPositionWord, false);
-  OD_get_i16(this->CO_monitorWord_entry, 0x02, &this->CO_demandCurrentWord, false);
-  OD_get_i16(this->CO_monitorWord_entry, 0x03, &this->CO_demandPositionWord, false);
+  OD_get_i32(this->CO_monitorSInt32_entry, 0x01, &this->CO_actualPosition, false);
+  OD_get_i32(this->CO_monitorSInt32_entry, 0x02, &this->CO_actualVelocity, false);
+  OD_get_i32(this->CO_monitorSInt32_entry, 0x03, &this->CO_actualForce, false);
 }
 
 void LinmotMotor::CO_monitor_rpdo_received () {
-  OD_get_i16(this->CO_monitorWord_entry, 0x04, &this->CO_modelTempWord, false);
-  OD_get_u16(this->CO_statusWord_entry, 0x06, &this->CO_realTempWord, false);
-  OD_get_i16(this->CO_monitorWord_entry, 0x05, &this->CO_motorVoltageWord, false);
-  OD_get_i16(this->CO_monitorWord_entry, 0x06, &this->CO_powerLossWord, false);
+  OD_get_i16(this->CO_monitorSInt16_entry, 0x01, &this->CO_modelTemp, false);
+  OD_get_u16(this->CO_statusWord_entry, 0x07, &this->CO_realTemp, false);
+  OD_get_u16(this->CO_statusWord_entry, 0x05, &this->CO_motorVoltage, false);
+  OD_get_u16(this->CO_statusWord_entry, 0x06, &this->CO_powerLoss, false);
 }
 
 void LinmotMotor::CO_setNodeId(uint8_t nodeId) {
@@ -106,7 +105,8 @@ void LinmotMotor::CO_setCmdParameters(OD_entry_t *entry) {
   this->CO_cmdParameters_flags = OD_getFlagsPDO(entry);
 };
 
-void LinmotMotor::CO_setStatus(OD_entry_t *entry) {
+// TODO - Should we separate these into proper categories. Status, MonitorUInt16, MonitorSInt16, etc?
+void LinmotMotor::CO_setStatusUInt16(OD_entry_t *entry) {
   this->CO_statusWord_entry = entry;
   this->CO_statusWord_extension = {
     .object = this,
@@ -117,15 +117,37 @@ void LinmotMotor::CO_setStatus(OD_entry_t *entry) {
   OD_extension_init(entry, &this->CO_statusWord_extension);
 };
 
-void LinmotMotor::CO_setMonitor(OD_entry_t *entry) {
-  this->CO_monitorWord_entry = entry;
-  this->CO_monitorWord_extension = {
+void LinmotMotor::CO_setMonitorUInt16(OD_entry_t *entry) {
+  this->CO_monitorUInt16_entry = entry;
+  this->CO_monitorUInt16_extension = {
     .object = this,
     .read = OD_readOriginal,
     .write = track_monitor_update
   };
 
-  OD_extension_init(entry, &this->CO_monitorWord_extension);
+  OD_extension_init(entry, &this->CO_monitorUInt16_extension);
+};
+
+void LinmotMotor::CO_setMonitorSInt16(OD_entry_t *entry) {
+  this->CO_monitorSInt16_entry = entry;
+  this->CO_monitorSInt16_extension = {
+    .object = this,
+    .read = OD_readOriginal,
+    .write = track_monitor_update
+  };
+
+  OD_extension_init(entry, &this->CO_monitorSInt16_extension);
+};
+
+void LinmotMotor::CO_setMonitorSInt32(OD_entry_t *entry) {
+  this->CO_monitorSInt32_entry = entry;
+  this->CO_monitorSInt32_extension = {
+    .object = this,
+    .read = OD_readOriginal,
+    .write = track_monitor_update
+  };
+
+  OD_extension_init(entry, &this->CO_monitorSInt32_extension);
 };
 
 void LinmotMotor::CO_control_addFlag(uint16_t flag) {

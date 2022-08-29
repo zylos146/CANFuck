@@ -16,8 +16,13 @@
 
 #include "data_logger.hpp"
 
+#include <Adafruit_NeoPixel.h>
+
+Adafruit_NeoPixel pixels(1, 48, NEO_GRB + NEO_KHZ800);
+
 AsyncWebServer server(80);
-AsyncWebSocket ws("/"); // access at ws://[esp ip]/
+AsyncWebSocket ws("/");
+AsyncEventSource events("/es");
 
 // TODO - Allow ESP32 Perferences to choose motor implementation
 LinmotMotor* motor;
@@ -56,11 +61,23 @@ void onEvent(AsyncWebSocket *server, AsyncWebSocketClient *client, AwsEventType 
   }
 }
 
+void onConnect(AsyncEventSourceClient *client) {
+    if(client->lastId()){
+      Serial.printf("EventSource Client reconnected! Last message ID that it gat is: %u\n", client->lastId());
+    } else {
+      Serial.printf("EventSource Client connected!");
+    }
+    //send event with message "hello!", id current millis
+    // and set reconnect delay to 1 second
+    client->send("hello!",NULL,millis(),1000);
+}
+
 void loop() {
   if (blynk != NULL) {
     blynk->loop();
   }
-  ws.cleanupClients();
+  // TODO - fix this stack overflow
+  //ws.cleanupClients();
 }
 
 void setup() {
@@ -77,6 +94,9 @@ void setup() {
   }
 
   ESP_LOGI("main", "Starting Web Server");
+  DefaultHeaders::Instance().addHeader(F("Access-Control-Allow-Origin"), F("*"));
+  DefaultHeaders::Instance().addHeader(F("Access-Control-Allow-Headers"), F("content-type"));
+
   server.serveStatic("/", SPIFFS, "/www/").setDefaultFile("index.html");
   server.onNotFound([](AsyncWebServerRequest *request) {
       Serial.printf("Not found: %s!\r\n", request->url().c_str());
@@ -86,8 +106,17 @@ void setup() {
   server.begin();
 
   ws.onEvent(onEvent);
+  events.onConnect((ArEventHandlerFunction)onConnect);
   server.addHandler(&ws);
+  server.addHandler(&events);
   wlog.attachWebsocket(&ws);
+  wlog.attachEventsource(&events);
+  wlog.startTask();
+
+  pixels.begin();
+  pixels.setBrightness(50);
+  pixels.setPixelColor(0, 0, 0, 15);
+  pixels.show();
 
   if (CONTROLLER_USED) {
     WEB_LOGI("main", "Initializing Hardware Controller");
@@ -113,8 +142,9 @@ void setup() {
   motor->setMachineGeometry(bounds);
 
   motor->CO_setNodeId(NODE_ID_LINMOT);
-  motor->CO_setStatus(OD_ENTRY_H2110_linMotStatusUInt16);
-  motor->CO_setMonitor(OD_ENTRY_H2114_linMotStatusSInt16);
+  motor->CO_setStatusUInt16(OD_ENTRY_H2110_linMotStatusUInt16);
+  motor->CO_setMonitorSInt16(OD_ENTRY_H2114_linMotStatusSInt16);
+  motor->CO_setMonitorSInt32(OD_ENTRY_H2115_linMotStatusSInt32);
   motor->CO_setControl(OD_ENTRY_H2111_linMotControlWord);
   motor->CO_setCmdHeader(OD_ENTRY_H2112_linMotCMD_Header);
   motor->CO_setCmdParameters(OD_ENTRY_H2113_linMotCMD_Parameters);
