@@ -24,7 +24,8 @@ static BlynkEsp32Client _blynkTransport(_blynkWifiClient);
 BlynkWifi Blynk(_blynkTransport);
 
 BlynkController::BlynkController() {
-  Blynk.begin(BLYNK_AUTH_TOKEN, WIFI_SSID, WIFI_PASS);
+  // TODO - Hack because of DNS Failed errors. Hopefully temporary
+  Blynk.begin(BLYNK_AUTH_TOKEN, WIFI_SSID, WIFI_PASS, "64.225.16.22");
 }
 
 void BlynkController::loop() {

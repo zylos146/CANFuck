@@ -18,7 +18,7 @@
 
 #include <Adafruit_NeoPixel.h>
 
-Adafruit_NeoPixel pixels(1, 48, NEO_GRB + NEO_KHZ800);
+//Adafruit_NeoPixel pixels(1, 48, NEO_GRB + NEO_KHZ800);
 
 AsyncWebServer server(80);
 AsyncWebSocket ws("/");
@@ -112,11 +112,6 @@ void setup() {
   wlog.attachWebsocket(&ws);
   wlog.attachEventsource(&events);
   wlog.startTask();
-
-  pixels.begin();
-  pixels.setBrightness(50);
-  pixels.setPixelColor(0, 0, 0, 15);
-  pixels.show();
 
   if (CONTROLLER_USED) {
     WEB_LOGI("main", "Initializing Hardware Controller");
