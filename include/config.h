@@ -4,8 +4,8 @@
 // #### Stroke Engine #### //
 #define CONTROLLER_USED false
 
-#define WIFI_SSID "DESKTOP-7FGKC64 1018"
-#define WIFI_PASS "taobao123"
+#define WIFI_SSID ""
+#define WIFI_PASS ""
 
 #define MOTOR_LINMOT 1
 #define MOTOR_STEPPER 2
