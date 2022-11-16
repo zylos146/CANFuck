@@ -1,0 +1,17 @@
+export const EVENT_TYPES = {
+  POINTS: 'points',
+  HEARTBEAT: 'heartbeat'
+}
+
+export const REMOTE_SET_HEALTH = 'REMOTE_SET_HEALTH'
+export const REMOTE_SET_IP = 'REMOTE_SET_IP'
+export const REMOTE_HEARTBEAT = 'REMOTE_HEARTBEAT' 
+export const REMOTE_DATA_POINTS = 'REMOTE_DATA_POINTS'
+export const REMOTE_CONNECT = 'REMOTE_CONNECT'
+export const REMOTE_DISCONNECT = 'REMOTE_DISCONNECT'
+export const REMOTE_DISCONNECTED = 'REMOTE_DISCONNECTED'
+
+export const REMOTE_ES_SET = 'REMOTE_ES_SET'
+export const REMOTE_WS_SET = 'REMOTE_WS_SET'
+
+export const MAX_HEARTBEAT_DIFF_MS = 500

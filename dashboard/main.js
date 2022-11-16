@@ -28,12 +28,12 @@ function documentLoaded() {
   }, {
     x: xData,
     y: yData,
-    name: 'Demand Position',
+    name: 'Actual Velocity',
     yaxis: 'y2'
   }, {
     x: xData,
     y: yData,
-    name: 'Actual Velocity',
+    name: 'Demand Position',
     yaxis: 'y3'
   }], {
     margin: { t: 0 },

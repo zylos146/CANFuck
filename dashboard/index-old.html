@@ -1,0 +1,29 @@
+<!doctype html>
+<!-- Simple oscilloscope trace plot using WebGL
+     Copyright (c) Jeremy P Bentham 2021. See http://iosoft.blog for details
+
+     Licensed under the Apache License, Version 2.0 (the "License");
+     you may not use this file except in compliance with the License.
+     You may obtain a copy of the License at
+       http://www.apache.org/licenses/LICENSE-2.0
+
+     Unless required by applicable law or agreed to in writing, software
+     distributed under the License is distributed on an "AS IS" BASIS,
+     WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+     See the License for the specific language governing permissions and
+     limitations under the License.
+
+     v0.17 JPB 13/1/21  Removed duplicate init_graph
+-->
+<html>
+   <body onload=start_graph()>
+      <canvas id = "graph_canvas"></canvas>
+      <button id="single_btn"   onclick="run_single(this)">Single</button>
+      <button id="run_stop_btn" onclick="run_stop(this)"  >Run</button>
+      <select id="sel_nchans" onchange="sel_nchans()"></select>
+      <select id="sel_srce"   onchange="sel_srce()"  ></select>
+      <pre id="status" style="font-size: 14px; margin: 8px"></pre>
+
+      <script src="main.js"></script>
+   </body>
+</html>
