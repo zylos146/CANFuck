@@ -2,8 +2,13 @@
 #include "Wire.h"
 #include <Preferences.h>
 
+#include <Crypto.h>
+#include <SHA256.h>
+
+#include <ESPConnect.h>
 #include "SPIFFS.h"
 #include "ESPAsyncWebServer.h"
+#include <ESPDash.h>
 
 #include "blynk.hpp"
 #include "StrokeEngine.h"
@@ -18,6 +23,9 @@
 
 #include <Adafruit_NeoPixel.h>
 
+#include "gui.h"
+
+
 //Adafruit_NeoPixel pixels(1, 48, NEO_GRB + NEO_KHZ800);
 
 AsyncWebServer server(80);
@@ -29,6 +37,10 @@ LinmotMotor* motor;
 StrokeEngine* engine;
 CANFuckController* controller; // TODO - Abstract interface with controller away? Use similar system to Object Dictionary with CANOpen?
 BlynkController* blynk = NULL;
+
+ESPDash dashboard(&server); 
+Card temperature(&dashboard, TEMPERATURE_CARD, "Temperature", "°C");
+Card humidity(&dashboard, HUMIDITY_CARD, "Humidity", "%");
 
 void onRequest(AsyncWebServerRequest *request){
   //Handle Unknown Request
@@ -76,16 +88,44 @@ void loop() {
   if (blynk != NULL) {
     blynk->loop();
   }
+
   // TODO - fix this stack overflow
   //ws.cleanupClients();
 }
+
+#define HASH_SIZE 32
+SHA256 sha256;
 
 void setup() {
   Serial.begin(UART_SPEED);
   Wire.begin(I2C_SDA_PIN, I2C_SCL_PIN);
 
+  const char* mac = WiFi.macAddress().c_str();
+  uint8_t value[HASH_SIZE];
+
+  Hash *hash = &sha256;
+  hash->reset();
+  hash->update(mac, strlen(mac));
+  hash->finalize(value, sizeof(value));
+
+  sprintf(wifiName, "CAN-SoftAP %02X", value[4]);
+  sprintf(wifiPassword, "softap-%02x%02x", value[5], value[6]);
+
+  xTaskCreatePinnedToCore(&gui_main_task, "gui", 4096*2, NULL, 0, NULL, 1);
+
+  ESP_LOGI("main", "Wifi: %s %s", wifiName, wifiPassword);
+  ESPConnect.autoConnect(wifiName, wifiPassword);
+
+  if (ESPConnect.begin(&server)) {
+    ESP_LOGI("main", "Connected to WiFi");
+    //ESP_LOGI("main", "IPAddress: " + WiFi.localIP().toString());
+  } else {
+    ESP_LOGI("main", "Failed to connect to WiFi. Waiting for reboot...");
+    while (true) { vTaskDelay(5 / portTICK_PERIOD_MS); }
+  }
+
   ESP_LOGI("main", "Starting Bylnk!");
-  blynk = new BlynkController();
+  //blynk = new BlynkController();
 
   ESP_LOGI("main", "Mounting SPIFFS");
   if(!SPIFFS.begin(true)){
@@ -97,7 +137,7 @@ void setup() {
   DefaultHeaders::Instance().addHeader(F("Access-Control-Allow-Origin"), F("*"));
   DefaultHeaders::Instance().addHeader(F("Access-Control-Allow-Headers"), F("content-type"));
 
-  server.serveStatic("/", SPIFFS, "/www/").setDefaultFile("index.html");
+  server.serveStatic("/www2", SPIFFS, "/www/").setDefaultFile("index.html");
   server.onNotFound([](AsyncWebServerRequest *request) {
       Serial.printf("Not found: %s!\r\n", request->url().c_str());
       request->send(404);
@@ -155,6 +195,8 @@ void setup() {
 
   WEB_LOGI("main", "Attaching Blynk to Motor and Engine");
   blynk->attach(engine, motor);
+
+  while (true) { vTaskDelay(5 / portTICK_PERIOD_MS); }
 
   WEB_LOGI("main", "Configuring Stroke Engine");
   engine->setParameter(StrokeParameter::PATTERN, 0);
