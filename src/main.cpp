@@ -18,12 +18,15 @@
 
 #include "CO_main.h"
 #include "motor/linmot.hpp"
+#include "motor/virtual.hpp"
+#include "lvgl_gui.hpp"
+#include "screen/boot.hpp"
+#include "screen/status.hpp"
 
 #include "data_logger.hpp"
 
 #include <Adafruit_NeoPixel.h>
-
-#include "gui.h"
+#include "esp32s3/rom/rtc.h"
 
 
 //Adafruit_NeoPixel pixels(1, 48, NEO_GRB + NEO_KHZ800);
@@ -33,14 +36,20 @@ AsyncWebSocket ws("/");
 AsyncEventSource events("/es");
 
 // TODO - Allow ESP32 Perferences to choose motor implementation
-LinmotMotor* motor;
+
+#if MOTOR_USED == MOTOR_LINMOT
+  LinmotMotor* motor;
+#elif MOTOR_USED == MOTOR_MOCK
+  VirtualMotor* motor;
+#endif
+
 StrokeEngine* engine;
 CANFuckController* controller; // TODO - Abstract interface with controller away? Use similar system to Object Dictionary with CANOpen?
 BlynkController* blynk = NULL;
 
-ESPDash dashboard(&server); 
-Card temperature(&dashboard, TEMPERATURE_CARD, "Temperature", "°C");
-Card humidity(&dashboard, HUMIDITY_CARD, "Humidity", "%");
+//ESPDash dashboard(&server); 
+//Card temperature(&dashboard, TEMPERATURE_CARD, "Temperature", "°C");
+//Card humidity(&dashboard, HUMIDITY_CARD, "Humidity", "%");
 
 void onRequest(AsyncWebServerRequest *request){
   //Handle Unknown Request
@@ -96,8 +105,43 @@ void loop() {
 #define HASH_SIZE 32
 SHA256 sha256;
 
+LVGLGui* gui;
+char wifiName[32];
+char wifiPassword[10];
+
+
+void print_reset_reason(int reason)
+{
+  switch ( reason)
+  {
+    case 1 : ESP_LOGI("main", "POWERON_RESET");break;          /**<1,  Vbat power on reset*/
+    case 3 : ESP_LOGI("main", "SW_RESET");break;               /**<3,  Software reset digital core*/
+    case 4 : ESP_LOGI("main", "OWDT_RESET");break;             /**<4,  Legacy watch dog reset digital core*/
+    case 5 : ESP_LOGI("main", "DEEPSLEEP_RESET");break;        /**<5,  Deep Sleep reset digital core*/
+    case 6 : ESP_LOGI("main", "SDIO_RESET");break;             /**<6,  Reset by SLC module, reset digital core*/
+    case 7 : ESP_LOGI("main", "TG0WDT_SYS_RESET");break;       /**<7,  Timer Group0 Watch dog reset digital core*/
+    case 8 : ESP_LOGI("main", "TG1WDT_SYS_RESET");break;       /**<8,  Timer Group1 Watch dog reset digital core*/
+    case 9 : ESP_LOGI("main", "RTCWDT_SYS_RESET");break;       /**<9,  RTC Watch dog Reset digital core*/
+    case 10 : ESP_LOGI("main", "INTRUSION_RESET");break;       /**<10, Instrusion tested to reset CPU*/
+    case 11 : ESP_LOGI("main", "TGWDT_CPU_RESET");break;       /**<11, Time Group reset CPU*/
+    case 12 : ESP_LOGI("main", "SW_CPU_RESET");break;          /**<12, Software reset CPU*/
+    case 13 : ESP_LOGI("main", "RTCWDT_CPU_RESET");break;      /**<13, RTC Watch dog Reset CPU*/
+    case 14 : ESP_LOGI("main", "EXT_CPU_RESET");break;         /**<14, for APP CPU, reseted by PRO CPU*/
+    case 15 : ESP_LOGI("main", "RTCWDT_BROWN_OUT_RESET");break;/**<15, Reset when the vdd voltage is not stable*/
+    case 16 : ESP_LOGI("main", "RTCWDT_RTC_RESET");break;      /**<16, RTC Watch dog reset digital core and rtc module*/
+    default : ESP_LOGI("main", "NO_MEAN");
+  }
+}
+
 void setup() {
   Serial.begin(UART_SPEED);
+
+  ESP_LOGI("main", "CPU0 reset reason:");
+  print_reset_reason(rtc_get_reset_reason(0));
+
+  ESP_LOGI("main", "CPU1 reset reason:");
+  print_reset_reason(rtc_get_reset_reason(1));
+
   Wire.begin(I2C_SDA_PIN, I2C_SCL_PIN);
 
   const char* mac = WiFi.macAddress().c_str();
@@ -111,7 +155,12 @@ void setup() {
   sprintf(wifiName, "CAN-SoftAP %02X", value[4]);
   sprintf(wifiPassword, "softap-%02x%02x", value[5], value[6]);
 
-  xTaskCreatePinnedToCore(&gui_main_task, "gui", 4096*2, NULL, 0, NULL, 1);
+  gui = new LVGLGui();
+  gui->start();
+
+  BootScreen* bootScreen = new BootScreen();
+  StatusScreen* statusScreen = new StatusScreen();
+  gui->activate(statusScreen);
 
   ESP_LOGI("main", "Wifi: %s %s", wifiName, wifiPassword);
   ESPConnect.autoConnect(wifiName, wifiPassword);
@@ -124,6 +173,7 @@ void setup() {
     while (true) { vTaskDelay(5 / portTICK_PERIOD_MS); }
   }
 
+  while (true) { vTaskDelay(5 / portTICK_PERIOD_MS); }
   ESP_LOGI("main", "Starting Bylnk!");
   //blynk = new BlynkController();
 
@@ -133,6 +183,7 @@ void setup() {
     return;
   }
 
+  while (true) { vTaskDelay(5 / portTICK_PERIOD_MS); }
   ESP_LOGI("main", "Starting Web Server");
   DefaultHeaders::Instance().addHeader(F("Access-Control-Allow-Origin"), F("*"));
   DefaultHeaders::Instance().addHeader(F("Access-Control-Allow-Headers"), F("content-type"));
@@ -165,6 +216,8 @@ void setup() {
   }
 
   WEB_LOGI("main", "Configuring Motor");
+
+#if MOTOR_USED == MOTOR_LINMOT
   motor = new LinmotMotor();
 
   MachineGeometry bounds = {
@@ -183,6 +236,18 @@ void setup() {
   motor->CO_setControl(OD_ENTRY_H2111_linMotControlWord);
   motor->CO_setCmdHeader(OD_ENTRY_H2112_linMotCMD_Header);
   motor->CO_setCmdParameters(OD_ENTRY_H2113_linMotCMD_Parameters);
+#elif MOTOR_USED == MOTOR_MOCK
+  motor = new VirtualMotor();
+
+  MachineGeometry bounds = {
+    .start = 0, // mm
+    .end = 100, // mm
+    .keepout = 10 // mm
+  };
+  motor->setMaxSpeed(5000); // 5 m/s
+  motor->setMaxAcceleration(500); // 25 m/s^2
+  motor->setMachineGeometry(bounds);
+#endif
 
   engine = new StrokeEngine();
   WEB_LOGI("main", "Attaching Motor to Stroke Engine");
@@ -195,8 +260,6 @@ void setup() {
 
   WEB_LOGI("main", "Attaching Blynk to Motor and Engine");
   blynk->attach(engine, motor);
-
-  while (true) { vTaskDelay(5 / portTICK_PERIOD_MS); }
 
   WEB_LOGI("main", "Configuring Stroke Engine");
   engine->setParameter(StrokeParameter::PATTERN, 0);
@@ -213,7 +276,4 @@ void setup() {
   WEB_LOGI("main", "Homing Motor");
   motor->enable();
   motor->goToHome();
-  
-  //ESP_LOGI("main", "Starting Motion Task!");
-  //xTaskCreate(&app_motion, "app_motion", 4096, NULL, 5, NULL);
 }

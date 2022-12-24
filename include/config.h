@@ -9,7 +9,8 @@
 
 #define MOTOR_LINMOT 1
 #define MOTOR_STEPPER 2
-#define MOTOR_USED 1
+#define MOTOR_MOCK 3
+#define MOTOR_USED 3
 
 // #### CANOpen #### //
 #define CAN_TX_IO (35)  /** CAN TX pin */
