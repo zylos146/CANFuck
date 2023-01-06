@@ -222,5 +222,5 @@ static void canopen_timer_task(void *arg) {
 }
 
 void CO_register_tasks() {
-  xTaskCreate(&canopen_main_task, "canopen_main_task", 4096, NULL, 5, NULL);
+  xTaskCreatePinnedToCore(&canopen_main_task, "canopen_main_task", 4096, NULL, 5, NULL, 1);
 }

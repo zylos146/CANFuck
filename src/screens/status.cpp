@@ -66,9 +66,8 @@ void StatusScreen::tick() {
       lv_textarea_set_text(ui_STATUS_TopBarTitle, topBarTitle);
       showWifi = true;
     }
-    lv_refr_now(NULL);
   }
 
-  
+  lv_refr_now(NULL);
   loopCount = (loopCount + 1) % 1000;
 }

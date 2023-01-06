@@ -108,5 +108,5 @@ bool CANFuckController::start() {
 
 void CANFuckController::registerTasks() {
   ESP_LOGI("controller", "Registering tasks");
-  xTaskCreate(&controller_poll, "controller_poll", 4096, this, 5, NULL);
+  xTaskCreatePinnedToCore(&controller_poll, "controller_poll", 4096, this, 5, NULL, 1);
 }

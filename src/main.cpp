@@ -22,8 +22,11 @@
 #include "lvgl_gui.hpp"
 #include "screen/boot.hpp"
 #include "screen/status.hpp"
+#include "screen/wifi.hpp"
 
 #include "data_logger.hpp"
+#include "serial.hpp"
+#include "wifi.hpp"
 
 #include <Adafruit_NeoPixel.h>
 #include "esp32s3/rom/rtc.h"
@@ -106,9 +109,6 @@ void loop() {
 SHA256 sha256;
 
 LVGLGui* gui;
-char wifiName[32];
-char wifiPassword[10];
-
 
 void print_reset_reason(int reason)
 {
@@ -134,7 +134,11 @@ void print_reset_reason(int reason)
 }
 
 void setup() {
-  Serial.begin(UART_SPEED);
+  // Disables serial output basically except over USB
+  Serial.begin(115200, SERIAL_8N1, 45, 48);
+
+  // Wait for initial monitor to connect
+  vTaskDelay(2000 / portTICK_PERIOD_MS);
 
   ESP_LOGI("main", "CPU0 reset reason:");
   print_reset_reason(rtc_get_reset_reason(0));
@@ -155,15 +159,25 @@ void setup() {
   sprintf(wifiName, "CAN-SoftAP %02X", value[4]);
   sprintf(wifiPassword, "softap-%02x%02x", value[5], value[6]);
 
-  gui = new LVGLGui();
-  gui->start();
+  //gui = new LVGLGui();
+  //gui->start();
 
-  BootScreen* bootScreen = new BootScreen();
-  StatusScreen* statusScreen = new StatusScreen();
-  gui->activate(statusScreen);
+  //BootScreen* bootScreen = new BootScreen();
+  //StatusScreen* statusScreen = new StatusScreen();
+  //WifiScreen* wifiScreen = new WifiScreen();
+  //gui->activate(wifiScreen);
 
+  WiFi.mode(WIFI_STA); //Optional
+  WiFi.begin("Central Nexus", "taobao123");
+  Serial.println("\nConnecting");
+
+  while(WiFi.status() != WL_CONNECTED) {
+      Serial.print(".");
+      vTaskDelay(5 / portTICK_PERIOD_MS);
+  }
+  
   ESP_LOGI("main", "Wifi: %s %s", wifiName, wifiPassword);
-  ESPConnect.autoConnect(wifiName, wifiPassword);
+  ESPConnect.autoConnect(wifiName, "test1234");
 
   if (ESPConnect.begin(&server)) {
     ESP_LOGI("main", "Connected to WiFi");
@@ -172,10 +186,15 @@ void setup() {
     ESP_LOGI("main", "Failed to connect to WiFi. Waiting for reboot...");
     while (true) { vTaskDelay(5 / portTICK_PERIOD_MS); }
   }
+  
+  //gui->activate(bootScreen);
+  vTaskDelay(5000 / portTICK_PERIOD_MS);
 
-  while (true) { vTaskDelay(5 / portTICK_PERIOD_MS); }
-  ESP_LOGI("main", "Starting Bylnk!");
+  //gui->activate(statusScreen);
+
+  //ESP_LOGI("main", "Starting Bylnk!");
   //blynk = new BlynkController();
+  serial_setup();
 
   ESP_LOGI("main", "Mounting SPIFFS");
   if(!SPIFFS.begin(true)){
@@ -183,7 +202,6 @@ void setup() {
     return;
   }
 
-  while (true) { vTaskDelay(5 / portTICK_PERIOD_MS); }
   ESP_LOGI("main", "Starting Web Server");
   DefaultHeaders::Instance().addHeader(F("Access-Control-Allow-Origin"), F("*"));
   DefaultHeaders::Instance().addHeader(F("Access-Control-Allow-Headers"), F("content-type"));
@@ -200,9 +218,13 @@ void setup() {
   events.onConnect((ArEventHandlerFunction)onConnect);
   server.addHandler(&ws);
   server.addHandler(&events);
-  wlog.attachWebsocket(&ws);
-  wlog.attachEventsource(&events);
-  wlog.startTask();
+  //wlog.attachWebsocket(&ws);
+  //wlog.attachEventsource(&events);
+  //wlog.startTask();
+
+  while (true) {
+    vTaskDelay(500 / portTICK_PERIOD_MS); 
+  }
 
   if (CONTROLLER_USED) {
     WEB_LOGI("main", "Initializing Hardware Controller");

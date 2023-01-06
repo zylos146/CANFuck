@@ -51,11 +51,11 @@ void BootScreen::tick() {
 
   if (WiFi.status() == WL_CONNECTED) {
     lv_textarea_set_text(ui_BOOT_Name, WiFi.localIP().toString().c_str());
-    lv_refr_now(NULL);
   } else {
     sprintf(test, "%02X", counter);
     strcat(test, " Unconnected");
     lv_textarea_set_text(ui_BOOT_Name, test);
-    lv_refr_now(NULL);
   }
+
+  lv_refr_now(NULL);
 }

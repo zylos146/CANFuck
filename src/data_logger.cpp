@@ -35,8 +35,8 @@ const char* DataParameter_KEYS[DataParameter_NUM_OF_ITEMS] = {
 WebLogger wlog;
 
 void WebLogger::startTask() {
-  xTaskCreate(&WebLogger::sendData, "weblogger_send_data", 10000, this, 5, &this->sendDataHandle);
-  xTaskCreate(&WebLogger::sendHeartbeat, "weblogger_send_heartbeat", 2000, this, 5, &this->sendHeartbeatHandle);
+  xTaskCreatePinnedToCore(&WebLogger::sendData, "weblogger_send_data", 10000, this, 5, &this->sendDataHandle, 1);
+  xTaskCreatePinnedToCore(&WebLogger::sendHeartbeat, "weblogger_send_heartbeat", 2000, this, 5, &this->sendHeartbeatHandle, 1);
 }
 
 void WebLogger::log(DataParameter key, float value) {

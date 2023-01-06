@@ -36,5 +36,5 @@ static void virtualmot_run_task(void *pvParameter) {
 }
 
 VirtualMotor::VirtualMotor() {
-  xTaskCreate(&virtualmot_run_task, "virtualmot_run_task", 4096, this, 5, NULL);
+  xTaskCreatePinnedToCore(&virtualmot_run_task, "virtualmot_run_task", 4096, this, 5, NULL, 1);
 }
