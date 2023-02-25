@@ -5,6 +5,7 @@
 class StatusScreen : public ScreenInterface {
   public:
     StatusScreen();
+    String getName() { return "Status"; }
 
   private:
     lv_obj_t *ui_STATUS;

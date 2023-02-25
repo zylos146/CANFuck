@@ -1,14 +1,16 @@
 #ifndef LVGL_GUI_H
 #define LVGL_GUI_H
 
+#include "esp_log.h"
 #include <TFT_eSPI.h>
 #include <lvgl.h>
-#include "motor.hpp"	
 #include <map>
-#include <WiFi.h>
-#include <ESPConnect.h>
 
 class ScreenInterface {
+  public:
+    bool getIsActive() { return isActive; }
+    virtual String getName() { return "generic"; }
+
   protected:
     virtual void tick();
     bool isActive = false;
@@ -26,6 +28,12 @@ class LVGLGui {
     void flush(lv_disp_drv_t *disp, const lv_area_t *area, lv_color_t *color_p);
 
     void activate(ScreenInterface* screen) {
+      if (screen == NULL) {
+        return; // TODO - Log a warning here
+      }
+
+      ESP_LOGI("gui", "Activating new screen '%s'", screen->getName());
+
       if (this->activeScreen != NULL) {
         this->activeScreen->isActive = false;
       }

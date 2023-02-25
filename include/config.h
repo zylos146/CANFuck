@@ -32,7 +32,8 @@
 #define FRAMEWORK_USED FRAMEWORK_ESP_IDF
 
 // #### FreeRTOS #### //
-#define BOOT_WAIT 2000
+#define BOOT_SCREEN_WAIT 2000
+#define CANOPEN_START_WAIT 2000
 #define MAIN_WAIT 100 /** Time in ms between every main loop cycle */
 
 // #### Communication #### //

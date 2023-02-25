@@ -5,6 +5,7 @@
 class BootScreen : public ScreenInterface {
   public:
     BootScreen();
+    String getName() { return "CANfuck Boot"; }
 
   private:
     lv_obj_t *ui_BOOT;

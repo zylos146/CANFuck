@@ -169,7 +169,7 @@ void canopen_main_task(void *pvParameter) {
     WEB_LOGI("task.main", "Allocated %u bytes for CANopen objects\n", heapMemoryUsed);
   }
 
-  vTaskDelay(BOOT_WAIT / portTICK_PERIOD_MS);
+  vTaskDelay(CANOPEN_START_WAIT / portTICK_PERIOD_MS);
   WEB_LOGI("task.main", "Started");
 
   while (reset != CO_RESET_APP) {

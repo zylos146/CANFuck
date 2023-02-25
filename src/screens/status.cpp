@@ -1,6 +1,6 @@
 #include "screen/status.hpp"
-
-#include "screen/boot.hpp"
+#include <WiFi.h>
+#include <ESPConnect.h>
 
 StatusScreen::StatusScreen() {
   ui_root = ui_STATUS = lv_obj_create(NULL);
@@ -66,8 +66,9 @@ void StatusScreen::tick() {
       lv_textarea_set_text(ui_STATUS_TopBarTitle, topBarTitle);
       showWifi = true;
     }
+    lv_refr_now(NULL);
   }
 
-  lv_refr_now(NULL);
+  
   loopCount = (loopCount + 1) % 1000;
 }

@@ -1,36 +1,41 @@
 #include "esp_log.h"
+#include "config.h"
+
+// General hardware libs
+#include "SPIFFS.h"
 #include "Wire.h"
 #include <Preferences.h>
-
 #include <Crypto.h>
 #include <SHA256.h>
 
+// Specific hardware libs
 #include <ESPConnect.h>
-#include "SPIFFS.h"
 #include "ESPAsyncWebServer.h"
 #include <ESPDash.h>
+#include <Adafruit_NeoPixel.h>
 
 #include "blynk.hpp"
 #include "StrokeEngine.h"
 
-#include "config.h"
 #include "controller/canfuck.hpp"
 
 #include "CO_main.h"
-#include "motor/linmot.hpp"
-#include "motor/virtual.hpp"
 #include "lvgl_gui.hpp"
-#include "screen/boot.hpp"
-#include "screen/status.hpp"
-#include "screen/wifi.hpp"
-
-#include "data_logger.hpp"
-#include "serial.hpp"
 #include "wifi.hpp"
 
-#include <Adafruit_NeoPixel.h>
-#include "esp32s3/rom/rtc.h"
+// Screens
+#include "screen/boot.hpp"
+#include "screen/status.hpp"
+#include "screen/wifi_ap.hpp"
+#include "screen/wifi_sta.hpp"
+#include "screen/wifi_failure.hpp"
 
+// Motors
+#include "motor/linmot.hpp"
+#include "motor/virtual.hpp"
+
+#include "data_logger.hpp"
+#include "reset_reason.hpp"
 
 //Adafruit_NeoPixel pixels(1, 48, NEO_GRB + NEO_KHZ800);
 
@@ -49,10 +54,6 @@ AsyncEventSource events("/es");
 StrokeEngine* engine;
 CANFuckController* controller; // TODO - Abstract interface with controller away? Use similar system to Object Dictionary with CANOpen?
 BlynkController* blynk = NULL;
-
-//ESPDash dashboard(&server); 
-//Card temperature(&dashboard, TEMPERATURE_CARD, "Temperature", "°C");
-//Card humidity(&dashboard, HUMIDITY_CARD, "Humidity", "%");
 
 void onRequest(AsyncWebServerRequest *request){
   //Handle Unknown Request
@@ -96,6 +97,23 @@ void onConnect(AsyncEventSourceClient *client) {
     client->send("hello!",NULL,millis(),1000);
 }
 
+
+// States
+// Booting - Show Logo for a few seconds
+// Connecting to AP
+// Starting SoftAP
+
+// BOOT (Serial, I2C, Core Dump / CPU Reset Reason)
+// WIFI_CONNECT (Attempt WiFi connection for 1 min, then abort)
+// WIFI_SOFT_AP_START (Idle in this state for a minute)
+// COREDUMP_SEND (Optional if WiFi starts)
+// WIFI_SERVER_START (Optional if WiFi starts)
+// MOTOR_START
+// ENGINE_START
+// ACTIVE
+// ERROR
+
+LVGLGui* gui;
 void loop() {
   if (blynk != NULL) {
     blynk->loop();
@@ -105,48 +123,51 @@ void loop() {
   //ws.cleanupClients();
 }
 
-#define HASH_SIZE 32
-SHA256 sha256;
+void boot_setup() {
+  Serial.begin(UART_SPEED);
+  print_reset_reason();
 
-LVGLGui* gui;
+  Wire.begin(I2C_SDA_PIN, I2C_SCL_PIN);
 
-void print_reset_reason(int reason)
-{
-  switch ( reason)
-  {
-    case 1 : ESP_LOGI("main", "POWERON_RESET");break;          /**<1,  Vbat power on reset*/
-    case 3 : ESP_LOGI("main", "SW_RESET");break;               /**<3,  Software reset digital core*/
-    case 4 : ESP_LOGI("main", "OWDT_RESET");break;             /**<4,  Legacy watch dog reset digital core*/
-    case 5 : ESP_LOGI("main", "DEEPSLEEP_RESET");break;        /**<5,  Deep Sleep reset digital core*/
-    case 6 : ESP_LOGI("main", "SDIO_RESET");break;             /**<6,  Reset by SLC module, reset digital core*/
-    case 7 : ESP_LOGI("main", "TG0WDT_SYS_RESET");break;       /**<7,  Timer Group0 Watch dog reset digital core*/
-    case 8 : ESP_LOGI("main", "TG1WDT_SYS_RESET");break;       /**<8,  Timer Group1 Watch dog reset digital core*/
-    case 9 : ESP_LOGI("main", "RTCWDT_SYS_RESET");break;       /**<9,  RTC Watch dog Reset digital core*/
-    case 10 : ESP_LOGI("main", "INTRUSION_RESET");break;       /**<10, Instrusion tested to reset CPU*/
-    case 11 : ESP_LOGI("main", "TGWDT_CPU_RESET");break;       /**<11, Time Group reset CPU*/
-    case 12 : ESP_LOGI("main", "SW_CPU_RESET");break;          /**<12, Software reset CPU*/
-    case 13 : ESP_LOGI("main", "RTCWDT_CPU_RESET");break;      /**<13, RTC Watch dog Reset CPU*/
-    case 14 : ESP_LOGI("main", "EXT_CPU_RESET");break;         /**<14, for APP CPU, reseted by PRO CPU*/
-    case 15 : ESP_LOGI("main", "RTCWDT_BROWN_OUT_RESET");break;/**<15, Reset when the vdd voltage is not stable*/
-    case 16 : ESP_LOGI("main", "RTCWDT_RTC_RESET");break;      /**<16, RTC Watch dog reset digital core and rtc module*/
-    default : ESP_LOGI("main", "NO_MEAN");
+  gui = new LVGLGui();
+  gui->start();
+}
+
+BootScreen* bootScreen = NULL;
+void boot_start () {
+  bootScreen = new BootScreen();
+  gui->activate(bootScreen);
+
+  // Allow the boot screen to show for a bit
+  for (uint8_t i = 0; i < (BOOT_SCREEN_WAIT / 50); i++) { vTaskDelay(50 / portTICK_PERIOD_MS); }
+}
+
+WifiStaScreen* wifiStaScreen = NULL;
+WifiApScreen* wifiApScreen = NULL;
+WifiFailureScreen* wifiFailureScreen = NULL;
+StatusScreen* statusScreen = NULL;
+void wifi_poll(void* pvParameter) {
+  while (true) {
+    // If WiFi is Connected, move on to Status
+    if (WiFi.status() == WL_CONNECTED) {
+      ESP_LOGI("main", "Wifi Polling Task exiting");
+      vTaskDelete(NULL);
+    } else if (WiFi.getMode() == WIFI_AP_STA && !wifiApScreen->getIsActive()) { 
+      gui->activate(wifiApScreen);
+    } else if (WiFi.getMode() == WIFI_STA  && !wifiApScreen->getIsActive()) {
+      gui->activate(wifiStaScreen);
+    }
+
+    vTaskDelay(33 / portTICK_PERIOD_MS);
   }
 }
 
-void setup() {
-  // Disables serial output basically except over USB
-  Serial.begin(115200, SERIAL_8N1, 45, 48);
-
-  // Wait for initial monitor to connect
-  vTaskDelay(2000 / portTICK_PERIOD_MS);
-
-  ESP_LOGI("main", "CPU0 reset reason:");
-  print_reset_reason(rtc_get_reset_reason(0));
-
-  ESP_LOGI("main", "CPU1 reset reason:");
-  print_reset_reason(rtc_get_reset_reason(1));
-
-  Wire.begin(I2C_SDA_PIN, I2C_SCL_PIN);
+#define HASH_SIZE 32
+SHA256 sha256;
+void wifi_setup () {
+  wifiStaScreen = new WifiStaScreen();
+  wifiApScreen = new WifiApScreen();
+  wifiFailureScreen = new WifiFailureScreen();
 
   const char* mac = WiFi.macAddress().c_str();
   uint8_t value[HASH_SIZE];
@@ -159,43 +180,40 @@ void setup() {
   sprintf(wifiName, "CAN-SoftAP %02X", value[4]);
   sprintf(wifiPassword, "softap-%02x%02x", value[5], value[6]);
 
-  //gui = new LVGLGui();
-  //gui->start();
-
-  //BootScreen* bootScreen = new BootScreen();
-  //StatusScreen* statusScreen = new StatusScreen();
-  //WifiScreen* wifiScreen = new WifiScreen();
-  //gui->activate(wifiScreen);
-
-  WiFi.mode(WIFI_STA); //Optional
-  WiFi.begin("Central Nexus", "taobao123");
-  Serial.println("\nConnecting");
-
-  while(WiFi.status() != WL_CONNECTED) {
-      Serial.print(".");
-      vTaskDelay(5 / portTICK_PERIOD_MS);
-  }
-  
   ESP_LOGI("main", "Wifi: %s %s", wifiName, wifiPassword);
-  ESPConnect.autoConnect(wifiName, "test1234");
+  ESPConnect.autoConnect(wifiName, wifiPassword);
 
-  if (ESPConnect.begin(&server)) {
-    ESP_LOGI("main", "Connected to WiFi");
-    //ESP_LOGI("main", "IPAddress: " + WiFi.localIP().toString());
-  } else {
-    ESP_LOGI("main", "Failed to connect to WiFi. Waiting for reboot...");
+  // Start the WiFi checking task
+  TaskHandle_t wifiPollTask;
+  xTaskCreatePinnedToCore(&wifi_poll, "wifi_poll", 4096, NULL, 5, &wifiPollTask, 1);
+
+  // 30 second attempt to connect to configured AP
+  // 180 second attempt to serve AP page for configuring WiFi
+  // This will halt until WiFi.status() == WL_CONNECTED, or a timeout
+  // Returns true if connected, false if timed out
+  bool success = ESPConnect.begin(&server);
+  vTaskDelete(wifiPollTask);
+
+  if (!success) {
+    gui->activate(wifiFailureScreen);
+    ESP_LOGE("main", "Failed to connect to WiFi. Waiting for reboot...");
     while (true) { vTaskDelay(5 / portTICK_PERIOD_MS); }
   }
-  
-  //gui->activate(bootScreen);
-  vTaskDelay(5000 / portTICK_PERIOD_MS);
 
-  //gui->activate(statusScreen);
+  statusScreen = new StatusScreen();
+  gui->activate(statusScreen);
+}
+
+void setup() {
+  boot_setup();
+  boot_start();
+  wifi_setup();
 
   //ESP_LOGI("main", "Starting Bylnk!");
   //blynk = new BlynkController();
-  serial_setup();
 
+  while (true) { vTaskDelay(5 / portTICK_PERIOD_MS); }
+  
   ESP_LOGI("main", "Mounting SPIFFS");
   if(!SPIFFS.begin(true)){
     ESP_LOGE("main", "An Error has occurred while mounting SPIFFS");
@@ -218,13 +236,9 @@ void setup() {
   events.onConnect((ArEventHandlerFunction)onConnect);
   server.addHandler(&ws);
   server.addHandler(&events);
-  //wlog.attachWebsocket(&ws);
-  //wlog.attachEventsource(&events);
-  //wlog.startTask();
-
-  while (true) {
-    vTaskDelay(500 / portTICK_PERIOD_MS); 
-  }
+  wlog.attachWebsocket(&ws);
+  wlog.attachEventsource(&events);
+  wlog.startTask();
 
   if (CONTROLLER_USED) {
     WEB_LOGI("main", "Initializing Hardware Controller");

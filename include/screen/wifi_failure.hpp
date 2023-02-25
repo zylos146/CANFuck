@@ -2,9 +2,10 @@
 
 #include "lvgl_gui.hpp"
 
-class WifiScreen : public ScreenInterface {
+class WifiFailureScreen : public ScreenInterface {
   public:
-    WifiScreen();
+    WifiFailureScreen();
+    String getName() { return "Wifi: Failed to Connect"; }
 
   private:
     lv_obj_t *ui_WIFI;

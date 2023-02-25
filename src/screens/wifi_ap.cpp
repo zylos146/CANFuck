@@ -1,7 +1,7 @@
-#include "screen/wifi.hpp"
+#include "screen/wifi_ap.hpp"
 #include "wifi.hpp"
 
-WifiScreen::WifiScreen() {
+WifiApScreen::WifiApScreen() {
   ui_root = ui_WIFI = lv_obj_create(NULL);
   lv_obj_clear_flag(ui_WIFI, LV_OBJ_FLAG_SCROLLABLE); /// Flags
 
@@ -118,7 +118,7 @@ WifiScreen::WifiScreen() {
   lv_textarea_set_text(ui_WIFI_PasswordTitle, "Password");
 }
 
-void WifiScreen::tick() {
+void WifiApScreen::tick() {
   lv_textarea_set_text(ui_WIFI_Name, wifiName);
   lv_textarea_set_text(ui_WIFI_Password, wifiPassword);
   lv_refr_now(NULL);
