@@ -8,3 +8,9 @@ url=https://github.com/zylos146/StrokeEngine-CANOpen
 [submodule "lib/lvgl"]
 	path = lib/lvgl
 	url = https://github.com/lvgl/lvgl.git
+[submodule "lib/OSSM-framework"]
+	path = lib/OSSM-framework
+	url = https://github.com/zylos146/OSSM-framework.git
+[submodule "lib/hsmcpp"]
+	path = lib/hsmcpp
+	url = https://github.com/igor-krechetov/hsmcpp.git
