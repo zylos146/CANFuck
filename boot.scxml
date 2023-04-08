@@ -1,0 +1,55 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<scxml xmlns="http://www.w3.org/2005/07/scxml" version="1.0" binding="early" name="boot" qt:editorversion="9.0.2" xmlns:qt="http://www.qt.io/2015/02/scxml-ext">
+    <state id="SetupWiFi" initial="AttemptApConnection">
+        <qt:editorinfo scenegeometry="666.92;767.67;645.09;682.33;462.29;557.84" geometry="666.92;767.67;-21.83;-85.34;462.29;557.84"/>
+        <state id="HostSelfAp">
+            <qt:editorinfo scenegeometry="786.62;1104.41;709.68;1054.41;249.42;100" geometry="119.70;336.74;-76.94;-50;249.42;100"/>
+            <transition type="external" event="ApHosted" target="SetupSvelte">
+                <qt:editorinfo movePoint="-29.05;5.53" endTargetFactors="47.37;88.33" localGeometry="407.65;-1.28"/>
+            </transition>
+        </state>
+        <state id="AttemptApConnection">
+            <qt:editorinfo scenegeometry="767.25;927.40;707.25;877.40;250.14;100" geometry="100.33;159.73;-60;-50;250.14;100"/>
+            <transition type="external" event="ON_TIMER_SAVED_AP_TIMEOUT" target="HostSelfAp">
+                <qt:editorinfo movePoint="103.92;5.89"/>
+            </transition>
+            <onentry>
+                <script>start_timer(SAVED_AP_TIMEOUT,3000,true)</script>
+            </onentry>
+            <transition type="external" event="ApConnected" target="SetupSvelte">
+                <qt:editorinfo movePoint="-16.59;9.68" endTargetFactors="18.13;40.82" localGeometry="343.99;0.13"/>
+            </transition>
+        </state>
+    </state>
+    <state id="ShowLogo">
+        <qt:editorinfo scenegeometry="964.72;581.93;942.89;531.93;120;100" geometry="964.72;581.93;-21.83;-50;120;100"/>
+        <transition type="external" event="ON_TIMER_LOGO_TIMER" target="SetupWiFi">
+            <qt:editorinfo movePoint="-91.63;8.98" endTargetFactors="76.64;2.71"/>
+        </transition>
+        <onentry>
+            <script>start_timer(LOGO_TIMER,2000,true)</script>
+        </onentry>
+    </state>
+    <state id="AttemptRemotePairing">
+        <qt:editorinfo scenegeometry="1464.54;690.47;1466.10;694.83;239.93;100" geometry="1464.54;690.47;1.56;4.36;239.93;100"/>
+    </state>
+    <state id="SetupMDns">
+        <qt:editorinfo scenegeometry="1531.27;577.77;1471.27;527.77;229.60;100" geometry="1531.27;577.77;-60;-50;229.60;100"/>
+        <transition type="external" event="Finished" target="AttemptRemotePairing">
+            <qt:editorinfo movePoint="29.05;4.15" endTargetFactors="53.27;12.10"/>
+        </transition>
+    </state>
+    <state id="Init">
+        <qt:editorinfo scenegeometry="735.56;579.86;675.56;529.86;160.97;100" geometry="735.56;579.86;-60;-50;160.97;100"/>
+        <transition type="external" event="Finished" target="ShowLogo"/>
+    </state>
+    <state id="SetupSvelte">
+        <qt:editorinfo scenegeometry="1087.23;309.42;1135.95;531.93;224;100" geometry="1087.23;309.42;48.72;222.51;224;100"/>
+        <transition type="external" event="Finished" target="SetupMDns">
+            <qt:editorinfo movePoint="9.68;38.73" endTargetFactors="15.29;58.35"/>
+        </transition>
+    </state>
+    <state id="RemoteActive">
+        <qt:editorinfo scenegeometry="1464.54;881.99;1466.10;886.35;239.93;100" geometry="1464.54;881.99;1.56;4.36;239.93;100"/>
+    </state>
+</scxml>

@@ -1,0 +1,24 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<scxml xmlns="http://www.w3.org/2005/07/scxml" version="1.0" binding="early" name="WifiManager" qt:editorversion="9.0.2" xmlns:qt="http://www.qt.io/2015/02/scxml-ext" initial="AttemptApConnection">
+    <state id="SetupSvelte">
+        <qt:editorinfo scenegeometry="641.84;340.12;567.07;419.81;213.13;100" geometry="641.84;340.12;-74.77;79.69;213.13;100"/>
+        <transition type="external" event="Finished" target="SetupMDns">
+            <qt:editorinfo endTargetFactors="15.29;58.35"/>
+        </transition>
+    </state>
+    <state id="SetupMDns">
+        <qt:editorinfo scenegeometry="936.51;469.81;876.51;419.81;229.60;100" geometry="936.51;469.81;-60;-50;229.60;100"/>
+    </state>
+    <state id="AttemptApConnection">
+        <qt:editorinfo scenegeometry="286.86;292.87;226.86;242.87;250.14;100" geometry="286.86;292.87;-60;-50;250.14;100"/>
+        <transition type="external" event="ON_TIMER_SAVED_AP_TIMEOUT" target="HostSelfAp">
+            <qt:editorinfo movePoint="101.89;5.89"/>
+        </transition>
+        <onentry>
+            <script>start_timer(SAVED_AP_TIMEOUT,3000,true)</script>
+        </onentry>
+    </state>
+    <state id="HostSelfAp">
+        <qt:editorinfo scenegeometry="304.16;470.90;227.22;420.90;249.42;100" geometry="304.16;470.90;-76.94;-50;249.42;100"/>
+    </state>
+</scxml>

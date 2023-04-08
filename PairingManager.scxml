@@ -1,0 +1,46 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<scxml xmlns="http://www.w3.org/2005/07/scxml" version="1.0" binding="early" name="PairingManager" qt:editorversion="9.0.2" xmlns:qt="http://www.qt.io/2015/02/scxml-ext">
+    <state id="FindActiveAPs">
+        <qt:editorinfo scenegeometry="567.03;445.09;313;395.09;314.03;100" geometry="567.03;445.09;-254.03;-50;314.03;100"/>
+        <transition type="internal" event="NoOSSMFound" target="FindActiveAPs"/>
+        <transition type="external" event="UnknownOSSMFound" target="PromptPairingCode">
+            <qt:editorinfo movePoint="-74.18;-7.11"/>
+        </transition>
+        <transition type="external" event="KnownOSSMFound" target="AttemptAutoConnect">
+            <qt:editorinfo movePoint="80.28;8.13" endTargetFactors="45.53;72.59"/>
+        </transition>
+    </state>
+    <state id="AttemptAutoConnect">
+        <qt:editorinfo scenegeometry="1049.72;766.20;795.69;716.20;314.03;100" geometry="1049.72;766.20;-254.03;-50;314.03;100"/>
+        <transition type="external" event="OSSMConnected" target="Paired">
+            <qt:editorinfo movePoint="49.79;28.45" endTargetFactors="70.17;57.01"/>
+        </transition>
+        <transition type="external" event="OSSMRejected" target="FailedConnect">
+            <qt:editorinfo movePoint="3.05;14.22"/>
+        </transition>
+    </state>
+    <state id="PromptPairingCode">
+        <qt:editorinfo scenegeometry="257.09;622.12;197.09;572.12;222.60;100" geometry="257.09;622.12;-60;-50;222.60;100"/>
+        <transition type="external" event="PairingCodeReceived" target="AttemptNewConnect">
+            <qt:editorinfo movePoint="71.14;6.10"/>
+        </transition>
+    </state>
+    <state id="AttemptNewConnect">
+        <qt:editorinfo scenegeometry="245.92;766.20;185.92;716.20;244.93;100" geometry="245.92;766.20;-60;-50;244.93;100"/>
+        <transition type="external" event="OSSMConnected" target="Paired">
+            <qt:editorinfo movePoint="-91.46;12.19"/>
+        </transition>
+        <transition type="external" event="OSSMRejected" target="FailedConnect">
+            <qt:editorinfo movePoint="10.17;41.67"/>
+        </transition>
+    </state>
+    <state id="Paired">
+        <qt:editorinfo scenegeometry="456.27;960.30;396.27;910.30;120;100" geometry="456.27;960.30;-60;-50;120;100"/>
+        <transition type="external" event="OSSMDisconnected" target="FindActiveAPs">
+            <qt:editorinfo movePoint="167.67;244.90" endTargetFactors="3.96;55.31" localGeometry="-347.54;0;-347.54;-509.73"/>
+        </transition>
+    </state>
+    <state id="FailedConnect">
+        <qt:editorinfo scenegeometry="609.71;766.20;549.71;716.20;120;100" geometry="609.71;766.20;-60;-50;120;100"/>
+    </state>
+</scxml>

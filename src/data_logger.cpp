@@ -56,6 +56,8 @@ void WebLogger::log(DataParameter key, float value) {
 }
 
 void WebLogger::log(WebLogLevel level, char* format, ...) {
+  
+
   if (this->ws == NULL) {
     return;
   }
@@ -79,7 +81,7 @@ void WebLogger::log(WebLogLevel level, char* format, ...) {
   }
 
   vsnprintf(temp, len+1, format, arg);
-  
+
   StaticJsonDocument<1024> doc;
   doc["type"] = "log";
   doc["level"] = WebLogLevel_KEYS[static_cast<uint8_t>(level)];

@@ -1,4 +1,6 @@
 // Based on https://www.hackster.io/techbase_group/arduino-esp32-serial-port-to-tcp-converter-via-wifi-66d341
+#include "config.h"
+
 #include "WiFi.h"
 #include "AsyncTCP.h"
 
@@ -7,10 +9,10 @@
 
 #include "serial.hpp"
 
-#define BUFFER_SIZE 1024
+#define BUFFER_SIZE VCP_BUFFER_SIZE
 #define SERIAL_RX_PIN 44
 #define SERIAL_TX_PIN 43
-const int baudrate = 38400;
+const int baudrate = VCP_BAUD_RATE;
 const int rs_config = SERIAL_8N1;
 
 //WiFiServer serial_server;
@@ -36,8 +38,8 @@ void array_to_string(byte array[], unsigned int len, char buffer[])
 static void handleData(void *arg, AsyncClient *client, void *data, size_t len)
 {
   array_to_string((byte*)data, len, hexBuff);
-	ESP_LOGI("serial", "data received from client %s \n", client->remoteIP().toString().c_str());
-  ESP_LOGI("serial", "Client Data %u: %s", len, hexBuff);
+	log_i("data received from client %s \n", client->remoteIP().toString().c_str());
+  log_i("Client Data %u: %s", len, hexBuff);
   
   Serial2.write((char*)data, len);
   Serial2.flush();
@@ -46,23 +48,23 @@ static void handleData(void *arg, AsyncClient *client, void *data, size_t len)
 static void handleError(void *arg, AsyncClient *client, int8_t error)
 {
   serial_activeClient = NULL;
-	ESP_LOGI("serial", "connection error %s from client %s \n", client->errorToString(error), client->remoteIP().toString().c_str());
+	log_i("connection error %s from client %s \n", client->errorToString(error), client->remoteIP().toString().c_str());
 }
 
 static void handleDisconnect(void *arg, AsyncClient *client)
 {
   serial_activeClient = NULL;
-	ESP_LOGI("serial", "client %s disconnected \n", client->remoteIP().toString().c_str());
+	log_i("client %s disconnected \n", client->remoteIP().toString().c_str());
 }
 
 static void handleTimeOut(void *arg, AsyncClient *client, uint32_t time)
 {
   serial_activeClient = NULL;
-	ESP_LOGI("serial", "client ACK timeout ip: %s \n", client->remoteIP().toString().c_str());
+	log_i("client ACK timeout ip: %s \n", client->remoteIP().toString().c_str());
 }
 
 static void serial_handleNewClient(void* arg, AsyncClient* client) {
-	ESP_LOGI("serial", "new client has been connected to server, ip: %s", client->remoteIP().toString().c_str());
+	log_i("new client has been connected to server, ip: %s", client->remoteIP().toString().c_str());
 
   serial_activeClient = client;
 	client->onData(&handleData, NULL);
@@ -72,7 +74,7 @@ static void serial_handleNewClient(void* arg, AsyncClient* client) {
 }
 
 void serial_setup() {
-  ESP_LOGI("serial", "Starting RS232 TCP Server");
+  log_i("Starting RS232 TCP Server");
   //serial_server = WiFiServer(3000);
   //serial_server.begin();
 
@@ -98,7 +100,7 @@ void serial_task(void* pvParameter) {
         serial_activeClient->send();
 
         array_to_string((byte*)buff, size, hexBuff);
-        ESP_LOGI("serial", "Server Data %u: %s", size, hexBuff);
+        log_i("Server Data %u: %s", size, hexBuff);
 
         vTaskDelay(1 / portTICK_PERIOD_MS);
       }
@@ -110,7 +112,7 @@ void serial_task(void* pvParameter) {
       vTaskDelay(10 / portTICK_PERIOD_MS);
     }
 
-    ESP_LOGI("RS232", "RS232: Client connected");
+    log_i("RS232: Client connected");
     while (client.connected()) {
         
       // read data from wifi client and send to serial
@@ -120,9 +122,9 @@ void serial_task(void* pvParameter) {
                 Serial2.write(buff, size);
                 Serial2.flush();
 
-                ESP_LOGI("RS232", "RS232: Client Data Start");
+                log_i("RS232: Client Data Start");
                 Serial.write(buff, size); // Send to debug port
-                ESP_LOGI("RS232", "RS232: Client Data End");
+                log_i("RS232: Client Data End");
       }
 
       // read data from serial and send to wifi client
@@ -132,15 +134,15 @@ void serial_task(void* pvParameter) {
                 client.write(buff, size);
                 client.flush();
 
-                ESP_LOGI("RS232", "RS232: Server Data Start");
+                log_i("RS232: Server Data Start");
                 Serial.write(buff, size); // Send to debug port
-                ESP_LOGI("RS232", "RS232: Server Data End");
+                log_i("RS232: Server Data End");
       }
 
       vTaskDelay(10 / portTICK_PERIOD_MS);
     }
 
-    ESP_LOGI("RS232", "RS232: Client disconnected");
+    log_i("RS232: Client disconnected");
     client.stop();
     client = NULL;
     */
