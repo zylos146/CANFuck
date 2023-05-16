@@ -1,4 +1,7 @@
 #include "esp_log.h"
+#include "Arduino.h"
+#include "logging.hpp"
+using namespace esp32m;
 #include "config.h"
 
 // General hardware libs
@@ -12,12 +15,12 @@
 #include <ESPConnect.h>
 #include "ESPAsyncWebServer.h"
 #include <ESPDash.h>
-#include <Adafruit_NeoPixel.h>
+// TODO - #include <Adafruit_NeoPixel.h>
 
 #include "blynk.hpp"
 #include "StrokeEngine.h"
 
-#include "controller/canfuck.hpp"
+// #include "controller/canfuck.hpp"
 
 #include "CO_main.h"
 #include "lvgl_gui.hpp"
@@ -32,7 +35,7 @@
 
 // Motors
 #include "motor/linmot.hpp"
-#include "motor/virtual.hpp"
+#include "motor/virtualMotor.h"
 
 #include "data_logger.hpp"
 #include "reset_reason.hpp"

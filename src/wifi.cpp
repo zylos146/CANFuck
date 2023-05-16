@@ -6,6 +6,7 @@
 #include "config.h"
 #include "wifi.hpp"
 #include "webserver.hpp"
+#include "stores/functionality.hpp"
 
 // TODO - Get rid of these globals eventually
 char wifiName[32];

@@ -8,7 +8,7 @@ void LinmotMotor::unsafeGoToPos(float position, float speed, float acceleration)
 
   this->CO_sendCmd(
     0x0900, 
-    static_cast<uint16_t>(this->_mapSafePosition(position) * 10), 
+    static_cast<uint16_t>(this->mapSafePosition(position) * 10), 
     static_cast<uint16_t>(speed), 
     static_cast<uint16_t>(acceleration), 
     static_cast<uint16_t>(acceleration)

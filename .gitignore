@@ -3,6 +3,7 @@
 .vscode/c_cpp_properties.json
 .vscode/launch.json
 .vscode/ipch
-build/
-sdkconfig.old
-dashboard_old
+.vscode/settings
+
+include/StatefulService.hpp
+src/StatefulService.cpp

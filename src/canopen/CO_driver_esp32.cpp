@@ -52,6 +52,9 @@
 #include "driver/twai.h"
 #include "driver/gpio.h"
 
+#include "logging.hpp"
+using namespace esp32m;
+
 CO_CANmodule_t *CANmodulePointer = NULL;
 
 //CAN Timing configuration
