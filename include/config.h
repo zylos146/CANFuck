@@ -4,21 +4,22 @@
 // #### Stroke Engine #### //
 #define CONTROLLER_USED false
 
-#define WIFI_SSID ""
-#define WIFI_PASS ""
+#define WIFI_SSID "Central Nexus"
+#define WIFI_PASS "taobao123"
 
 #define MOTOR_LINMOT 1
 #define MOTOR_STEPPER 2
 #define MOTOR_MOCK 3
-#define MOTOR_USED 3
+#define MOTOR_USED 1
 
 // #### CANOpen #### //
-#define CAN_TX_IO (35)  /** CAN TX pin */
-#define CAN_RX_IO (36) /** CAN RX pin */
+#define CAN_STANDBY_IO (37)
+#define CAN_TX_IO (36)  /** CAN TX pin */
+#define CAN_RX_IO (35) /** CAN RX pin */
 
 #define CAN_BITRATE 500    /* kbit */
 #define NODE_ID_SELF 0x01
-#define NODE_ID_LINMOT 0x3F
+#define NODE_ID_LINMOT 0x3F // 63
 
 #define CAN_B1100_OD 1
 #define CAN_E1100_OD 1
@@ -42,7 +43,14 @@
 //#define UART_RX_PIN GPIO_NUM_32 /** Serial RX Pinnummber */
 #define UART_SPEED 115200
 
-#define I2C_SDA_PIN 36
-#define I2C_SCL_PIN 37
+#define I2C_SDA_PIN 0
+#define I2C_SCL_PIN 0
+
+#define SERIAL_CONFIG SERIAL_8N1
+#define SERIAL_BAUD_RATE 38400
+#define SERIAL_BUFFER_SIZE 1024
+#define SERIAL_PORT 3000
+#define SERIAL_RX_PIN 18
+#define SERIAL_TX_PIN 17
 
 #endif

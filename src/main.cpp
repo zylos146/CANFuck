@@ -36,6 +36,7 @@
 
 #include "data_logger.hpp"
 #include "reset_reason.hpp"
+#include "serial.hpp"
 
 //Adafruit_NeoPixel pixels(1, 48, NEO_GRB + NEO_KHZ800);
 
@@ -127,7 +128,10 @@ void boot_setup() {
   Serial.begin(UART_SPEED);
   print_reset_reason();
 
-  Wire.begin(I2C_SDA_PIN, I2C_SCL_PIN);
+  //Wire.begin(I2C_SDA_PIN, I2C_SCL_PIN);
+
+  pinMode(CAN_STANDBY_IO, OUTPUT);
+  digitalWrite(CAN_STANDBY_IO, LOW);
 
   gui = new LVGLGui();
   gui->start();
@@ -192,7 +196,6 @@ void wifi_setup () {
   // This will halt until WiFi.status() == WL_CONNECTED, or a timeout
   // Returns true if connected, false if timed out
   bool success = ESPConnect.begin(&server);
-  vTaskDelete(wifiPollTask);
 
   if (!success) {
     gui->activate(wifiFailureScreen);
@@ -208,23 +211,16 @@ void setup() {
   boot_setup();
   boot_start();
   wifi_setup();
+  serial_setup();
 
-  //ESP_LOGI("main", "Starting Bylnk!");
-  //blynk = new BlynkController();
-
-  while (true) { vTaskDelay(5 / portTICK_PERIOD_MS); }
-  
-  ESP_LOGI("main", "Mounting SPIFFS");
-  if(!SPIFFS.begin(true)){
-    ESP_LOGE("main", "An Error has occurred while mounting SPIFFS");
-    return;
-  }
+  ESP_LOGI("main", "Starting Bylnk!");
+  blynk = new BlynkController();
 
   ESP_LOGI("main", "Starting Web Server");
   DefaultHeaders::Instance().addHeader(F("Access-Control-Allow-Origin"), F("*"));
   DefaultHeaders::Instance().addHeader(F("Access-Control-Allow-Headers"), F("content-type"));
 
-  server.serveStatic("/www2", SPIFFS, "/www/").setDefaultFile("index.html");
+  //server.serveStatic("/www2", SPIFFS, "/www/").setDefaultFile("index.html");
   server.onNotFound([](AsyncWebServerRequest *request) {
       Serial.printf("Not found: %s!\r\n", request->url().c_str());
       request->send(404);
@@ -239,6 +235,8 @@ void setup() {
   wlog.attachWebsocket(&ws);
   wlog.attachEventsource(&events);
   wlog.startTask();
+
+  //while (true) { vTaskDelay(5 / portTICK_PERIOD_MS); }
 
   if (CONTROLLER_USED) {
     WEB_LOGI("main", "Initializing Hardware Controller");

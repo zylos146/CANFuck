@@ -5,18 +5,13 @@
 #include "freertos/FreeRTOS.h"
 #include "freertos/task.h"
 
+#include "config.h"
 #include "serial.hpp"
-
-#define BUFFER_SIZE 1024
-#define SERIAL_RX_PIN 44
-#define SERIAL_TX_PIN 43
-const int baudrate = 38400;
-const int rs_config = SERIAL_8N1;
 
 //WiFiServer serial_server;
 AsyncServer* serial_server = NULL;
 AsyncClient* serial_activeClient = NULL;
-char* buff[BUFFER_SIZE];
+char* buff[SERIAL_BUFFER_SIZE];
 char hexBuff[2048]; // TODO - Encapsulate in anonymous namespace
 
 // https://stackoverflow.com/a/44749986
@@ -76,7 +71,7 @@ void serial_setup() {
   //serial_server = WiFiServer(3000);
   //serial_server.begin();
 
-  Serial2.begin(baudrate, rs_config, SERIAL_RX_PIN, SERIAL_TX_PIN);
+  Serial2.begin(SERIAL_BAUD_RATE, SERIAL_CONFIG, SERIAL_RX_PIN, SERIAL_TX_PIN);
 
   serial_server = new AsyncServer(3000);
   serial_server->onClient(&serial_handleNewClient, serial_server);
@@ -92,7 +87,7 @@ void serial_task(void* pvParameter) {
   while (true) {
     if (serial_activeClient != NULL && serial_activeClient->canSend()) {
       while ((size = Serial2.available())) {
-        size = (size >= BUFFER_SIZE ? BUFFER_SIZE : size);
+        size = (size >= SERIAL_BUFFER_SIZE ? SERIAL_BUFFER_SIZE : size);
         Serial2.readBytes((char*)buff, size);
         serial_activeClient->add((const char*)buff, size);
         serial_activeClient->send();
@@ -115,7 +110,7 @@ void serial_task(void* pvParameter) {
         
       // read data from wifi client and send to serial
       while ((size = client.available())) {
-                size = (size >= BUFFER_SIZE ? BUFFER_SIZE : size);
+                size = (size >= SERIAL_BUFFER_SIZE ? SERIAL_BUFFER_SIZE : size);
                 client.read(buff, size);
                 Serial2.write(buff, size);
                 Serial2.flush();
@@ -127,7 +122,7 @@ void serial_task(void* pvParameter) {
 
       // read data from serial and send to wifi client
       while ((size = Serial2.available())) {
-                size = (size >= BUFFER_SIZE ? BUFFER_SIZE : size);
+                size = (size >= SERIAL_BUFFER_SIZE ? SERIAL_BUFFER_SIZE : size);
                 Serial2.readBytes(buff, size);
                 client.write(buff, size);
                 client.flush();
