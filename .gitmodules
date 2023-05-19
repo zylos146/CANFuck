@@ -2,9 +2,6 @@
 	path = lib/StrokeEngine
 	url = https://github.com/theelims/StrokeEngine.git
 	branch = main
-[submodule "lib/StrokeEngine-CANOpen"]
-	path = lib/StrokeEngine-CANOpen
-url=https://github.com/zylos146/StrokeEngine-CANOpen
 [submodule "lib/lvgl"]
 	path = lib/lvgl
 	url = https://github.com/lvgl/lvgl.git

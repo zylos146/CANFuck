@@ -255,12 +255,12 @@ void setup() {
   motor = new LinmotMotor();
 
   MachineGeometry bounds = {
-    .start = 110, // mm
-    .end = -7, // mm
-    .keepout = 10 // mm
+    .start = 0, // mm
+    .end = 130, // mm
+    .keepout = 5 // mm
   };
   motor->setMaxSpeed(5000); // 5 m/s
-  motor->setMaxAcceleration(500); // 25 m/s^2
+  motor->setMaxAcceleration(25000); // 25 m/s^2
   motor->setMachineGeometry(bounds);
 
   motor->CO_setNodeId(NODE_ID_LINMOT);

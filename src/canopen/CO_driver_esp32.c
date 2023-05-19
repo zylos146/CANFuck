@@ -51,6 +51,9 @@
 #include "driver/twai.h"
 #include "driver/gpio.h"
 
+#include "soc/gpio_periph.h"
+#include "hal/gpio_hal.h"
+
 CO_CANmodule_t *CANmodulePointer = NULL;
 
 //CAN Timing configuration
@@ -67,7 +70,9 @@ static twai_general_config_t generalConfig = {.mode = TWAI_MODE_NORMAL,
                                              .tx_queue_len = CAN_TX_QUEUE_LENGTH, /*ESP TX Buffer Size (CO_config.h)*/
                                              .rx_queue_len = CAN_RX_QUEUE_LENGTH, /*ESP RX Buffer Size (CO_config.h)*/
                                              .alerts_enabled = TWAI_ALERT_ALL | TWAI_ALERT_AND_LOG,    /*Disable CAN Alarms TODO: Enable for CO_CANverifyErrors*/
-                                             .clkout_divider = 0};                /*No Clockout*/
+                                             .clkout_divider = 0,
+                                             .intr_flags = ESP_INTR_FLAG_LEVEL1, /*CAN Interrupt Priority*/
+};                /*No Clockout*/
 
 //Timer Interrupt Configuration
 const esp_timer_create_args_t CO_CANinterruptArgs = {
@@ -76,6 +81,7 @@ const esp_timer_create_args_t CO_CANinterruptArgs = {
 
 //Timer Handle
 esp_timer_handle_t CO_CANinterruptPeriodicTimer;
+uint32_t CO_txTraceId = 0;
 
 /******************************************************************************/
 void CO_CANsetConfigurationMode(void *CANdriverState)
@@ -88,14 +94,18 @@ void CO_CANsetConfigurationMode(void *CANdriverState)
 void CO_CANsetNormalMode(CO_CANmodule_t *CANmodule)
 {
     
-      ESP_LOGI("CANOpen.init", "install");
+    //gpio_hal_iomux_func_sel(GPIO_PIN_MUX_REG[CAN_TX_IO], PIN_FUNC_GPIO);
+    //gpio_hal_iomux_func_sel(GPIO_PIN_MUX_REG[CAN_RX_IO], PIN_FUNC_GPIO);
+
+      ESP_LOGE("CANOpen.init", "install");
     /*Install CAN driver*/
     ESP_ERROR_CHECK(twai_driver_install(&generalConfig, &timingConfig, &filterConfig));
     /*Start CAN Controller*/
-      ESP_LOGI("CANOpen.init", "start");
+      ESP_LOGE("CANOpen.init", "start");
     ESP_ERROR_CHECK(twai_start());
 
-      ESP_LOGI("CANOpen.init", "add handler");
+      ESP_LOGE("CANOpen.init", "add handler");
+      
     /*WORKAROUND: INTERRUPT ALLOCATION FÜR CAN NICHT MÖGLICH DA BEREITS IM IDF TREIBER VERWENDET*/
     /* Configure Timer interrupt function for execution every CO_CAN_PSEUDO_INTERRUPT_INTERVAL */
     ESP_ERROR_CHECK(esp_timer_create(&CO_CANinterruptArgs, &CO_CANinterruptPeriodicTimer));
@@ -247,7 +257,7 @@ CO_ReturnError_t CO_CANmodule_init(
         /* Configure all masks so, that received message must match filter */
 
         //Don't filter messages
-        ESP_LOGI("CO_driver", "RxFilters are active, but no filter configured.");
+        ESP_LOGE("CO_driver", "RxFilters are active, but no filter configured.");
         filterConfig.acceptance_code = 0;
         filterConfig.acceptance_mask = 0xFFFFFFFF;
         filterConfig.single_filter = true;
@@ -372,6 +382,8 @@ CO_ReturnError_t CO_CANsend(CO_CANmodule_t *CANmodule, CO_CANtx_t *buffer)
     /* if CAN TX buffer is free, copy message to it */
     if ((esp_can_hw_status.msgs_to_tx < CAN_TX_QUEUE_LENGTH) && (CANmodule->CANtxCount == 0))
     {
+        uint32_t traceId = CO_txTraceId++;
+
         CANmodule->bufferInhibitFlag = buffer->syncFlag;
         twai_message_t temp_can_message; /* generate esp can message for transmission */
         /*MESSAGE MIT DATEN FÜLLEN*/
@@ -388,17 +400,44 @@ CO_ReturnError_t CO_CANsend(CO_CANmodule_t *CANmodule, CO_CANtx_t *buffer)
             temp_can_message.data[i] = buffer->data[i]; /* copy data from buffer in esp can message */
         }
 
+        //ESP_LOGE("CANsend", "Trace: %u, ID: %d, Data %d,%d,%d,%d,%d,%d", traceId, temp_can_message.identifier, temp_can_message.data[0], temp_can_message.data[1], temp_can_message.data[2], temp_can_message.data[3], temp_can_message.data[4], temp_can_message.data[5]);
+
         /* Transmit esp can message.  */
         esp_err_t send_err = twai_transmit(&temp_can_message, pdMS_TO_TICKS(CAN_MS_TO_WAIT));
         if (send_err == ESP_OK)
         {
+            //ESP_LOGE("CO_CANsend", "Trace: %u, Success", traceId);
             // TODO - Filter log system 
-            // ESP_LOGI("CANsend", "ID: %d , Data %d,%d,%d,%d,%d,%d", temp_can_message.identifier, temp_can_message.data[0], temp_can_message.data[1], temp_can_message.data[2], temp_can_message.data[3], temp_can_message.data[4], temp_can_message.data[5]);
         }
         else
         {
+
+// Translate send_err into a human-readable string based on the following error codes:
+
+//#define TWAI_ALERT_TX_IDLE                  0x00000001  /**< Alert(1): No more messages to transmit */
+//#define TWAI_ALERT_TX_SUCCESS               0x00000002  /**< Alert(2): The previous transmission was successful */
+//#define TWAI_ALERT_RX_DATA                  0x00000004  /**< Alert(4): A frame has been received and added to the RX queue */
+//#define TWAI_ALERT_BELOW_ERR_WARN           0x00000008  /**< Alert(8): Both error counters have dropped below error warning limit */
+//#define TWAI_ALERT_ERR_ACTIVE               0x00000010  /**< Alert(16): TWAI controller has become error active */
+//#define TWAI_ALERT_RECOVERY_IN_PROGRESS     0x00000020  /**< Alert(32): TWAI controller is undergoing bus recovery */
+//#define TWAI_ALERT_BUS_RECOVERED            0x00000040  /**< Alert(64): TWAI controller has successfully completed bus recovery */
+//#define TWAI_ALERT_ARB_LOST                 0x00000080  /**< Alert(128): The previous transmission lost arbitration */
+//#define TWAI_ALERT_ABOVE_ERR_WARN           0x00000100  /**< Alert(256): One of the error counters have exceeded the error warning limit */
+//#define TWAI_ALERT_BUS_ERROR                0x00000200  /**< Alert(512): A (Bit, Stuff, CRC, Form, ACK) error has occurred on the bus */
+//#define TWAI_ALERT_TX_FAILED                0x00000400  /**< Alert(1024): The previous transmission has failed (for single shot transmission) */
+//#define TWAI_ALERT_RX_QUEUE_FULL            0x00000800  /**< Alert(2048): The RX queue is full causing a frame to be lost */
+//#define TWAI_ALERT_ERR_PASS                 0x00001000  /**< Alert(4096): TWAI controller has become error passive */
+//#define TWAI_ALERT_BUS_OFF                  0x00002000  /**< Alert(8192): Bus-off condition occurred. TWAI controller can no longer influence bus */
+//#define TWAI_ALERT_RX_FIFO_OVERRUN          0x00004000  /**< Alert(16384): An RX FIFO overrun has occurred */
+//#define TWAI_ALERT_TX_RETRIED               0x00008000  /**< Alert(32768): An message transmission was cancelled and retried due to an errata workaround */
+//#define TWAI_ALERT_PERIPH_RESET             0x00010000  /**< Alert(65536): The TWAI controller was reset */
+//#define TWAI_ALERT_ALL                      0x0001FFFF  /**< Bit mask to enable all alerts during configuration */
+
+// TWAI_ALERT_ABOVE_ERR_WARN || TWAI_ALERT_BUS_ERROR || TWAI_ALERT_ERR_PASS || TWAI_ALERT_BUS_OFF
             err = CO_ERROR_TIMEOUT;
-            ESP_LOGE("CO_CANsend", "Failed to queue message for transmission - %u", send_err);
+            uint32_t alerts = 0;
+            esp_err_t alert_err = twai_read_alerts(&alerts, pdMS_TO_TICKS(CAN_MS_TO_WAIT));
+            ESP_LOGE("CO_CANsend", "Trace: %u, Failed to queue message for transmission - send_err:%u alert:%u alert_err:%u", traceId, send_err, alerts, alert_err);
         }
     }
     /* if no buffer is free, message will be sent by interrupt */
@@ -482,7 +521,7 @@ void CO_CANverifyErrors(CO_CANmodule_t *CANmodule)
         }
         else
         { /* not bus off */
-            ESP_LOGI("CO_CANverifyErrors", "reset bus off");
+            ESP_LOGE("CO_CANverifyErrors", "reset bus off");
             // TODO - CO_errorReset(em, CO_EM_CAN_TX_BUS_OFF, err);
 
             if ((rxErrors >= 96U) || (txErrors >= 96U))
@@ -549,7 +588,7 @@ void CO_CANinterrupt(void *args)
         ESP_ERROR_CHECK(twai_receive(&temp_can_message, pdMS_TO_TICKS(CAN_MS_TO_WAIT)));
 
 /*
-        ESP_LOGI(
+        ESP_LOGE(
           "CANreceive", 
           "ID: %d , Data %d,%d,%d,%d,%d,%d", 
           temp_can_message.identifier, 
