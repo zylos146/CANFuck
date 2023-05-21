@@ -1,10 +1,13 @@
-CANfuck Back-end code is licensed as LGPL v3, which is inherited from ESP32-sveltekit.
-CANfuck Front-end code is licensed as MIT, which is also inherited from ESP32-sveltekit.
-See LICENSE.sveltekit for the exact ESP32-sveltekit link/license.
+https://github.com/theelims/ESP32-sveltekit
+
+ESP32-SvelteKit is distributed with two licenses for different sections of the
+code. The back end code inherits the GNU LESSER GENERAL PUBLIC LICENSE Version 3
+and is therefore distributed said license. The front end code is distributed
+under the MIT License.
 
 MIT License
 
-Copyright (c) 2023 theelims & zylos
+Copyright (c) 2023 theelims
 
 Permission is hereby granted, free of charge, to any person obtaining a copy
 of this software and associated documentation files (the "Software"), to deal
