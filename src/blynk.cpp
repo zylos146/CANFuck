@@ -1,8 +1,8 @@
 #include <HardwareSerial.h>
 
-#define BLYNK_TEMPLATE_ID           "TMPL4LnmPRGq"
+#define BLYNK_TEMPLATE_ID           "TMPL000000000"
 #define BLYNK_DEVICE_NAME           "Quickstart Device"
-#define BLYNK_AUTH_TOKEN            "PNj6yEcR6u9ksT6IuUZFUY4yqpjtTAcX"
+#define BLYNK_AUTH_TOKEN            "YourAuthToken"
 
 #define NO_GLOBAL_BLYNK
 
