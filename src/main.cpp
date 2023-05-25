@@ -14,6 +14,8 @@
 #include <ESPDash.h>
 #include <Adafruit_NeoPixel.h>
 
+#include <ESPmDNS.h>
+
 #include "blynk.hpp"
 #include "StrokeEngine.h"
 
@@ -207,11 +209,25 @@ void wifi_setup () {
   gui->activate(statusScreen);
 }
 
+void mdns_setup() {
+  if (!MDNS.begin("canfuck")) {
+    ESP_LOGE("main", "Error setting up MDNS responder!");
+
+    while(1) {
+      delay(1000);
+    }
+  }
+  
+  MDNS.addService("http", "tcp", 80);
+  ESP_LOGI("main", "mDNS responder started");
+}
+
 void setup() {
   boot_setup();
   boot_start();
   wifi_setup();
   serial_setup();
+  mdns_setup();
 
   ESP_LOGI("main", "Starting Bylnk!");
   blynk = new BlynkController();
