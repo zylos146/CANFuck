@@ -1,10 +1,12 @@
 {
   "build": {
     "arduino":{
-      "ldscript": "esp32s3_out.ld"
+      "ldscript": "esp32s3_out.ld",
+      "partitions": "canfuck_16MB.csv"
     },
     "core": "esp32",
     "extra_flags": [
+      "-DBOARD_HAS_PSRAM",
       "-DARDUINO_ESP32S3_DEV",
       "-DARDUINO_USB_MODE=1",
       "-DARDUINO_RUNNING_CORE=1",
@@ -15,7 +17,7 @@
     "flash_mode": "qio",
     "hwids": [
       [
-        "0X303A",
+        "0x303A",
         "0x1001"
       ]
     ],
@@ -23,7 +25,7 @@
     "variant": "esp32s3"
   },
   "connectivity": [
-    "wifi", "bluetooth"
+    "wifi"
   ],
   "debug": {
     "default_tool": "esp-builtin",
@@ -36,13 +38,13 @@
     "arduino",
     "espidf"
   ],
-  "name": "Espressif ESP32-S3-DevKitC-1-N8 (8 MB QD, No PSRAM)",
+  "name": "CANfuck ESP32-S3-N16R8 (16 MB QD, 8MB PSRAM)",
   "upload": {
-    "flash_size": "8MB",
-    "maximum_ram_size": 327680,
-    "maximum_size": 8388608,
+    "flash_size": "16MB",
+    "maximum_ram_size": 8716288,
+    "maximum_size": 16777216,
     "require_upload_port": true,
-    "speed": 460800
+    "speed": 921600
   },
   "url": "https://docs.espressif.com/projects/esp-idf/en/latest/esp32s3/hw-reference/esp32s3/user-guide-devkitc-1.html",
   "vendor": "Espressif"
