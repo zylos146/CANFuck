@@ -1,10 +1,16 @@
-import { writable, derived } from 'svelte/store';
+import { writable } from 'svelte/store';
+import { goto } from '$app/navigation';
 import jwt_decode from 'jwt-decode';
 
 export type userProfile = {
 	username: string;
 	admin: boolean;
 	bearer_token: string;
+};
+
+type decodedJWT = {
+	username: string;
+	admin: boolean;
 };
 
 let empty = {
@@ -25,7 +31,7 @@ function createStore() {
 	return {
 		subscribe,
 		init: (access_token: string) => {
-			const decoded = jwt_decode(access_token);
+			const decoded: decodedJWT = jwt_decode(access_token);
 			const userdata = {
 				bearer_token: access_token,
 				username: decoded.username,
@@ -40,6 +46,8 @@ function createStore() {
 			set(empty);
 			// remove localStorage "user"
 			localStorage.removeItem('user');
+			// redirect to login page
+			goto('/');
 		}
 	};
 }

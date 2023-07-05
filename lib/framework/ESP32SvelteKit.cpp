@@ -16,11 +16,12 @@
 
 ESP32SvelteKit::ESP32SvelteKit(AsyncWebServer *server) : _featureService(server),
                                                          _securitySettingsService(server, &ESPFS),
-                                                         _wifiSettingsService(server, &ESPFS, &_securitySettingsService),
+                                                         _wifiSettingsService(server, &ESPFS, &_securitySettingsService, &_notificationEvents),
                                                          _wifiScanner(server, &_securitySettingsService),
                                                          _wifiStatus(server, &_securitySettingsService),
                                                          _apSettingsService(server, &ESPFS, &_securitySettingsService),
                                                          _apStatus(server, &_securitySettingsService, &_apSettingsService),
+                                                         _notificationEvents(server),
 #if FT_ENABLED(FT_NTP)
                                                          _ntpSettingsService(server, &ESPFS, &_securitySettingsService),
                                                          _ntpStatus(server, &_securitySettingsService),
@@ -37,6 +38,12 @@ ESP32SvelteKit::ESP32SvelteKit(AsyncWebServer *server) : _featureService(server)
 #endif
 #if FT_ENABLED(FT_SECURITY)
                                                          _authenticationService(server, &_securitySettingsService),
+#endif
+#if FT_ENABLED(FT_SLEEP)
+                                                         _sleepService(server, &_securitySettingsService),
+#endif
+#if FT_ENABLED(FT_BATTERY)
+                                                         _batteryService(&_notificationEvents),
 #endif
                                                          _restartService(server, &_securitySettingsService),
                                                          _factoryResetService(server, &ESPFS, &_securitySettingsService),
@@ -97,19 +104,26 @@ ESP32SvelteKit::ESP32SvelteKit(AsyncWebServer *server) : _featureService(server)
 void ESP32SvelteKit::begin()
 {
     ESPFS.begin(true);
+
     _wifiSettingsService.begin();
+
+    MDNS.begin(_wifiSettingsService.getHostname().c_str());
+    MDNS.setInstanceName(_appName);
+    MDNS.addService("http", "tcp", 80);
+    MDNS.addServiceTxt("http", "tcp", "Firmware Version", FIRMWARE_VERSION);
+
     _apSettingsService.begin();
 #if FT_ENABLED(FT_NTP)
     _ntpSettingsService.begin();
-#endif
-#if FT_ENABLED(FT_OTA)
-    _otaSettingsService.begin();
 #endif
 #if FT_ENABLED(FT_MQTT)
     _mqttSettingsService.begin();
 #endif
 #if FT_ENABLED(FT_SECURITY)
     _securitySettingsService.begin();
+#endif
+#if FT_ENABLED(FT_OTA)
+    _otaSettingsService.begin();
 #endif
 }
 

@@ -1,10 +1,10 @@
 # Build Process
 
-The build process is controlled by [platformio.ini](https://github.com/theelims/ESP32-sveltekit/platformio.ini) and automates the build of the front end website with Vite as well as the binary compilation for the ESP32 firmware. Whenever PlatformIO is triggered with the `upload` command this process will call the python script [build_interface.py](https://github.com/theelims/ESP32-sveltekit/scripts/build_interface.py) to action. It will start the Vite build and gzip the resulting files either to the `data/` directory or embed them into a header file. If necessary a file system image for the flash is created and upload to the ESP32 prior to compiling the firmware binary.
+The build process is controlled by [platformio.ini](https://github.com/theelims/ESP32-sveltekit/platformio.ini) and automates the build of the front end website with Vite as well as the binary compilation for the ESP32 firmware. Whenever PlatformIO is triggered with the `upload` command this process will call the python script [build_interface.py](https://github.com/theelims/ESP32-sveltekit/scripts/build_interface.py) to action. It will start the Vite build and gzip the resulting files either to the `data/` directory or embed them into a header file. If necessary a file system image for the flash is created for the default build environment and upload to the ESP32 prior to compiling the firmware binary.
 
 ## Serving from Flash or PROGMEM
 
-The front end website can be served either from the SPIFFS partition of the flash, or embedded into the firmware binary from PROGMEM (default). Later has the advantage that only one binary needs to be distributed easing the OTA process. Further more this is desirable if you like to preserve the settings stored in the SPIFFS partition, or have other files there that need to survive a firmware update. To serve from the SPIFFS partition instead please uncomment the following build flag:
+The front end website can be served either from the SPIFFS partition of the flash, or embedded into the firmware binary from PROGMEM (default). Later has the advantage that only one binary needs to be distributed easing the OTA process. Further more this is desirable if you like to preserve the settings stored in the SPIFFS partition, or have other files there that need to survive a firmware update. To serve from the SPIFFS partition instead please comment the following build flag out:
 
 ```ini
 build_flags =
@@ -29,7 +29,6 @@ Many of the framework's built in features may be enabled or disabled as required
 Customize the settings as you see fit. A value of 0 will disable the specified feature:
 
 ```ini
-  -D FT_PROJECT=1
   -D FT_SECURITY=1
   -D FT_MQTT=1
   -D FT_NTP=1
@@ -39,7 +38,6 @@ Customize the settings as you see fit. A value of 0 will disable the specified f
 
 | Flag               | Description                                                                                                                                                                                                              |
 | ------------------ | ------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------ |
-| FT_PROJECT         | Controls whether the "project" section of the UI is enabled. Disable this if you don't intend to have your own screens in the UI.                                                                                        |
 | FT_SECURITY        | Controls whether the [security features](statefulservice.md#security-features) are enabled. Disabling this means you won't need to authenticate to access the device and all authentication predicates will be bypassed. |
 | FT_MQTT            | Controls whether the MQTT features are enabled. Disable this if your project does not require MQTT support.                                                                                                              |
 | FT_NTP             | Controls whether network time protocol synchronization features are enabled. Disable this if your project does not require accurate time.                                                                                |
@@ -99,4 +97,30 @@ Various settings support placeholder substitution, indicated by comments in [fac
 
 ### Cross-Origin Resource Sharing
 
+If you need to enable Cross-Origin Resource Sharing (CORS) on the ESP32 server just uncomment the following build flags:
+
+```ini
+build_flags =
+...
+  ; Uncomment to configure Cross-Origin Resource Sharing
+  -D ENABLE_CORS
+  -D CORS_ORIGIN=\"*\"
+```
+
+This will add the `Access-Control-Allow-Origin` and `Access-Control-Allow-Credentials` headers to any request made.
+
 ### ESP32 `CORE_DEBUG_LEVEL`
+
+The ESP32 Arduino Core and many other libraries use the ESP Logging tools. To enable these debug and error messages from deep inside your libraries uncomment the following build flag.
+
+```ini
+build_flags =
+...
+	-DCORE_DEBUG_LEVEL=5
+```
+
+It accepts values from 1 (Verbose) to 5 (Errors) for different information depths to be logged on the serial terminal.
+
+## Vite and LittleFS 32 Character Limit
+
+The static files for the website are build using vite. By default vite adds a unique hash value to all filenames for improved caching performance. However, LittleFS on the ESP32 is limited to filenames with 32 characters. This restricts the number of characters available for the user to name svelte files. To give a little bit more headroom a vite-plugin removes all hash values, as they offer no benefit on an ESP32. However, have the 32 character limit in mind when naming files. Excessively long names may still cause some issues when building the LittleFS binary.

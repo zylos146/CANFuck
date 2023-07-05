@@ -1,7 +1,7 @@
 <script lang="ts">
 	import type { PageData } from './$types';
-	import logo from '$lib/assets/svelte-logo.png';
-	import { notifications } from '$lib/stores/notifications';
+	import logo from '$lib/assets/logo.png';
+	import { notifications } from '$lib/components/toasts/notifications';
 
 	export let data: PageData;
 </script>
@@ -31,7 +31,7 @@
 			<a
 				class="btn btn-primary"
 				href="/demo"
-				on:click={() => notifications.success('You did it!', 3000)}>Start Demo</a
+				on:click={() => notifications.success('You did it!', 1000)}>Start Demo</a
 			>
 		</div>
 	</div>

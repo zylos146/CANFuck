@@ -1,7 +1,7 @@
 <script>
 	import { flip } from 'svelte/animate';
 	import { fly } from 'svelte/transition';
-	import { notifications } from '$lib/stores/notifications';
+	import { notifications } from '$lib/components/toasts/notifications';
 	import error from '~icons/tabler/circle-x';
 	import success from '~icons/tabler/circle-check';
 	import warning from '~icons/tabler/alert-triangle';
@@ -11,7 +11,7 @@
 		error: 'alert-error',
 		success: 'alert-success',
 		warning: 'alert-warning',
-		info: 'alert-error'
+		info: 'alert-info'
 	};
 
 	export let icon = {
@@ -30,10 +30,8 @@
 			in:fly={{ y: 100, duration: 400 }}
 			out:fly={{ x: 100, duration: 400 }}
 		>
-			<div>
-				<svelte:component this={icon[notification.type]} class="h-6 w-6 flex-shrink-0" />
-				<span>{notification.message}</span>
-			</div>
+			<svelte:component this={icon[notification.type]} class="h-6 w-6 flex-shrink-0" />
+			<span>{notification.message}</span>
 		</div>
 	{/each}
 </div>

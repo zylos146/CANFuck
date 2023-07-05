@@ -19,20 +19,23 @@
 
 #include <AsyncTCP.h>
 #include <WiFi.h>
-
+#include <ESPmDNS.h>
 #include <FeaturesService.h>
 #include <APSettingsService.h>
 #include <APStatus.h>
 #include <AuthenticationService.h>
+#include <BatteryService.h>
 #include <FactoryResetService.h>
 #include <MqttSettingsService.h>
 #include <MqttStatus.h>
+#include <NotificationEvents.h>
 #include <NTPSettingsService.h>
 #include <NTPStatus.h>
 #include <OTASettingsService.h>
 #include <UploadFirmwareService.h>
 #include <RestartService.h>
 #include <SecuritySettingsService.h>
+#include <SleepService.h>
 #include <SystemStatus.h>
 #include <WiFiScanner.h>
 #include <WiFiSettingsService.h>
@@ -45,6 +48,10 @@
 
 #ifndef CORS_ORIGIN
 #define CORS_ORIGIN "*"
+#endif
+
+#ifndef FIRMWARE_VERSION
+#define FIRMWARE_VERSION "demo"
 #endif
 
 class ESP32SvelteKit
@@ -63,6 +70,11 @@ public:
     SecurityManager *getSecurityManager()
     {
         return &_securitySettingsService;
+    }
+
+    NotificationEvents *getNotificationEvents()
+    {
+        return &_notificationEvents;
     }
 
 #if FT_ENABLED(FT_SECURITY)
@@ -108,9 +120,33 @@ public:
     }
 #endif
 
+#if FT_ENABLED(FT_SLEEP)
+    SleepService *getSleepService()
+    {
+        return &_sleepService;
+    }
+#endif
+
+#if FT_ENABLED(FT_BATTERY)
+    BatteryService *getBatteryService()
+    {
+        return &_batteryService;
+    }
+#endif
+
     void factoryReset()
     {
         _factoryResetService.factoryReset();
+    }
+
+    void setMDNSAppName(String name)
+    {
+        _appName = name;
+    }
+
+    void recoveryMode()
+    {
+        _apSettingsService.recoveryMode();
     }
 
 private:
@@ -121,6 +157,7 @@ private:
     WiFiStatus _wifiStatus;
     APSettingsService _apSettingsService;
     APStatus _apStatus;
+    NotificationEvents _notificationEvents;
 #if FT_ENABLED(FT_NTP)
     NTPSettingsService _ntpSettingsService;
     NTPStatus _ntpStatus;
@@ -138,9 +175,16 @@ private:
 #if FT_ENABLED(FT_SECURITY)
     AuthenticationService _authenticationService;
 #endif
+#if FT_ENABLED(FT_SLEEP)
+    SleepService _sleepService;
+#endif
+#if FT_ENABLED(FT_BATTERY)
+    BatteryService _batteryService;
+#endif
     RestartService _restartService;
     FactoryResetService _factoryResetService;
     SystemStatus _systemStatus;
+    String _appName = "ESP32 SvelteKit Demo";
 };
 
 #endif

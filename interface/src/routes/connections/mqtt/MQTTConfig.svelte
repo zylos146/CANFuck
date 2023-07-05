@@ -4,7 +4,7 @@
 	import SettingsCard from '$lib/components/SettingsCard.svelte';
 	import { user } from '$lib/stores/user';
 	import { page } from '$app/stores';
-	import { notifications } from '$lib/stores/notifications';
+	import { notifications } from '$lib/components/toasts/notifications';
 	import Spinner from '$lib/components/Spinner.svelte';
 	import MQTT from '~icons/tabler/topology-star-3';
 	import Info from '~icons/tabler/info-circle';
@@ -111,13 +111,11 @@
 				transition:slide|local={{ duration: 300, easing: cubicOut }}
 			>
 				<div class="alert alert-info my-2 shadow-lg">
-					<div>
-						<Info class="h-6 w-6 flex-shrink-0 stroke-current" />
-						<span
-							>The LED is controllable via MQTT with the demo project designed to work with Home
-							Assistant's auto discovery feature.</span
-						>
-					</div>
+					<Info class="h-6 w-6 flex-shrink-0 stroke-current" />
+					<span
+						>The LED is controllable via MQTT with the demo project designed to work with Home
+						Assistant's auto discovery feature.</span
+					>
 				</div>
 				<div class="grid w-full grid-cols-1 content-center gap-x-4 px-4">
 					<div>

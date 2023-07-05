@@ -60,6 +60,14 @@ CANFuck started as a driver for CANOpen-based LinMot drivers, but now supports a
 ## MIDI Dictionary (TODO - Provide Table of MIDI CC sent / accepted)
 
 # Libraries Used
-### CANOpenNode
-Used for all CANOpen access, and provided by the separate [CANOpenNode-ESP32](https://github.com/zylos146/CANOpenNode-ESP32) library.
 
+- [CANOpenNode](https://github.com/CANopenNode/CANopenNode)
+- [SvelteKit](https://kit.svelte.dev/)
+- [Tailwind CSS](https://tailwindcss.com/)
+- [DaisyUI](https://daisyui.com/)
+- [tabler ICONS](https://tabler-icons.io/)
+- [unplugin-icons](https://github.com/antfu/unplugin-icons)
+- [svelte-modals](https://svelte-modals.mattjennings.io/)
+- [ArduinoJson](https://github.com/bblanchon/ArduinoJson)
+- [ESPAsyncWebServer](https://github.com/me-no-dev/ESPAsyncWebServer)
+- [AsyncMqttClient](https://github.com/marvinroger/async-mqtt-client)

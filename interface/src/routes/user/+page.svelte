@@ -6,7 +6,7 @@
 	import { user } from '$lib/stores/user';
 	import type { userProfile } from '$lib/stores/user';
 	import { page } from '$app/stores';
-	import { notifications } from '$lib/stores/notifications';
+	import { notifications } from '$lib/components/toasts/notifications';
 	import InputPassword from '$lib/components/InputPassword.svelte';
 	import SettingsCard from '$lib/components/SettingsCard.svelte';
 	import ConfirmDialog from '$lib/components/ConfirmDialog.svelte';
@@ -31,7 +31,7 @@
 
 	type SecuritySettings = {
 		jwt_secret: string;
-		users: [userSetting];
+		users: userSetting[];
 	};
 
 	let securitySettings: SecuritySettings;
@@ -109,9 +109,9 @@
 			},
 			onConfirm: () => {
 				securitySettings.users.splice(index, 1);
-				console.log(securitySettings);
 				securitySettings = securitySettings;
 				closeModal();
+				postSecuritySettings(securitySettings);
 			}
 		});
 	}
@@ -123,6 +123,7 @@
 			onSaveUser: (editedUser: userSetting) => {
 				securitySettings.users[index] = editedUser;
 				closeModal();
+				postSecuritySettings(securitySettings);
 			}
 		});
 	}
@@ -133,8 +134,10 @@
 			onSaveUser: (newUser: userSetting) => {
 				securitySettings.users = [...securitySettings.users, newUser];
 				closeModal();
+				postSecuritySettings(securitySettings);
 			}
 		});
+		//
 	}
 </script>
 
@@ -200,13 +203,11 @@
 
 			<span class="pb-2 text-xl font-medium">Security Settings</span>
 			<div class="alert alert-warning shadow-lg">
-				<div>
-					<Warning class="h-6 w-6 flex-shrink-0" />
-					<span
-						>The JWT secret is used to sign authentication tokens. If you modify the JWT Secret, all
-						users will be signed out.</span
-					>
-				</div>
+				<Warning class="h-6 w-6 flex-shrink-0" />
+				<span
+					>The JWT secret is used to sign authentication tokens. If you modify the JWT Secret, all
+					users will be signed out.</span
+				>
 			</div>
 			<label class="label" for="secret">
 				<span class="label-text text-md">JWT Secret</span>

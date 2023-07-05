@@ -6,7 +6,7 @@
 	import SettingsCard from '$lib/components/SettingsCard.svelte';
 	import { user } from '$lib/stores/user';
 	import { page } from '$app/stores';
-	import { notifications } from '$lib/stores/notifications';
+	import { notifications } from '$lib/components/toasts/notifications';
 	import Spinner from '$lib/components/Spinner.svelte';
 	import Collapsible from '$lib/components/Collapsible.svelte';
 	import AP from '~icons/tabler/access-point';
@@ -95,6 +95,12 @@
 			id: 2,
 			text: `Never`
 		}
+	];
+
+	let apStatusDescription = [
+		{ bg_color: 'bg-success', text_color: 'text-success-content', description: 'Active' },
+		{ bg_color: 'bg-error', text_color: 'text-error-content', description: 'Inactive' },
+		{ bg_color: 'bg-warning', text_color: 'text-warning-content', description: 'Lingering' }
 	];
 
 	let formErrors = {
@@ -204,20 +210,14 @@
 			>
 				<div class="rounded-box bg-base-100 flex items-center space-x-3 px-4 py-2">
 					<div
-						class="mask mask-hexagon h-auto w-10 {apStatus.status === 0
-							? 'bg-success'
-							: 'bg-error'}"
+						class="mask mask-hexagon h-auto w-10 {apStatusDescription[apStatus.status].bg_color}"
 					>
-						<AP
-							class="h-auto w-full scale-75 {apStatus.status === 0
-								? 'text-success-content'
-								: 'text-error-content'}"
-						/>
+						<AP class="h-auto w-full scale-75 {apStatusDescription[apStatus.status].text_color}" />
 					</div>
 					<div>
 						<div class="font-bold">Status</div>
 						<div class="text-sm opacity-75">
-							{apStatus.status === 0 ? 'Active' : 'Inactive'}
+							{apStatusDescription[apStatus.status].description}
 						</div>
 					</div>
 				</div>

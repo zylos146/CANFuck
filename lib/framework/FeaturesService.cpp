@@ -23,11 +23,6 @@ void FeaturesService::features(AsyncWebServerRequest *request)
 {
     AsyncJsonResponse *response = new AsyncJsonResponse(false, MAX_FEATURES_SIZE);
     JsonObject root = response->getRoot();
-#if FT_ENABLED(FT_PROJECT)
-    root["project"] = true;
-#else
-    root["project"] = false;
-#endif
 #if FT_ENABLED(FT_SECURITY)
     root["security"] = true;
 #else
@@ -52,6 +47,21 @@ void FeaturesService::features(AsyncWebServerRequest *request)
     root["upload_firmware"] = true;
 #else
     root["upload_firmware"] = false;
+#endif
+#if FT_ENABLED(FT_DOWNLOAD_FIRMWARE)
+    root["download_firmware"] = true;
+#else
+    root["download_firmware"] = false;
+#endif
+#if FT_ENABLED(FT_SLEEP)
+    root["sleep"] = true;
+#else
+    root["sleep"] = false;
+#endif
+#if FT_ENABLED(FT_BATTERY)
+    root["battery"] = true;
+#else
+    root["battery"] = false;
 #endif
     response->setLength();
     request->send(response);

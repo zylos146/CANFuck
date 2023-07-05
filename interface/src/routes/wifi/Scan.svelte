@@ -1,14 +1,14 @@
 <script lang="ts">
 	import { closeModal } from 'svelte-modals';
+	import { focusTrap } from 'svelte-focus-trap';
 	import { fly } from 'svelte/transition';
 	import { user } from '$lib/stores/user';
 	import { page } from '$app/stores';
-	import WiFi from '~icons/tabler/wifi';
 	import Network from '~icons/tabler/router';
 	import AP from '~icons/tabler/access-point';
 	import Cancel from '~icons/tabler/x';
 	import Reload from '~icons/tabler/reload';
-	import { onMount } from 'svelte';
+	import { onMount, onDestroy } from 'svelte';
 	import RssiIndicator from '$lib/components/RSSIIndicator.svelte';
 
 	// provided by <Modals />
@@ -27,9 +27,19 @@
 		'WAPI PSK'
 	];
 
-	let listOfNetworks = [];
+	type networkItem = {
+		rssi: number;
+		ssid: string;
+		bssid: string;
+		channel: number;
+		encryption_type: number;
+	};
+
+	let listOfNetworks: networkItem[] = [];
 
 	let scanActive = false;
+
+	let pollingId: number;
 
 	async function scanNetworks() {
 		scanActive = true;
@@ -40,6 +50,13 @@
 				'Content-Type': 'application/json'
 			}
 		});
+		if ((await pollingResults()) == false) {
+			pollingId = setInterval(() => pollingResults(), 1000);
+		}
+		return;
+	}
+
+	async function pollingResults() {
 		const response = await fetch('/rest/listNetworks', {
 			method: 'GET',
 			headers: {
@@ -47,35 +64,52 @@
 				'Content-Type': 'application/json'
 			}
 		});
-		const result = await response.json();
-		listOfNetworks = result.networks;
-		scanActive = false;
-		return;
+		try {
+			const result = await response.json();
+			listOfNetworks = result.networks;
+			if (listOfNetworks.length) {
+				scanActive = false;
+				clearInterval(pollingId);
+				pollingId = 0;
+				return true;
+			} else {
+				scanActive = false;
+				return false;
+			}
+		} catch {
+			return false;
+		}
 	}
 
 	onMount(() => {
 		scanNetworks();
+	});
+
+	onDestroy(() => {
+		if (pollingId) {
+			clearInterval(pollingId);
+			pollingId = 0;
+		}
 	});
 </script>
 
 {#if isOpen}
 	<div
 		role="dialog"
-		class="pointer-events-none fixed inset-0 z-50 flex items-center justify-center overflow-y-auto"
+		class="pointer-events-none fixed inset-0 z-50 flex items-center justify-center"
 		transition:fly={{ y: 50 }}
 		on:introstart
 		on:outroend
+		use:focusTrap
 	>
 		<div
-			class="bg-base-100 shadow-secondary/30 rounded-box pointer-events-auto flex min-w-fit max-w-md flex-col justify-between p-4 shadow-lg"
+			class="bg-base-100 shadow-secondary/30 rounded-box pointer-events-auto flex max-h-full min-w-fit max-w-md flex-col justify-between p-4 shadow-lg"
 		>
 			<h2 class="text-base-content text-start text-2xl font-bold">Scan Networks</h2>
 			<div class="divider my-2" />
-			<div>
-				{#if scanActive}<div
-						class="bg-base-100 flex h-full w-full flex-col items-center justify-center p-6"
-					>
-						<AP class="text-secondary h-32 w-32 animate-ping stroke-2" />
+			<div class="overflow-y-auto">
+				{#if scanActive}<div class="bg-base-100 flex flex-col items-center justify-center p-6">
+						<AP class="text-secondary h-32 w-32 shrink animate-ping stroke-2" />
 						<p class="mt-8 text-2xl">Scanning ...</p>
 					</div>
 				{:else}
