@@ -101,7 +101,7 @@
 </script>
 
 <svelte:head>
-	<title>{$page.data.title}</title>
+	<title>CANfuck: {$page.data.title}</title>
 </svelte:head>
 
 {#if $page.data.features.security && $user.bearer_token === ''}

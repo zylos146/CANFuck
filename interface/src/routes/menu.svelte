@@ -1,5 +1,5 @@
 <script lang="ts">
-	import logo from '$lib/assets/logo.png';
+	import logo from '$lib/assets/canfuck-small.png';
 	import Github from '~icons/tabler/brand-github';
 	import Discord from '~icons/tabler/brand-discord';
 	import Users from '~icons/tabler/users';
@@ -14,16 +14,18 @@
 	import Copyright from '~icons/tabler/copyright';
 	import MQTT from '~icons/tabler/topology-star-3';
 	import NTP from '~icons/tabler/clock-check';
+	import CANfuck from '~icons/tabler/arrow-right-circle';
+	import Plug from '~icons/tabler/plug';
 	import { page } from '$app/stores';
 	import { onMount } from 'svelte';
 	import { user } from '$lib/stores/user';
 	import { createEventDispatcher } from 'svelte';
 
-	const appName = 'ESP32 SvelteKit';
+	const appName = 'CANfuck';
 
-	const copyright = '2023 theelims';
+	const copyright = '2023 theelims & zylos';
 
-	const github = { href: 'https://github.com/theelims/ESP32-sveltekit', active: true };
+	const github = { href: 'https://github.com/zylos146/CANFuck/', active: true };
 
 	const discord = { href: '.', active: false };
 	type menuItem = {
@@ -147,8 +149,7 @@
 		class="rounded-box mb-4 flex items-center hover:scale-[1.02] active:scale-[0.98]"
 		on:click={() => setActiveMenuItem(menuItems, '')}
 	>
-		<img src={logo} alt="Logo" class="h-12 w-12" />
-		<h1 class="px-4 text-2xl font-bold">{appName}</h1>
+		<img src={logo} alt="Logo" class="h-12" />
 	</a>
 	<ul class="menu rounded-box menu-vertical flex-nowrap overflow-y-auto">
 		{#each menuItems as menuItem, i (menuItem.title)}
