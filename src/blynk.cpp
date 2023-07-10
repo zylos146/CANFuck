@@ -12,7 +12,7 @@
 
 #undef NO_GLOBAL_BLYNK
 
-#include "config.h"
+
 #include "blynk.hpp"
 #include "StrokeEngine.h"
 

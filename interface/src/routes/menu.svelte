@@ -54,6 +54,13 @@
 			active: false
 		},
 		{
+			title: 'CANfuck',
+			icon: CANfuck,
+			href: '/canfuck',
+			feature: true,
+			active: false
+		},
+		{
 			title: 'Connections',
 			icon: Remote,
 			feature: $page.data.features.mqtt || $page.data.features.ntp,
@@ -71,6 +78,13 @@
 					icon: NTP,
 					href: '/connections/ntp',
 					feature: $page.data.features.ntp,
+					active: false
+				},
+				{
+					title: 'Serial',
+					icon: Plug,
+					href: '/connections/serial',
+					feature: $page.data.features.serial,
 					active: false
 				}
 			]

@@ -1,7 +1,7 @@
 #ifndef CONTROLLER_OSSM_H
 #define CONTROLLER_OSSM_H
 
-#include "config.h"
+
 #include "StrokeEngine.h"
 
 #include <SPI.h>

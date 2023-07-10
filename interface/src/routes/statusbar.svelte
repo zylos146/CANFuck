@@ -8,6 +8,7 @@
 	import Battery from '~icons/tabler/battery-charging-2';
 	import WiFiOff from '~icons/tabler/wifi-off';
 	import Hamburger from '~icons/tabler/menu-2';
+	import Terminal from '~icons/tabler/terminal-2';
 	import Power from '~icons/tabler/power';
 	import Cancel from '~icons/tabler/x';
 	import RssiIndicator from '$lib/components/RSSIIndicator.svelte';
@@ -36,9 +37,13 @@
 			}
 		});
 	}
+
+	function dropdownTerminal() {
+		
+	}
 </script>
 
-<div class="navbar bg-base-300 sticky top-0 z-10 h-12 min-h-fit drop-shadow-lg lg:h-16">
+<div class="flex-none navbar bg-base-300 sticky top-0 z-10 h-12 min-h-fit drop-shadow-lg lg:h-16">
 	<div class="flex-1">
 		<!-- Page Hamburger Icon here -->
 		<label for="main-menu" class="btn btn-ghost btn-circle btn-sm drawer-button lg:hidden"
@@ -57,6 +62,12 @@
 			</button>
 		</div>
 	{/if} -->
+	<div class="flex-none">
+		<button class="btn btn-square btn-ghost h-9 w-10" on:click={dropdownTerminal}>
+			<Terminal class="h-9 w-9" />
+		</button>
+	</div>
+
 	<div class="flex-none">
 		{#if $telemetry.rssi.disconnected}
 			<WiFiOff class="h-7 w-7" />

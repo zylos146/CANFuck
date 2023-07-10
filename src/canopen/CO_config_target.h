@@ -1,7 +1,7 @@
 #ifndef CO_CONFIG_TARGET_H
 #define CO_CONFIG_TARGET_H
 
-#include "config.h"
+
 #include "301/CO_config.h"
 
 #define CO_CONFIG_NMT ( \

@@ -4,9 +4,8 @@
 #include "CO_main.h"
 
 #include "esp_log.h"
-#include "data_logger.hpp"
 
-#include "config.h"
+
 
 #include "motor/linmot.hpp"
 
@@ -31,7 +30,7 @@ void LinmotMotor::task_motion() {
   bool isMotionWrong = (errorWord == LINMOT_ERROR_MOTION_CMD_WRONG_STATE);
   if (isError) {
     if (isCanTimeout || isMotionWrong) {
-      WEB_LOGI("task.main", "LinMot is in a known error state. Acknowledging! Timeout %d - Motion %d", isCanTimeout, isMotionWrong);
+      ESP_LOGI("task.main", "LinMot is in a known error state. Acknowledging! Timeout %d - Motion %d", isCanTimeout, isMotionWrong);
 
       this->CO_control_addFlag(LINMOT_CONTROL_ERROR_ACKNOWLEDGE);
       vTaskDelay(50 / portTICK_PERIOD_MS);
@@ -41,7 +40,7 @@ void LinmotMotor::task_motion() {
 
       return;
     } else {
-      WEB_LOGE("task.main", "LinMot is in a unknown error state 0x%04X! Unrecoverable, attempting to restart drive!", errorWord);
+      ESP_LOGE("task.main", "LinMot is in a unknown error state 0x%04X! Unrecoverable, attempting to restart drive!", errorWord);
       CO_NMT_sendCommand(CO->NMT, CO_NMT_RESET_NODE, this->CO_nodeId);
 
       // TODO - Bit of a hack to make sure error waits until refresh
@@ -56,7 +55,7 @@ void LinmotMotor::task_motion() {
   }
 
   if (!isEnabled) {
-    WEB_LOGI("task.main", "Switching on LinMot!");
+    ESP_LOGI("task.main", "Switching on LinMot!");
 
     this->CO_control_removeFlag(LINMOT_CONTROL_SWITCH_ON);
     vTaskDelay(50 / portTICK_PERIOD_MS);
@@ -68,7 +67,7 @@ void LinmotMotor::task_motion() {
   }
 
   if (isEnabled && !isHomed && !isMoving) {
-    WEB_LOGI("task.main", "Homing LinMot!");
+    ESP_LOGI("task.main", "Homing LinMot!");
     // TODO - Should shut off homing state after this
     // This is why Motion CMD error is encountered after rebooting drive!
 
@@ -89,7 +88,7 @@ void LinmotMotor::task_motion() {
 void LinmotMotor::task_heartbeat() {
   if (this->hasInitialized == false) {
     /*Set Operating Mode of Slaves to Operational*/
-    WEB_LOGI("task.main", "Setting LinMot to Operational State!");
+    ESP_LOGI("task.main", "Setting LinMot to Operational State!");
     CO_NMT_sendCommand(CO->NMT, CO_NMT_ENTER_OPERATIONAL, this->CO_nodeId);
     this->hasInitialized = true;
   }
@@ -100,7 +99,7 @@ void LinmotMotor::task_heartbeat() {
 
   double diff = difftime(now, this->lastRPDOUpdate);
   if (diff > 1.0) {
-    WEB_LOGE("task.main", "Error: Have not recieved LinMot RPDO in %d ms! Attempting to re-establish!", (int)(diff * 1000));
+    ESP_LOGE("task.main", "Error: Have not recieved LinMot RPDO in %d ms! Attempting to re-establish!", (int)(diff * 1000));
     this->state = MotorState::ERROR;
     CO_NMT_sendCommand(CO->NMT, CO_NMT_ENTER_OPERATIONAL, this->CO_nodeId);
   }
@@ -123,8 +122,8 @@ void LinmotMotor::task_heartbeat() {
   Blynk.virtualWrite(BLYNK_LINMOT_POWER_LOSS, (float)this->CO_powerLossWord);
   */
 
-  wlog.log(DataParameter::ACTUAL_POSITON, (float)this->CO_actualPosition / pow(10, 4));
-  wlog.log(DataParameter::ACTUAL_VELOCITY, (float)this->CO_actualVelocity / pow(10, 6));
+  //wlog.log(DataParameter::ACTUAL_POSITON, (float)this->CO_actualPosition / pow(10, 4));
+  //wlog.log(DataParameter::ACTUAL_VELOCITY, (float)this->CO_actualVelocity / pow(10, 6));
 }
 
 // Task Wrappers

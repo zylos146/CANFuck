@@ -13,6 +13,7 @@ const config: UserConfig = {
 		viteLittleFS()
 	],
 	server: {
+		host: true,
 		proxy: {
 			// Proxying REST: http://localhost:5173/rest/bar -> http://192.168.1.83/rest/bar
 			'/rest': {

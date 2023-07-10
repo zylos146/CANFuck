@@ -1,7 +1,7 @@
 #ifndef CONTROLLER_CANFUCK_H
 #define CONTROLLER_CANFUCK_H
 
-#include "config.h"
+
 #include "StrokeEngine.h"
 
 #include <SPI.h>

@@ -204,7 +204,9 @@
 
 <div class="flex flex-row flex-1 mt-4 mb-4 ml-4">
 
-	<!-- Machine Stroke Legend -->
+
+
+	<!-- Stroke / Depth -->
 	<div class="flex flex-col w-10">
 		<div class="flex-1 machine-stroke">
 			<span class="nub nub-depth"/>
@@ -219,7 +221,6 @@
 		</div>
 	</div>
 
-	<!-- Slider -->
 	<RangeSlider 
 		min={0}
 		max={100}
@@ -236,6 +237,9 @@
 		last="label"
 	/>
 	
+
+
+	<!-- Speed -->
 	<div class="flex flex-col w-10">
 		<div class="flex-1 machine-stroke">
 		</div>
@@ -259,6 +263,9 @@
 		last="label"
 	/>
 
+
+
+	<!-- Sensation -->
 	<div class="flex flex-col w-10">
 		<div class="flex-1 machine-stroke">
 			<span class="nub nub-sensation"/>
@@ -279,8 +286,12 @@
 		last="label"
 	/>
 
-	<!-- Speed / Sensation block -->
+
+
+	<!-- Motor Control Block -->
 	<div class="flex flex-col ml-4 mr-4">
+		
+		<!-- Motor Control -->
 		<div class="flex button-container {motorEnergized ? 'active' : 'inactive'}">
 			<!--{#if motorEnergized}<Alert/>{/if}-->
 			<button on:click={onEnergizeClick}>
@@ -293,5 +304,21 @@
 				{strokeRunning ? 'Pause' : 'Run'}
 			</button>
 		</div>
+
+		<!-- Motor Info -->
+		<div class="flex flex-row">
+			<div class="flex flex-col">
+				<div>test</div>
+				<div>test</div>
+			</div>
+			<div class="flex flex-col">
+				<div>test</div>
+				<div>test</div>
+			</div>
+		</div>
+		
 	</div>
+
+
+
 </div>

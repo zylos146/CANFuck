@@ -5,7 +5,7 @@
 #include "freertos/FreeRTOS.h"
 #include "freertos/task.h"
 
-#include "config.h"
+
 #include "serial.hpp"
 
 //WiFiServer serial_server;
