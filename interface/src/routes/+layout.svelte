@@ -100,8 +100,19 @@
 	);
 </script>
 
+<!-- Needed to fix issues with flex-1 not growing items inside drawer-content on Firefox Android -->
+<style>
+	.drawer {
+		height: 100dvh;
+	}
+</style>
+
 <svelte:head>
-	<title>CANfuck: {$page.data.title}</title>
+	{#if $page.data.title !== ''}
+		<title>CANfuck: {$page.data.title}</title>
+	{:else}
+		<title>CANfuck</title>
+	{/if}
 </svelte:head>
 
 {#if $page.data.features.security && $user.bearer_token === ''}
