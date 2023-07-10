@@ -8,31 +8,25 @@
 	import Info from '~icons/tabler/info-circle';
 	import Save from '~icons/tabler/device-floppy';
 	import Reload from '~icons/tabler/reload';
+	import Alert from '~icons/tabler/alert-triangle-filled';
+	import RangeSlider from "svelte-range-slider-pips";
 
-	type LightState = {
-		led_on: boolean;
+	type StrokeParameters = {
+		stroke_mm: number;
+		stroke_per_min: number;
+		depth_mm: number;
+		sensation: number;
 	};
 
-	let lightState: LightState = { led_on: false };
+	let strokeParameters: StrokeParameters = {
+		stroke_mm: 0,
+		stroke_per_min: 0,
+		depth_mm: 0,
+		sensation: 0
+	};
 
-	let lightOn = false;
-
-	async function getLightstate() {
-		try {
-			const response = await fetch('/rest/lightState', {
-				method: 'GET',
-				headers: {
-					Authorization: $page.data.features.security ? 'Bearer ' + $user.bearer_token : 'Basic',
-					'Content-Type': 'application/json'
-				}
-			});
-			const light = await response.json();
-			lightOn = light.led_on;
-		} catch (error) {
-			console.error('Error:', error);
-		}
-		return;
-	}
+	let motorEnergized = false;
+	let strokeRunning = false;
 
 	const ws_token = $page.data.features.security ? '?access_token=' + $user.bearer_token : '';
 
@@ -44,85 +38,260 @@
 	lightStateSocket.onmessage = (event) => {
 		const message = JSON.parse(event.data);
 		if (message.type == 'payload') {
-			lightState = message.payload;
+			strokeParameters = message.payload;
 		}
 	};
 
 	onDestroy(() => lightStateSocket.close());
 
-	onMount(() => {
-		getLightstate();
-	});
-
-	async function postLightstate() {
-		try {
-			const response = await fetch('/rest/lightState', {
-				method: 'POST',
-				headers: {
-					Authorization: $page.data.features.security ? 'Bearer ' + $user.bearer_token : 'Basic',
-					'Content-Type': 'application/json'
-				},
-				body: JSON.stringify({ led_on: lightOn })
-			});
-			if (response.status == 200) {
-				notifications.success('Light state updated.', 3000);
-				const light = await response.json();
-				lightOn = light.led_on;
-			} else {
-				notifications.error('User not authorized.', 3000);
-			}
-		} catch (error) {
-			console.error('Error:', error);
+	function onEnergizeClick() {
+		motorEnergized = !motorEnergized
+		if (!motorEnergized) {
+			strokeRunning = false
 		}
+	}
+
+	function onRunningClick() {
+		if (!motorEnergized) {
+			return
+		}
+
+		strokeRunning = !strokeRunning
 	}
 </script>
 
-<SettingsCard collapsible={false}>
-	<Light slot="icon" class="lex-shrink-0 mr-2 h-6 w-6 self-end" />
-	<span slot="title">Light State</span>
-	<div class="w-full">
-		<h1 class="text-xl font-semibold">REST Example</h1>
-		<div class="alert alert-info my-2 shadow-lg">
-			<Info class="h-6 w-6 flex-shrink-0 stroke-current" />
-			<span>The form below controls the LED via the RESTful service exposed by the ESP device.</span
-			>
+<style>
+	:global(body .rangeSlider) {
+		height: initial;
+		overflow: initial;
+		margin-right: 2em !important;
+
+  	--range-slider:          #646c7c;
+		--handle-border:   var(--handle);
+		--range-inactive:  var(--handle-focus);
+		--range:           var(--handle-focus);
+		--float-inactive:  var(--handle-focus);
+		--float:           var(--handle-focus);
+		--float-text:        white;
+		--pip-active:        white;
+		--pip-active-text:   var(--pip-active);
+	}
+
+:global(body .rangeSlider) {
+	--handle1: #00cfff;
+	--handle3: #ff2b66;
+	--handle2: #3edd8b;
+	--handle4: #f5d556;
+}
+
+:global(body .rangeSlider:nth-of-type(4)) {
+	--handle1: #ff2b66;
+}
+
+:global(body .rangeSlider:nth-of-type(6)) {
+	--handle1: #f5d556;
+}
+
+	:global(.rangeSlider .rangeHandle) {
+		--handle-focus: var(--handle);
+		--handle-inactive: var(--handle);
+		--handle-border: var(--handle);
+	}
+
+	:global(.rangeSlider .rangeHandle:nth-of-type(1)) {
+		--handle: var(--handle1);
+	}
+	:global(.rangeSlider .rangeHandle:nth-of-type(2)) {
+		--handle: var(--handle2);
+	}
+	:global(.rangeSlider .rangeHandle:nth-of-type(3)) {
+		--handle: var(--handle3);
+	}
+	:global(.rangeSlider .rangeHandle:nth-of-type(4)) {
+		--handle: var(--handle4);
+	}
+
+	:global(.rangeSlider .rangeBar) {
+		height: 3px;
+		background: linear-gradient(90deg, var(--handle1), var(--handle1) 25%, var(--handle2) 75%, var(--handle2) );
+	}
+
+	:global(.rangeHandle) {
+    width: 15px;
+    height: 15px;
+    top: 1px;
+  }
+
+	:global(.rangeHandle .rangeNub) {
+    opacity: 1;
+	}
+
+	.machine-stroke {
+		transform: rotate(-180deg);
+
+		writing-mode: vertical-rl;
+		text-orientation: mixed;
+		text-align: center;
+
+		font-weight: 600;
+	}
+
+	.nub {
+		display: inline-block;
+
+		width: 0.6em;
+		height: 1.4em;
+		border-radius: 1.4em;
+
+		margin-right: 3px;
+		margin-bottom: 5px;
+	}
+
+	.nub-depth {
+		background-color: #3edd8b;
+	}
+
+	.nub-stroke {
+		background-color: #00cfff;
+	}
+
+	.nub-spm {
+		background-color: #ff2b66;
+	}
+
+	.nub-sensation {
+		background-color: #f5d556;
+	}
+
+	.nub-unit {
+		margin-top: 5px;
+		color: #646c7c;
+	}
+
+	.button-container {
+		@apply px-5 mt-4 rounded;
+		height: 8rem;
+	}
+	.button-container.inactive {
+		@apply bg-green-700;
+	}
+	.button-container.active {
+		@apply bg-red-500;
+	}
+
+	.button-container button {
+		transform: rotate(-180deg);
+
+		writing-mode: vertical-rl;
+		text-align: center;
+		
+		@apply text-white font-bold;
+
+		width: 2rem;
+		font-size: 1.5rem;
+
+		margin-top: 1rem;
+		margin-bottom: 1rem;
+	}
+	
+	:global(.button-container svg) {
+		transform: rotate(-90deg);
+
+		width: 2rem;
+		height: 2rem;
+	}
+</style>
+
+<div class="flex flex-row flex-1 mt-4 mb-4 ml-4">
+
+	<!-- Machine Stroke Legend -->
+	<div class="flex flex-col w-10">
+		<div class="flex-1 machine-stroke">
+			<span class="nub nub-depth"/>
+			Depth
+			<span class="nub-unit">mm</span>
 		</div>
-		<div class="flex flex-row flex-wrap justify-between gap-x-2">
-			<div class="form-control w-52">
-				<label class="label cursor-pointer">
-					<span class="mr-4">Light State?</span>
-					<input type="checkbox" bind:checked={lightOn} class="checkbox checkbox-primary" />
-				</label>
-			</div>
-			<div class="flex-grow" />
-			<button class="btn btn-primary inline-flex items-center" on:click={postLightstate}
-				><Save class="mr-2 h-5 w-5" /><span>Save</span></button
-			>
-			<button class="btn btn-primary inline-flex items-center" on:click={getLightstate}
-				><Reload class="mr-2 h-5 w-5" /><span>Reload</span></button
-			>
-		</div>
-		<div class="divider" />
-		<h1 class="text-xl font-semibold">Websocket Example</h1>
-		<div class="alert alert-info my-2 shadow-lg">
-			<Info class="h-6 w-6 flex-shrink-0 stroke-current" />
-			<span
-				>The switch below controls the LED via the WebSocket. It will automatically update whenever
-				the LED state changes.</span
-			>
-		</div>
-		<div class="form-control w-52">
-			<label class="label cursor-pointer">
-				<span class="">Light State?</span>
-				<input
-					type="checkbox"
-					class="toggle toggle-primary"
-					bind:checked={lightState.led_on}
-					on:change={() => {
-						lightStateSocket.send(JSON.stringify(lightState));
-					}}
-				/>
-			</label>
+		<div class="flex-1 machine-stroke">Machine Stroke</div>
+		<div class="flex-1 machine-stroke">
+			<span class="nub nub-stroke"/>
+			Stroke
+			<span class="nub-unit">mm</span>
 		</div>
 	</div>
-</SettingsCard>
+
+	<!-- Slider -->
+	<RangeSlider 
+		min={0}
+		max={100}
+		values={[0, 50]} 
+
+		range
+		vertical 
+		pushy
+
+		pips
+		pipstep={10}
+
+		first="label" 
+		last="label"
+	/>
+	
+	<div class="flex flex-col w-10">
+		<div class="flex-1 machine-stroke">
+		</div>
+		<div class="flex-1 machine-stroke">
+			<span class="nub nub-spm"/>
+			Strokes Per Minute</div>
+		<div class="flex-1 machine-stroke">
+		</div>
+	</div>
+	<RangeSlider 
+		min={0}
+		max={100}
+		values={[20]} 
+
+		vertical
+
+		pips
+		pipstep={10}
+
+		first="label" 
+		last="label"
+	/>
+
+	<div class="flex flex-col w-10">
+		<div class="flex-1 machine-stroke">
+			<span class="nub nub-sensation"/>
+			Sensation
+		</div>
+	</div>
+	<RangeSlider 
+		min={0}
+		max={100}
+		values={[70]} 
+
+		vertical
+
+		pips
+		pipstep={10}
+
+		first="label" 
+		last="label"
+	/>
+
+	<!-- Speed / Sensation block -->
+	<div class="flex flex-col ml-4 mr-4">
+		<div class="flex button-container {motorEnergized ? 'active' : 'inactive'}">
+			<!--{#if motorEnergized}<Alert/>{/if}-->
+			<button on:click={onEnergizeClick}>
+				{motorEnergized ? 'ESTOP' : 'Energize'}
+			</button>
+			<!--{#if motorEnergized}<Alert/>{/if}-->
+		</div>
+		<div class="flex button-container {strokeRunning ? 'active' : 'inactive'}">
+			<button on:click={onRunningClick}>
+				{strokeRunning ? 'Pause' : 'Run'}
+			</button>
+		</div>
+	</div>
+</div>
