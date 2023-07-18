@@ -13,25 +13,23 @@
  **/
 
 #include <ESP32SvelteKit.h>
+#include <service/SerialStateService.hpp>
 
 AsyncWebServer server(80);
 ESP32SvelteKit esp32sveltekit(&server);
+SerialStateService serialState(&server, esp32sveltekit.getSecurityManager(), esp32sveltekit.getFS());
 
 void setup()
 {
-    // start serial and filesystem
-    Serial.begin(115200);
+  Serial.begin(115200);
 
-    // start the framework and demo project
-    esp32sveltekit.setMDNSAppName("ESP32 SvelteKit Demo App");
-    esp32sveltekit.begin();
-    
-    // start the server
-    server.begin();
+  esp32sveltekit.setMDNSAppName("canfuck");
+  esp32sveltekit.begin();
+  serialState.begin();
+  server.begin();
 }
 
 void loop()
 {
-    // run the framework's loop function
-    esp32sveltekit.loop();
+  esp32sveltekit.loop();
 }
