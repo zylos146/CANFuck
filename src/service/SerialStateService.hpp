@@ -52,6 +52,7 @@ public:
     state.port = root["port"];
     state.rx_pin = root["rx_pin"];
     state.tx_pin = root["tx_pin"];
+    
     return StateUpdateResult::CHANGED;
   }
 };

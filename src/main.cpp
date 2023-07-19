@@ -14,10 +14,14 @@
 
 #include <ESP32SvelteKit.h>
 #include <service/SerialStateService.hpp>
+#include <service/MachineStateService.hpp>
+#include <service/StrokeStateService.hpp>
 
 AsyncWebServer server(80);
 ESP32SvelteKit esp32sveltekit(&server);
 SerialStateService serialState(&server, esp32sveltekit.getSecurityManager(), esp32sveltekit.getFS());
+MachineStateService machineState(&server, esp32sveltekit.getSecurityManager());
+StrokeStateService strokeState(&server, esp32sveltekit.getSecurityManager());
 
 void setup()
 {
