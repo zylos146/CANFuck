@@ -8,6 +8,8 @@
         "files.associations": {
             "*.tcc": "cpp",
             "algorithm": "cpp"
-        }
+        },
+        "editor.detectIndentation": false,
+        "editor.tabSize": 2
     }
 }
