@@ -27,6 +27,9 @@ LoggingStateService loggingState(&server, esp32sveltekit.getSecurityManager());
 
 void setup()
 {
+  pinMode(CAN_STANDBY_IO, OUTPUT);
+  digitalWrite(CAN_STANDBY_IO, LOW);
+  
   Serial.begin(115200);
   loggingState.begin();
   server.begin();
