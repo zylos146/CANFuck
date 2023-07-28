@@ -21,7 +21,7 @@
 #define CO_CAN_PSEUDO_INTERRUPT_INTERVAL (1000) /** CAN "Interrupt" Interval in μs*/
 #define CO_MAIN_TASK_INTERVAL (1000)   /* Interval of tmrTask thread in microseconds */
 
-#define CAN_MS_TO_WAIT (10000) /*CAN TX/RX Timeout value*/
+#define CAN_MS_TO_WAIT (2500) /*CAN TX/RX Timeout value*/
 
 #define NMT_CONTROL ((CO_NMT_control_t)(CO_NMT_STARTUP_TO_OPERATIONAL | CO_NMT_ERR_ON_ERR_REG))
 #define FIRST_HB_TIME 500

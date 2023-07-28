@@ -96,6 +96,13 @@
 			feature: true,
 			submenu: [
 				{
+					title: 'System Logs',
+					icon: Health,
+					href: '/system/logs',
+					feature: true,
+					active: false
+				},
+				{
 					title: 'System Status',
 					icon: Health,
 					href: '/system/status',

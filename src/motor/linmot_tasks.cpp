@@ -61,7 +61,16 @@ void LinmotMotor::task_motion() {
     vTaskDelay(50 / portTICK_PERIOD_MS);
 
     this->CO_control_addFlag(LINMOT_CONTROL_SWITCH_ON);
-    vTaskDelay(250 / portTICK_PERIOD_MS);
+    
+    if (initAttemptCount < 250) {
+      initAttemptCount++;
+    }
+    
+    if (initAttemptCount > 4) {
+      vTaskDelay(2000 / portTICK_PERIOD_MS); 
+    } else {
+      vTaskDelay(250 / portTICK_PERIOD_MS); 
+    }
 
     return;
   }
@@ -79,7 +88,8 @@ void LinmotMotor::task_motion() {
     this->CO_control_removeFlag(LINMOT_CONTROL_HOME);
     vTaskDelay(50 / portTICK_PERIOD_MS);
 
-    this->state = MotorState::ACTIVE;
+    initAttemptCount = 0;
+    this->state = MotorState::RUNNING;
 
     return;
   }
@@ -100,7 +110,7 @@ void LinmotMotor::task_heartbeat() {
   double diff = difftime(now, this->lastRPDOUpdate);
   if (diff > 1.0) {
     ESP_LOGE("task.main", "Error: Have not recieved LinMot RPDO in %d ms! Attempting to re-establish!", (int)(diff * 1000));
-    this->state = MotorState::ERROR;
+    this->state = MotorState::FAULT;
     CO_NMT_sendCommand(CO->NMT, CO_NMT_ENTER_OPERATIONAL, this->CO_nodeId);
   }
 
@@ -166,5 +176,5 @@ static void linmot_run_task(void *pvParameter) {
 
 // TODO - move constructor to linmot.cpp?
 LinmotMotor::LinmotMotor() {
-  xTaskCreate(&linmot_run_task, "linmot_run_task", 4096, this, 5, NULL);
+  xTaskCreatePinnedToCore(&linmot_run_task, "linmot_run_task", 4096, this, 1, NULL, 1);
 }

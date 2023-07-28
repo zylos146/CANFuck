@@ -28,6 +28,7 @@ class SerialState
 {
 public:
   boolean enabled = true;
+  boolean logging = false;
   unsigned long baudrate = 38400;
   uint32_t rs_config = SERIAL_8N1; // TODO - Allow to be used in string form in UI
   uint16_t port = 23;
@@ -37,6 +38,7 @@ public:
   static void read(SerialState &settings, JsonObject &root)
   {
     root["enabled"] = settings.enabled; // TODO - Tie into actually turning server on/off
+    root["logging"] = settings.logging;
     root["baudrate"] = settings.baudrate;
     root["rs_config"] = settings.rs_config;
     root["port"] = settings.port;
@@ -47,12 +49,13 @@ public:
   static StateUpdateResult update(JsonObject &root, SerialState &state)
   {
     state.enabled = root["enabled"];
+    state.logging = root["logging"];
     state.baudrate = root["baudrate"];
     state.rs_config = root["rs_config"];
     state.port = root["port"];
     state.rx_pin = root["rx_pin"];
     state.tx_pin = root["tx_pin"];
-    
+
     return StateUpdateResult::CHANGED;
   }
 };
@@ -87,6 +90,7 @@ public:
         securityManager->wrapRequest(
             std::bind(&SerialStateService::getStatus, this, std::placeholders::_1),
             AuthenticationPredicates::IS_ADMIN));
+    log_i("Created Serial VCP Service");
   }
 
   void getStatus(AsyncWebServerRequest *request)
@@ -114,6 +118,8 @@ public:
       server->onClient(std::bind(&SerialStateService::handleNewClient, this, std::placeholders::_1, std::placeholders::_2), server);
       server->begin();
 
+      log_i("Bringing up Serial VCP Server @ port %u, %u hz", state.port, state.baudrate);
+
       xTaskCreatePinnedToCore(&SerialStateService::handlePoll, "serial_task", 4096, this, 5, NULL, 1);
     });
   }
@@ -121,8 +127,11 @@ public:
   void handleData(void *arg, AsyncClient *client, void *data, size_t len)
   {
     array_to_string((byte*)data, len, hexBuffer);
-    log_i("data received from client %s \n", client->remoteIP().toString().c_str());
-    log_i("Client Data %u: %s", len, hexBuffer);
+
+    if (_state.logging) {
+      log_i("data received from client %s \n", client->remoteIP().toString().c_str());
+      log_i("Client Data %u: %s", len, hexBuffer);
+    }
     
     Serial2.write((char*)data, len);
     Serial2.flush();
@@ -192,11 +201,14 @@ public:
         while ((size = Serial2.available())) {
           size = (size >= SERIAL_BUFFER_SIZE ? SERIAL_BUFFER_SIZE : size);
           Serial2.readBytes((char*)service->buffer, size);
-          service->activeClient->add((const char*)service->buffer, size);
+          service->activeClient->add(static_cast<const char*>(service->buffer), size);
           service->activeClient->send();
 
           array_to_string((byte*)service->buffer, size, service->hexBuffer);
-          log_i("Server Data %u: %s", size, service->hexBuffer);
+          
+          if (service->_state.logging) {
+            log_i("Server Data %u: %s", size, service->hexBuffer);
+          }
 
           vTaskDelay(1 / portTICK_PERIOD_MS); 
         }

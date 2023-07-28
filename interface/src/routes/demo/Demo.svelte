@@ -12,16 +12,16 @@
 	import RangeSlider from "svelte-range-slider-pips";
 
 	type StrokeParameters = {
-		stroke_mm: number;
+		envelope_start_mm: number;
+		envelope_end_mm: number;
 		stroke_per_min: number;
-		depth_mm: number;
 		sensation: number;
 	};
 
 	let strokeParameters: StrokeParameters = {
-		stroke_mm: 0,
+		envelope_start_mm: 0,
+		envelope_end_mm: 0,
 		stroke_per_min: 0,
-		depth_mm: 0,
 		sensation: 0
 	};
 
@@ -29,20 +29,35 @@
 	let strokeRunning = false;
 
 	const ws_token = $page.data.features.security ? '?access_token=' + $user.bearer_token : '';
-
-	const lightStateSocket = new WebSocket('ws://' + $page.url.host + '/ws/lightState' + ws_token);
-	lightStateSocket.onopen = (event) => {
-		lightStateSocket.send('Hello');
+	const strokeSocket = new WebSocket('ws://' + $page.url.host + '/ws/stroke' + ws_token);
+	strokeSocket.onopen = (event) => {
+		strokeSocket.send('Hello');
 	};
 
-	lightStateSocket.onmessage = (event) => {
+	strokeSocket.onmessage = (event) => {
 		const message = JSON.parse(event.data);
-		if (message.type == 'payload') {
-			strokeParameters = message.payload;
-		}
+		strokeParameters = message.payload
 	};
 
-	onDestroy(() => lightStateSocket.close());
+	onDestroy(() => strokeSocket.close());
+
+	function onStrokeChange(e) {
+		const [stroke, depth] = e.detail.values
+		
+		strokeParameters.envelope_start_mm = stroke
+		strokeParameters.envelope_end_mm = depth
+		strokeSocket.send(JSON.stringify(strokeParameters))
+	}
+
+	function onSpeedChange(e) {
+		strokeParameters.stroke_per_min = e.detail.value
+		strokeSocket.send(JSON.stringify(strokeParameters))
+	}
+
+	function onSensationChange(e) {
+		strokeParameters.sensation = e.detail.value
+		strokeSocket.send(JSON.stringify(strokeParameters))
+	}
 
 	function onEnergizeClick() {
 		motorEnergized = !motorEnergized
@@ -210,13 +225,13 @@
 	<div class="flex flex-col w-10">
 		<div class="flex-1 machine-stroke">
 			<span class="nub nub-depth"/>
-			Depth
+			End
 			<span class="nub-unit">mm</span>
 		</div>
-		<div class="flex-1 machine-stroke">Machine Stroke</div>
+		<div class="flex-1 machine-stroke">Stroke Range</div>
 		<div class="flex-1 machine-stroke">
 			<span class="nub nub-stroke"/>
-			Stroke
+			Start
 			<span class="nub-unit">mm</span>
 		</div>
 	</div>
@@ -235,6 +250,8 @@
 
 		first="label" 
 		last="label"
+
+		on:change={onStrokeChange}
 	/>
 	
 
@@ -316,7 +333,7 @@
 				<div>test</div>
 			</div>
 		</div>
-		
+
 	</div>
 
 

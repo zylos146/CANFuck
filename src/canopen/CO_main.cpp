@@ -33,10 +33,7 @@ CO_config_t *config_ptr = NULL;
 
 uint8_t LED_red, LED_green;
 
-volatile uint32_t coInterruptCounter = 0U;
-static void canopen_timer_task(void *arg);
-esp_timer_create_args_t coMainTaskArgs;
-esp_timer_handle_t periodicTimer;
+int64_t coLastProcessMicro = 0;
 
 void CO_linmot_b1100_TPDO_init() {
   // Disable TPDO via Number of mapped objects = 0
@@ -147,12 +144,6 @@ void app_init_communication() {
     return;
   }
 
-  /* Configure Timer interrupt function for execution every CO_MAIN_TASK_INTERVAL */
-  coMainTaskArgs.callback = &canopen_timer_task;
-  coMainTaskArgs.name = "canopen_timer_task";
-  ESP_ERROR_CHECK(esp_timer_create(&coMainTaskArgs, &periodicTimer));
-  ESP_ERROR_CHECK(esp_timer_start_periodic(periodicTimer, CANOPEN_PROCESS_INTERVAL_US));
-
   /* start CAN */
   CO_CANsetNormalMode(CO->CANmodule);
 
@@ -172,19 +163,36 @@ void canopen_main_task(void *pvParameter) {
   ESP_LOGI("task.main", "Started");
 
   while (reset != CO_RESET_APP) {
-    uint32_t coInterruptCounterPrevious = coInterruptCounter;
     app_init_communication();
     reset = CO_RESET_NOT;
 
     while (reset == CO_RESET_NOT) {
-      uint32_t coInterruptCounterCopy;
-      uint32_t coInterruptCounterDiff;
-      coInterruptCounterCopy = coInterruptCounter;
-      coInterruptCounterDiff = coInterruptCounterCopy - coInterruptCounterPrevious;
-      coInterruptCounterPrevious = coInterruptCounterCopy;
+      int64_t coLastProcessMicroDiff;
+      int64_t coLastProcessMicroNow = esp_timer_get_time();
+      coLastProcessMicroDiff = coLastProcessMicroNow - coLastProcessMicro;
+      coLastProcessMicro = coLastProcessMicroNow;
 
       //ESP_LOGI("task.main", "Processing CANOpen... %u diff cycles", coInterruptCounterDiff);
-      reset = CO_process(CO, false, coInterruptCounterDiff * 1000, NULL);
+      reset = CO_process(CO, false, coLastProcessMicroDiff, NULL);
+
+      CO_LOCK_OD(CO->CANmodule);
+      if (!CO->nodeIdUnconfigured && CO->CANmodule->CANnormal) {
+        bool_t syncWas = false;
+
+    #if (CO_CONFIG_SYNC) & CO_CONFIG_SYNC_ENABLE
+        syncWas = CO_process_SYNC(CO, coLastProcessMicroDiff, NULL);
+    #endif
+
+    #if (CO_CONFIG_PDO) & CO_CONFIG_RPDO_ENABLE
+        CO_process_RPDO(CO, syncWas, coLastProcessMicroDiff, NULL);
+    #endif
+
+    #if (CO_CONFIG_PDO) & CO_CONFIG_TPDO_ENABLE
+        CO_process_TPDO(CO, syncWas, coLastProcessMicroDiff, NULL);
+    #endif
+      }
+
+      CO_UNLOCK_OD(CO->CANmodule);
 
       vTaskDelay(CANOPEN_TASK_INTERVAL_MS / portTICK_PERIOD_MS);
     }
@@ -196,30 +204,6 @@ void canopen_main_task(void *pvParameter) {
   esp_restart();
 }
 
-static void canopen_timer_task(void *arg) {
-  coInterruptCounter++;
-
-  CO_LOCK_OD(CO->CANmodule);
-
-  if (!CO->nodeIdUnconfigured && CO->CANmodule->CANnormal) {
-    bool_t syncWas = false;
-
-#if (CO_CONFIG_SYNC) & CO_CONFIG_SYNC_ENABLE
-    syncWas = CO_process_SYNC(CO, CO_MAIN_TASK_INTERVAL, NULL);
-#endif
-
-#if (CO_CONFIG_PDO) & CO_CONFIG_RPDO_ENABLE
-    CO_process_RPDO(CO, syncWas, CO_MAIN_TASK_INTERVAL, NULL);
-#endif
-
-#if (CO_CONFIG_PDO) & CO_CONFIG_TPDO_ENABLE
-    CO_process_TPDO(CO, syncWas, CO_MAIN_TASK_INTERVAL, NULL);
-#endif
-  }
-
-  CO_UNLOCK_OD(CO->CANmodule);
-}
-
 void CO_register_tasks() {
-  xTaskCreatePinnedToCore(&canopen_main_task, "canopen_main_task", 4096, NULL, 5, NULL, 1);
+  xTaskCreatePinnedToCore(&canopen_main_task, "canopen_main_task", 4096 * 4, NULL, 2, NULL, 1);
 }

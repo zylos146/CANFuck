@@ -67,6 +67,8 @@ public:
       "/config/machine.json"
     )
   {
+    log_i("Creating CANfuck Machine Service");
+
     motor.CO_setNodeId(NODE_ID_LINMOT);
     motor.CO_setStatusUInt16(OD_ENTRY_H2110_linMotStatusUInt16);
     motor.CO_setMonitorSInt16(OD_ENTRY_H2114_linMotStatusSInt16);
@@ -85,6 +87,8 @@ public:
     addUpdateHandler([&](const String &originId)
                      { onConfigUpdated(); },
                      false);
+
+    log_i("Created CANfuck Machine Service");
   }
 
   void begin() {
@@ -112,7 +116,7 @@ public:
 
   void doHome(AsyncWebServerRequest *request)
   {
-    motor.goToHome();
+    motor.startHoming();
     request->send(200);
   }
 

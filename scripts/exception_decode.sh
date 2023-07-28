@@ -1,0 +1,1 @@
+C:\Users\Avery\.platformio\packages\toolchain-xtensa-esp32s3\bin\xtensa-esp32s3-elf-addr2line.exe -pC -e C:\Users\Avery\Projects\Fucking-Machine\CANFuck\.pio\build\canfuck\firmware.elf

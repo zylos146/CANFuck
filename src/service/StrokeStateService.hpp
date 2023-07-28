@@ -90,11 +90,13 @@ public:
     addUpdateHandler([&](const String &originId)
                      { onConfigUpdated(); },
                      false);
+    log_i("Created CANfuck Stroke Service");
   }
 
   void begin(MachineStateService* machineState) {
     this->machineState = machineState;
     engine.attachMotor(&machineState->motor);
+    log_i("Attached motor to stroke engine"); // TODO - This shoudl be moved into stroke engine
   }
 
   void onConfigUpdated() {

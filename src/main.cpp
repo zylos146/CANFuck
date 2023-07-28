@@ -16,24 +16,26 @@
 #include <service/SerialStateService.hpp>
 #include <service/MachineStateService.hpp>
 #include <service/StrokeStateService.hpp>
+#include <service/LoggingService.hpp>
 
 AsyncWebServer server(80);
 ESP32SvelteKit esp32sveltekit(&server);
 SerialStateService serialState(&server, esp32sveltekit.getSecurityManager(), esp32sveltekit.getFS());
-MachineStateService machineState(&server, esp32sveltekit.getSecurityManager());
+MachineStateService machineState(&server, esp32sveltekit.getSecurityManager(), esp32sveltekit.getFS());
 StrokeStateService strokeState(&server, esp32sveltekit.getSecurityManager());
+LoggingStateService loggingState(&server, esp32sveltekit.getSecurityManager());
 
 void setup()
 {
   Serial.begin(115200);
+  loggingState.begin();
+  server.begin();
 
   esp32sveltekit.setMDNSAppName("canfuck");
   esp32sveltekit.begin();
   serialState.begin();
-  server.begin();
+  machineState.begin();
+  strokeState.begin(&machineState); // Init StrokeEngine
 }
 
-void loop()
-{
-  esp32sveltekit.loop();
-}
+void loop() { esp32sveltekit.loop(); }

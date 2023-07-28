@@ -400,19 +400,36 @@ CO_ReturnError_t CO_CANsend(CO_CANmodule_t *CANmodule, CO_CANtx_t *buffer)
             temp_can_message.data[i] = buffer->data[i]; /* copy data from buffer in esp can message */
         }
 
-        //ESP_LOGE("CANsend", "Trace: %u, ID: %d, Data %d,%d,%d,%d,%d,%d", traceId, temp_can_message.identifier, temp_can_message.data[0], temp_can_message.data[1], temp_can_message.data[2], temp_can_message.data[3], temp_can_message.data[4], temp_can_message.data[5]);
+        ESP_LOGE("CANsend", "Trace: %u, ID: %d, Data %d,%d,%d,%d,%d,%d", traceId, temp_can_message.identifier, temp_can_message.data[0], temp_can_message.data[1], temp_can_message.data[2], temp_can_message.data[3], temp_can_message.data[4], temp_can_message.data[5]);
 
         /* Transmit esp can message.  */
         esp_err_t send_err = twai_transmit(&temp_can_message, pdMS_TO_TICKS(CAN_MS_TO_WAIT));
         if (send_err == ESP_OK)
         {
-            //ESP_LOGE("CO_CANsend", "Trace: %u, Success", traceId);
+            ESP_LOGE("CO_CANsend", "Trace: %u, Success", traceId);
             // TODO - Filter log system 
         }
         else
         {
 
 // Translate send_err into a human-readable string based on the following error codes:
+
+//#define ESP_OK          0       /*!< esp_err_t value indicating success (no error) */
+//#define ESP_FAIL        -1      /*!< Generic esp_err_t code indicating failure */
+
+//#define ESP_ERR_NO_MEM              0x101   /*!< Out of memory */
+//#define ESP_ERR_INVALID_ARG         0x102   /*!< Invalid argument */
+//#define ESP_ERR_INVALID_STATE       0x103   /*!< Invalid state */
+//#define ESP_ERR_INVALID_SIZE        0x104   /*!< Invalid size */
+//#define ESP_ERR_NOT_FOUND           0x105   /*!< Requested resource not found */
+//#define ESP_ERR_NOT_SUPPORTED       0x106   /*!< Operation or feature not supported */
+//#define ESP_ERR_TIMEOUT             0x107   /*!< Operation timed out */
+//#define ESP_ERR_INVALID_RESPONSE    0x108   /*!< Received response was invalid */
+//#define ESP_ERR_INVALID_CRC         0x109   /*!< CRC or checksum was invalid *//
+//#define ESP_ERR_INVALID_VERSION     0x10A   /*!< Version was invalid */
+//#define ESP_ERR_INVALID_MAC         0x10B   /*!< MAC address was invalid */
+//#define ESP_ERR_NOT_FINISHED        0x10C   /*!< There are items remained to retrieve */
+
 
 //#define TWAI_ALERT_TX_IDLE                  0x00000001  /**< Alert(1): No more messages to transmit */
 //#define TWAI_ALERT_TX_SUCCESS               0x00000002  /**< Alert(2): The previous transmission was successful */
@@ -587,7 +604,7 @@ void CO_CANinterrupt(void *args)
         twai_message_t temp_can_message; //ESP data type can message
         ESP_ERROR_CHECK(twai_receive(&temp_can_message, pdMS_TO_TICKS(CAN_MS_TO_WAIT)));
 
-/*
+
         ESP_LOGE(
           "CANreceive", 
           "ID: %d , Data %d,%d,%d,%d,%d,%d", 
@@ -599,7 +616,7 @@ void CO_CANinterrupt(void *args)
           temp_can_message.data[4], 
           temp_can_message.data[5]
         );
-*/
+
 
         CO_CANrxMsg_t rcvMsg;      /* pointer to received message in CAN module */
         uint16_t index;            /* index of received message */

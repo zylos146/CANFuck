@@ -38,12 +38,55 @@
 // TODO - Define parameters better
 #define LINMOT_CMD_VAI_16BIT_GO_TO_POS (0x0900)
 
+#define MOTOR_FLAG_ENABLED (1 << 0)
+
+#define MOTOR_FLAG_WARNING (1 << 1)
+#define MOTOR_FLAG_ERROR (1 << 2)
+#define MOTOR_FLAG_FATAL (1 << 3)
+
+#define MOTOR_FLAG_AT_TARGET (1 << 4)
+#define MOTOR_FLAG_MOTION_ACTIVE (1 << 5)
+#define MOTOR_FLAG_HOMED (1 << 6)
+
 class LinmotMotor: public MotorInterface {
   public:
     LinmotMotor();
-    // Motion
-    void goToHome() { this->state = MotorState::HOMING; this->removeStatusFlag(MOTOR_FLAG_HOMED); }
-    void stopMotion();
+
+    // Motor Commands
+    void powerUp() {}
+    void powerDown() {}
+
+    void startMotion() {} // Start accepting motion commands
+    void startHoming() { }
+    void stopMotion() { /* DO NOTHING */ }
+    
+    void getFault() {}
+    void clearFault() {}
+
+    // Motor State
+    bool isUnpowered() {}
+    bool isStopped() {}
+    bool isRunning() { return (this->CO_statusWord & LINMOT_STATUS_OPERATION_ENABLED) > 0; }
+    bool hasFault() {}
+
+    // TEMP
+    bool hasStatusFlag(uint32_t flag) { return (this->status & flag) > 0; }
+    
+    MotorState getState() { return this->state; }
+    bool isInState(MotorState state) { return this->state == state; }
+    const char* getStateString() {
+      if (this->state == MotorState::UNPOWERED) { return "UNPOWERED"; }
+      if (this->state == MotorState::RUNNING) { return "RUNNING"; }
+      if (this->state == MotorState::HOMING) { return "HOMING"; }
+      if (this->state == MotorState::FAULT) { return "FAULT"; }
+
+      return "UNKNOWN";
+    }
+
+    // Motor Flags
+    bool isInMotion() { return (this->CO_statusWord & LINMOT_STATUS_MOTION_ACTIVE) > 0; }
+    bool isMotionCompleted() { return this->hasStatusFlag(MOTOR_FLAG_AT_TARGET) && !this->hasStatusFlag(MOTOR_FLAG_MOTION_ACTIVE); }
+    bool isHoming();
 
     // General
     void registerTasks();
@@ -75,6 +118,11 @@ class LinmotMotor: public MotorInterface {
     void unsafeGoToPos(float position, float speed, float acceleration);
 
   private:
+    uint32_t status = 0;
+
+    void addStatusFlag(uint32_t flag) { status |= flag; }
+    void removeStatusFlag(uint32_t flag) { status &= ~flag; }
+
     uint8_t CO_nodeId;
     
     OD_entry_t *CO_statusWord_entry;
@@ -124,6 +172,7 @@ class LinmotMotor: public MotorInterface {
     uint16_t position = 0;
     bool hasInitialized = false;
     time_t lastRPDOUpdate;
+    uint8_t initAttemptCount = 0;
 };
 
 #endif
