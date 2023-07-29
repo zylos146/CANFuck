@@ -46,15 +46,6 @@ void LinmotMotor::CO_run_rpdo_received () {
   if ((statusWord & LINMOT_STATUS_ERROR) > 0) { this->addStatusFlag(MOTOR_FLAG_ERROR); } else { this->removeStatusFlag(MOTOR_FLAG_ERROR); }
   if ((statusWord & LINMOT_STATUS_FATAL_ERROR) > 0) { this->addStatusFlag(MOTOR_FLAG_FATAL); } else { this->removeStatusFlag(MOTOR_FLAG_FATAL); }
 
-  uint8_t runState = (this->CO_runWord & 0xff00) >> 8;
-  if (runState == LINMOT_STATE_ERROR) {
-    this->state = MotorState::FAULT;
-  } else if (runState == LINMOT_STATE_HOMING) {
-    this->state = MotorState::HOMING;
-  } else if (runState == LINMOT_STATE_OPERATIONAL) {
-    this->state = MotorState::RUNNING;
-  }
-
   // ESP_LOGI("task.main", "RPDO CSword %d, CRunword %d, RunState %d, CErrorword %d,  CWarnword %d, Status %d, State %d!", this->CO_statusWord, this->CO_runWord, runState, this->CO_errorWord, this->CO_warnWord, this->status, (int)this->getState());
 
   time(&this->lastRPDOUpdate);

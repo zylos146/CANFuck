@@ -27,7 +27,14 @@
 #define LINMOT_WARN_MOTOR_DRIVE_HOT (1 << 6)
 #define LINMOT_WARN_MOTOR_NOT_HOMED (1 << 7)
 
+#define LINMOT_STATE_NOT_READY_TO_SWITCH_ON (0x00)
+#define LINMOT_STATE_SWITCH_ON_DISABLED (0x01)
+#define LINMOT_STATE_READY_TO_SWITCH_ON (0x02)
+#define LINMOT_STATE_SETUP_ERROR (0x03)
 #define LINMOT_STATE_ERROR (0x04)
+#define LINMOT_STATE_HW_TESTS (0x05)
+#define LINMOT_STATE_READY_TO_OPERATE (0x06)
+#define LINMOT_STATE_UNUSED (0x07)
 #define LINMOT_STATE_OPERATIONAL (0x08)
 #define LINMOT_STATE_HOMING (0x09)
 
@@ -53,21 +60,27 @@ class LinmotMotor: public MotorInterface {
     LinmotMotor();
 
     // Motor Commands
-    void powerUp() {}
-    void powerDown() {}
+    void powerUp() {
+      MotorInterface::powerUp();
+    }
+    void powerDown() {
+      MotorInterface::powerDown();
+    }
 
-    void startMotion() {} // Start accepting motion commands
-    void startHoming() { }
-    void stopMotion() { /* DO NOTHING */ }
+    void allowMotion() {
+      MotorInterface::allowMotion();
+    } // Start accepting motion commands
+    void startHoming() {
+      MotorInterface::startHoming();
+    }
+    void stopMotion() {
+      MotorInterface::stopMotion();
+    }
     
     void getFault() {}
     void clearFault() {}
 
-    // Motor State
-    bool isUnpowered() {}
-    bool isStopped() {}
-    bool isRunning() { return (this->CO_statusWord & LINMOT_STATUS_OPERATION_ENABLED) > 0; }
-    bool hasFault() {}
+    // TODO - Sync running/etc with motor state
 
     // TEMP
     bool hasStatusFlag(uint32_t flag) { return (this->status & flag) > 0; }
@@ -86,7 +99,12 @@ class LinmotMotor: public MotorInterface {
     // Motor Flags
     bool isInMotion() { return (this->CO_statusWord & LINMOT_STATUS_MOTION_ACTIVE) > 0; }
     bool isMotionCompleted() { return this->hasStatusFlag(MOTOR_FLAG_AT_TARGET) && !this->hasStatusFlag(MOTOR_FLAG_MOTION_ACTIVE); }
+
+    bool isUnpowered();
+    bool isStopped();
+    bool isRunning();
     bool isHoming();
+    bool hasFault();
 
     // General
     void registerTasks();
@@ -115,7 +133,7 @@ class LinmotMotor: public MotorInterface {
     void task_heartbeat();
 
   protected:
-    void unsafeGoToPos(float position, float speed, float acceleration);
+    void unsafeGoToPos(MachinePosition position, float speed, float acceleration);
 
   private:
     uint32_t status = 0;

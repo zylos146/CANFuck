@@ -65,7 +65,8 @@ public:
       this, 
       fs, 
       "/config/machine.json"
-    )
+    ),
+    motor()
   {
     log_i("Creating CANfuck Machine Service");
 
@@ -76,7 +77,7 @@ public:
     motor.CO_setControl(OD_ENTRY_H2111_linMotControlWord);
     motor.CO_setCmdHeader(OD_ENTRY_H2112_linMotCMD_Header);
     motor.CO_setCmdParameters(OD_ENTRY_H2113_linMotCMD_Parameters);
-
+    
     server->on(
         MACHINE_HOME_ENDPOINT_PATH,
         HTTP_POST,
@@ -120,12 +121,11 @@ public:
     request->send(200);
   }
 
-  friend class StrokeStateService;
+  LinmotMotor motor;
 
 private:
   HttpEndpoint<MachineState> _httpEndpoint;
   FSPersistence<MachineState> _fsPersistence;
 
-  LinmotMotor motor;
   MachineGeometry bounds;
 };

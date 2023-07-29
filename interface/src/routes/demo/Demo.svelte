@@ -14,19 +14,20 @@
 	type StrokeParameters = {
 		envelope_start_mm: number;
 		envelope_end_mm: number;
-		stroke_per_min: number;
+		strokes_per_min: number;
 		sensation: number;
+    in_estop: boolean;
+    running: boolean;
 	};
 
 	let strokeParameters: StrokeParameters = {
-		envelope_start_mm: 0,
-		envelope_end_mm: 0,
-		stroke_per_min: 0,
-		sensation: 0
+		envelope_start_mm: 20,
+		envelope_end_mm: 70,
+		strokes_per_min: 10,
+		sensation: 0,
+    in_estop: true,
+    running: false
 	};
-
-	let motorEnergized = false;
-	let strokeRunning = false;
 
 	const ws_token = $page.data.features.security ? '?access_token=' + $user.bearer_token : '';
 	const strokeSocket = new WebSocket('ws://' + $page.url.host + '/ws/stroke' + ws_token);
@@ -36,7 +37,7 @@
 
 	strokeSocket.onmessage = (event) => {
 		const message = JSON.parse(event.data);
-		strokeParameters = message.payload
+		//strokeParameters = message.payload
 	};
 
 	onDestroy(() => strokeSocket.close());
@@ -50,7 +51,7 @@
 	}
 
 	function onSpeedChange(e) {
-		strokeParameters.stroke_per_min = e.detail.value
+		strokeParameters.strokes_per_min = e.detail.value
 		strokeSocket.send(JSON.stringify(strokeParameters))
 	}
 
@@ -60,18 +61,21 @@
 	}
 
 	function onEnergizeClick() {
-		motorEnergized = !motorEnergized
-		if (!motorEnergized) {
-			strokeRunning = false
+		strokeParameters.in_estop = !strokeParameters.in_estop
+		if (strokeParameters.in_estop) {
+			strokeParameters.running = false
 		}
+    
+		strokeSocket.send(JSON.stringify(strokeParameters))
 	}
 
 	function onRunningClick() {
-		if (!motorEnergized) {
+		if (strokeParameters.in_estop) {
 			return
 		}
 
-		strokeRunning = !strokeRunning
+		strokeParameters.running = !strokeParameters.running
+		strokeSocket.send(JSON.stringify(strokeParameters))
 	}
 </script>
 
@@ -239,7 +243,7 @@
 	<RangeSlider 
 		min={0}
 		max={100}
-		values={[0, 50]} 
+		values={[strokeParameters.envelope_start_mm, strokeParameters.envelope_end_mm]} 
 
 		range
 		vertical 
@@ -269,7 +273,7 @@
 	<RangeSlider 
 		min={0}
 		max={100}
-		values={[20]} 
+		values={[strokeParameters.strokes_per_min]} 
 
 		vertical
 
@@ -278,6 +282,8 @@
 
 		first="label" 
 		last="label"
+
+    on:change={onSpeedChange}
 	/>
 
 
@@ -290,9 +296,9 @@
 		</div>
 	</div>
 	<RangeSlider 
-		min={0}
+		min={-100}
 		max={100}
-		values={[70]} 
+		values={[strokeParameters.sensation]} 
 
 		vertical
 
@@ -301,6 +307,8 @@
 
 		first="label" 
 		last="label"
+
+    on:change={onSensationChange}
 	/>
 
 
@@ -309,16 +317,16 @@
 	<div class="flex flex-col ml-4 mr-4">
 		
 		<!-- Motor Control -->
-		<div class="flex button-container {motorEnergized ? 'active' : 'inactive'}">
+		<div class="flex button-container {!strokeParameters.in_estop ? 'active' : 'inactive'}">
 			<!--{#if motorEnergized}<Alert/>{/if}-->
 			<button on:click={onEnergizeClick}>
-				{motorEnergized ? 'ESTOP' : 'Energize'}
+				{!strokeParameters.in_estop ? 'ESTOP' : 'Energize'}
 			</button>
 			<!--{#if motorEnergized}<Alert/>{/if}-->
 		</div>
-		<div class="flex button-container {strokeRunning ? 'active' : 'inactive'}">
+		<div class="flex button-container {strokeParameters.running ? 'active' : 'inactive'}">
 			<button on:click={onRunningClick}>
-				{strokeRunning ? 'Pause' : 'Run'}
+				{strokeParameters.running ? 'Pause' : 'Run'}
 			</button>
 		</div>
 
