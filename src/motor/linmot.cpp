@@ -1,4 +1,5 @@
 #include "motor/linmot.hpp"
+#include "esp_log.h"
 
 void LinmotMotor::unsafeGoToPos(MachinePosition position, float speed, float acceleration) {
   if (!this->isInState(MotorState::RUNNING)) {
@@ -6,6 +7,7 @@ void LinmotMotor::unsafeGoToPos(MachinePosition position, float speed, float acc
     return;
   }
 
+  ESP_LOGD("motor", "Going to real position %05.1f mm @ %05.1f mm/s, %05.1f mm/s^2", position, speed, acceleration);
   this->CO_sendCmd(
     0x0900, 
     static_cast<uint16_t>(position * 10), 
@@ -22,7 +24,7 @@ bool LinmotMotor::isUnpowered() {
 
 bool LinmotMotor::isStopped() {
   uint8_t runState = (this->CO_runWord & 0xff00) >> 8;
-  return runState == LINMOT_STATE_OPERATIONAL;
+  return runState != LINMOT_STATE_OPERATIONAL;
 }
 
 bool LinmotMotor::isRunning() {

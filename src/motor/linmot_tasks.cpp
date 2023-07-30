@@ -21,7 +21,7 @@ void LinmotMotor::task_motion() {
   uint16_t errorWord = this->CO_errorWord;
 
   bool isEnabled = (statusWord & LINMOT_STATUS_OPERATION_ENABLED) > 0;
-  // bool isActive = (statusWord & LINMOT_STATUS_SWITCH_ON) > 0;
+  bool isActive = (statusWord & LINMOT_STATUS_SWITCH_ON) > 0;
   bool isHomed = (statusWord & LINMOT_STATUS_HOMED) > 0;
   bool isMoving = (statusWord & LINMOT_STATUS_MOTION_ACTIVE) > 0;
   bool isError = (statusWord & LINMOT_STATUS_ERROR) > 0;
@@ -54,7 +54,11 @@ void LinmotMotor::task_motion() {
     }
   }
 
-  if (!isEnabled) {
+  if (this->state == MotorState::UNPOWERED && isEnabled) {
+    ESP_LOGI("task.main", "Switching off LinMot!");
+    this->CO_control_removeFlag(LINMOT_CONTROL_SWITCH_ON);
+    vTaskDelay(50 / portTICK_PERIOD_MS);
+  } else if (this->state != MotorState::UNPOWERED && !isEnabled) {
     ESP_LOGI("task.main", "Switching on LinMot!");
 
     this->CO_control_removeFlag(LINMOT_CONTROL_SWITCH_ON);

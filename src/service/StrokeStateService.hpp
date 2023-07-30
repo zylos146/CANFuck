@@ -134,7 +134,7 @@ public:
         //machineState->motor.stopMotion();
       }
 
-      if (state.running == true && !machineState->motor.isRunning()) {
+      if (state.running == true && !engine.isActive()) {
         //machineState->motor.allowMotion();
         engine.startPattern();
       }
