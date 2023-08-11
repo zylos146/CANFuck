@@ -18,12 +18,32 @@
 #include <service/StrokeStateService.hpp>
 #include <service/LoggingService.hpp>
 
+#include <quickjs.h>
+#include "quickjs-libc.h"
+
 AsyncWebServer server(80);
 ESP32SvelteKit esp32sveltekit(&server);
 SerialStateService serialState(&server, esp32sveltekit.getSecurityManager(), esp32sveltekit.getFS());
 MachineStateService machineState(&server, esp32sveltekit.getSecurityManager(), esp32sveltekit.getFS());
 StrokeStateService strokeState(&server, esp32sveltekit.getSecurityManager());
 LoggingStateService loggingState(&server, esp32sveltekit.getSecurityManager());
+
+JSContext *js_ctx;
+void setup_js() {
+  JSRuntime *rt = JS_NewRuntime();
+  if (!rt) {
+    return;
+  }
+
+  JS_SetMemoryLimit(rt, 64 * 1024 * 1024);
+  JS_SetGCThreshold(rt, 16 * 1024 * 1024);
+
+  js_ctx = JS_NewContext(rt);
+  if (!js_ctx) {
+      JS_FreeRuntime(rt);
+      return;
+  }
+}
 
 void setup()
 {
@@ -39,6 +59,8 @@ void setup()
   serialState.begin();
   machineState.begin();
   strokeState.begin(&machineState); // Init StrokeEngine
+
+  setup_js();
 }
 
 void loop() { esp32sveltekit.loop(); }
