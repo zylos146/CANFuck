@@ -60,7 +60,7 @@ void setup()
   machineState.begin();
   strokeState.begin(&machineState); // Init StrokeEngine
 
-  setup_js();
+  //setup_js();
 }
 
 void loop() { esp32sveltekit.loop(); }
