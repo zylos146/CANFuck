@@ -111,17 +111,21 @@ public:
 
   void begin() {
     _fsPersistence.readFromFS();
-    read([&](SerialState state){ 
-      Serial2.begin(state.baudrate, state.rs_config, SERIAL_RX_PIN, SERIAL_TX_PIN);
-      
-      server = new AsyncServer(state.port);
-      server->onClient(std::bind(&SerialStateService::handleNewClient, this, std::placeholders::_1, std::placeholders::_2), server);
-      server->begin();
+    
+    // Baudrates of 0 will trigger auto-detect which S3 doesn't support
+    unsigned long baudrate = _state.baudrate;
+    if (baudrate == 0 ) {
+      baudrate = SERIAL_BAUD_RATE; // TODO - Save to FS/State properly
+    }
+    Serial2.begin(baudrate, _state.rs_config, SERIAL_RX_PIN, SERIAL_TX_PIN);
+    
+    server = new AsyncServer(_state.port);
+    server->onClient(std::bind(&SerialStateService::handleNewClient, this, std::placeholders::_1, std::placeholders::_2), server);
+    server->begin();
 
-      log_i("Bringing up Serial VCP Server @ port %u, %u hz", state.port, state.baudrate);
+    log_i("Bringing up Serial VCP Server @ port %u, %u hz", _state.port, _state.baudrate);
 
-      xTaskCreatePinnedToCore(&SerialStateService::handlePoll, "serial_task", 4096, this, 5, NULL, 1);
-    });
+    xTaskCreatePinnedToCore(&SerialStateService::handlePoll, "serial_task", 4096, this, 5, NULL, 1);
   }
 
   void handleData(void *arg, AsyncClient *client, void *data, size_t len)
