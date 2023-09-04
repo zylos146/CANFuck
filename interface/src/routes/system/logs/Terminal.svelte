@@ -7,19 +7,66 @@
 	import SettingsCard from '$lib/components/SettingsCard.svelte';
 
 	let terminalElement;
-	let terminalController;
+	let term;
 
 	function initializeXterm() {
-		terminalController = new Terminal({
+		term = new Terminal({
 			fontFamily: 'Fira Code, Iosevka, monospace',
 			fontSize: 12
 		})
 		//termFit = new FitAddon.FitAddon()
-		//terminalController.loadAddon(termFit)
-		terminalController.open(terminalElement)
+		//term.loadAddon(termFit)
+		term.open(terminalElement)
 		//termFit.fit()
-		terminalController.write('\x1b[32mHelloHelloHelloHelloHelloHelloHelloHelloHelloHelloHelloHelloHelloHelloHelloHelloHelloHello\x1b[m\r\n')
-	} 
+		//term.write('\x1b[32mHelloHelloHelloHelloHelloHelloHelloHelloHelloHelloHelloHelloHelloHelloHelloHelloHelloHello\x1b[m\r\n')
+	
+    var line = "";
+    term.write("\r\n$ ")
+    term.onData(e => {
+        for (var i = 0; i < e.length; i++) {
+            let ch = e.charAt(i);
+            if (ch === "\x7f") {
+                if (line.length > 0) {
+                    term.write('\b \b');
+                    line = line.substring(0, line.length - 1);
+                }
+            } else if (ch === "\x0d") {
+                term.write("\n\r> ");
+                //var resolveReadLine = queue.shift();
+                //resolveReadLine(line);
+                line = "";
+            } else {
+                term.write(ch);
+                line += ch;
+            }
+        }
+    });
+    /*
+    let buff = ''
+    term.write("\r\n$ ")
+    term.onData(e => {
+      const printable = !ev.altKey && !ev.altGraphKey &&
+        !ev.ctrlKey && !ev.metaKey
+
+      if (ev.keyCode === 13) {
+        //const result = calc.parse(buff).eval();
+        term.writeln('');
+        term.writeln('test');
+        term.write("\r\n$ ");
+        buff = '';
+      } else if (ev.keyCode === 8) {
+        // Do not delete the prompts
+        buff = buff.slice(0, -1);
+        if (term.buffer.cursorX > 2) {
+          term.write("\b \b");
+        }
+      } else if (printable) {
+        buff += key;
+        term.write(key);
+      }
+    });
+    */
+  } 
 	
 	onMount(async () => {
 		initializeXterm();
@@ -30,7 +77,7 @@
 	strokeSocket.onopen = (event) => {};
 
 	strokeSocket.onmessage = (event) => {
-		terminalController.write(event.data);
+		term.write(event.data);
 	};
 
 	onDestroy(() => strokeSocket.close());

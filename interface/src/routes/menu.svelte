@@ -103,6 +103,13 @@
 					active: false
 				},
 				{
+					title: 'System Scripts',
+					icon: Health,
+					href: '/system/scripts',
+					feature: true,
+					active: false
+				},
+				{
 					title: 'System Status',
 					icon: Health,
 					href: '/system/status',

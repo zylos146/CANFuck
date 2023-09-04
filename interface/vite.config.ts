@@ -12,6 +12,9 @@ const config: UserConfig = {
 		// Shorten file names for LittleFS 32 char limit
 		viteLittleFS()
 	],
+  optimizeDeps: {
+      exclude: ["codemirror", "@codemirror/language-javascript" /* ... */],
+  },
 	server: {
 		host: true,
 		proxy: {
