@@ -35,6 +35,8 @@ void setup_js() {
     return;
   }
 
+  // TODO - These memory limits are absurd
+  // See if malloc in quickjs can be swapped for PSRAM malloc to give is breathing room
   JS_SetMemoryLimit(rt, 64 * 1024 * 1024);
   JS_SetGCThreshold(rt, 16 * 1024 * 1024);
 
