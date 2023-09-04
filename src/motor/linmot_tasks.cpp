@@ -70,8 +70,10 @@ void LinmotMotor::task_motion() {
       initAttemptCount++;
     }
     
-    if (initAttemptCount > 4) {
-      vTaskDelay(2000 / portTICK_PERIOD_MS); 
+    if (initAttemptCount > 8) {
+      vTaskDelay(30000 / portTICK_PERIOD_MS); 
+    } else if (initAttemptCount > 4) {
+      vTaskDelay(10000 / portTICK_PERIOD_MS); 
     } else {
       vTaskDelay(250 / portTICK_PERIOD_MS); 
     }
@@ -113,9 +115,23 @@ void LinmotMotor::task_heartbeat() {
 
   double diff = difftime(now, this->lastRPDOUpdate);
   if (diff > 1.0) {
+    if (talkAttemptCount < 250) {
+      talkAttemptCount++;
+    }
+    
+    if (talkAttemptCount > 8) {
+      vTaskDelay(30000 / portTICK_PERIOD_MS); 
+    } else if (talkAttemptCount > 4) {
+      vTaskDelay(10000 / portTICK_PERIOD_MS); 
+    } else {
+      vTaskDelay(250 / portTICK_PERIOD_MS); 
+    }
+
     ESP_LOGE("task.main", "Error: Have not recieved LinMot RPDO in %d ms! Attempting to re-establish!", (int)(diff * 1000));
     this->state = MotorState::FAULT;
     CO_NMT_sendCommand(CO->NMT, CO_NMT_ENTER_OPERATIONAL, this->CO_nodeId);
+  } else {
+    talkAttemptCount = 0;
   }
 
   uint8_t runState = (this->CO_runWord & 0xff00) >> 8;

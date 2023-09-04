@@ -190,6 +190,8 @@ class LinmotMotor: public MotorInterface {
     uint16_t position = 0;
     bool hasInitialized = false;
     time_t lastRPDOUpdate;
+
+    uint8_t talkAttemptCount = 0;
     uint8_t initAttemptCount = 0;
 };
 
