@@ -17,6 +17,40 @@ but can be used for any other hardware.
 > <span class="mono">¶</span>&emsp;[Input/Control Methods Supported](#controllers-supported)  
 > <span class="mono">¶</span>&emsp;[Dashboard](#dashboard)  
 
+# Current State
+This repository is being actively developed and discussed on the [KinkyMakers Discord](https://t.co/NJdd6mOPO1).
+
+**Elims**, **Vampix**, and **Zylos** are the main devs working towards an improved OSSM/FuckIO/CANfuck driver for open-source sex machines.
+
+There are three improved firmwares currently active
+- CANfuck (this one)
+- [FuckIO](https://github.com/theelims/FuckIO)
+- [OSSM-Stroke](https://github.com/ortlof/OSSM-Stroke) meant to be used with the [M5Remote](https://github.com/ortlof/OSSM-M5-Remote)
+
+I'm working on polishing up the CANfuck repo. experimental/master is pushed to master now. It's still an unstable release, but it does actually work end to end under certain criteria for A1100 drivers.
+
+I have the following roadmap
+- Polish/Finish Web Controller UI
+- Polish startup/connection with LinMot
+- Add Machine Configuration and Status pages
+- Add Board Configuration page (For CANfuck vs OSSM hardware)
+- Add iHSV57 support to StrokeEngine Experimental
+- Productionize CANfuck v3 hardware so it can be assembled by JLCPCB automatically
+- Build a release/beta version with flashing instructions on both ESP32 and ESP32-S3 based setups
+- Seek out end-user testing of the software on their own machines
+
+Items on the roadmap might change order, or what they are, but I do want to try it out on other people's setups sometime soon.
+We'll have to see how soon "soon" is though, as it is still a hobby project and it takes a lot of time.
+Some of these items are entire mini-projects of themselves as well, like the CANfuck v3 hardware.
+
+I've also gotta organize a lot of this work into tickets, put it into a Github Projects or Trello board of some time.
+I also wanna write up a bunch of Github Wiki documentation on how the internals work. 
+@Draconos hardware will likely be the first test-bed of the CANfuck software on someone elses machine. I've been working with them closely for a lot of the prototyping phase and know their setup should be compatible as they have one of my CANfuck v2 prototypes.
+
+Once these steps are done and we have a stable version to build on top of, we should be able to accept user contributions a lot easier as well. I know we've got several users who are interested in contributing like @muddy.toes, among others.
+
+Of course if anyone is interested in assisting with some of these roadmap items, it will be a bit more complex, but I'd be happy to accept the help.
+
 <a name="getting-started"></a>
 # Getting Started (TODO)
 CANFuck is only meant to run on ESP32 hardware, as it has some tight integrations with in.
