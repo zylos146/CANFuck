@@ -47,7 +47,11 @@ I've also gotta organize a lot of this work into tickets, put it into a Github P
 I also wanna write up a bunch of Github Wiki documentation on how the internals work. 
 @Draconos hardware will likely be the first test-bed of the CANfuck software on someone elses machine. I've been working with them closely for a lot of the prototyping phase and know their setup should be compatible as they have one of my CANfuck v2 prototypes.
 
-Once these steps are done and we have a stable version to build on top of, we should be able to accept user contributions a lot easier as well. I know we've got several users who are interested in contributing like @muddy.toes, among others.
+
+# How can I contribute?
+Both end-users with hardware willing to test out the software, and other developers are both very much welcome.
+
+Once the above steps are done and we have a stable version to build on top of, we should be able to accept user contributions a lot easier as well. I know we've got several users who are interested in contributing like @muddy.toes, among others.
 
 Of course if anyone is interested in assisting with some of these roadmap items, it will be a bit more complex, but I'd be happy to accept the help.
 
