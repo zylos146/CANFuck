@@ -5,3 +5,6 @@
 [submodule "lib/lvgl"]
 	path = lib/lvgl
 	url = https://github.com/lvgl/lvgl.git
+[submodule "lib/CANOpenNode-ESP32"]
+	path = lib/CANOpenNode-ESP32
+	url = https://github.com/zylos146/CANOpenNode-ESP32.git
